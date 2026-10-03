@@ -1,0 +1,29 @@
+---
+import { site } from '../site.config';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap row">
+    <span class="mono muted">© {year} {site.name}</span>
+    <span class="mono muted">
+      <a href="/blog/">Research log</a> · <a href="/rss.xml">RSS</a> · <a href="https://github.com/anothernilaypatel">GitHub</a>
+    </span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--line);
+    padding: 2rem 0 2.5rem;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+  a {
+    text-decoration: none;
+  }
+</style>

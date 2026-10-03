@@ -1,0 +1,202 @@
+---
+interface Props {
+  paths?: number;
+  seed?: number;
+  /** Fade noise paths out and converge them on the signal as the parent scrolls away. */
+  converge?: boolean;
+  class?: string;
+}
+const { paths = 34, seed = 7, converge = false, class: cls } = Astro.props;
+---
+
+<canvas
+  class:list={['market', cls]}
+  data-market
+  data-paths={paths}
+  data-seed={seed}
+  data-converge={converge ? '1' : undefined}
+  aria-hidden="true"></canvas>
+
+<style>
+  .market {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { rng, gaussian } from '../lib/series';
+
+  type Path = { ys: number[]; lane: number; vol: number; depth: number; x: number };
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  function readColors() {
+    const s = getComputedStyle(document.documentElement);
+    return {
+      ink: s.getPropertyValue('--ink').trim(),
+      accent: s.getPropertyValue('--accent').trim(),
+      up: s.getPropertyValue('--up').trim(),
+      down: s.getPropertyValue('--down').trim(),
+    };
+  }
+
+  function setup(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d')!;
+    const count = Number(canvas.dataset.paths);
+    const rand = rng(Number(canvas.dataset.seed));
+    const converge = canvas.dataset.converge === '1';
+    const STEP = 7;
+    let w = 0,
+      h = 0,
+      dpr = 1,
+      colors = readColors(),
+      paths: Path[] = [],
+      signal: Path,
+      pointerY = 0.5,
+      pointerTarget = 0.5,
+      progress = 0,
+      visible = true,
+      raf = 0,
+      acc = 0,
+      last = performance.now();
+
+    const nextY = (p: Path, prev: number) => prev + 0.06 * (p.lane - prev) + p.vol * gaussian(rand);
+
+    function makePath(lane: number, vol: number, depth: number): Path {
+      const n = Math.ceil(w / STEP) + 3;
+      const p: Path = { ys: [lane], lane, vol, depth, x: 0 };
+      for (let i = 1; i < n; i++) p.ys.push(nextY(p, p.ys[i - 1]));
+      return p;
+    }
+
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      w = Math.max(1, r.width);
+      h = Math.max(1, r.height);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      paths = [];
+      for (let i = 0; i < count; i++) {
+        const lane = 0.5 + gaussian(rand) * 0.17;
+        paths.push(makePath(Math.min(0.92, Math.max(0.08, lane)), 0.006 + rand() * 0.01, 0.2 + rand() * 0.8));
+      }
+      signal = makePath(0.5, 0.012, 1);
+      draw();
+    }
+
+    function shift() {
+      for (const p of [...paths, signal]) {
+        p.ys.shift();
+        p.ys.push(nextY(p, p.ys[p.ys.length - 1]));
+      }
+    }
+
+    function line(p: Path, offset: number, conv: number) {
+      const par = (pointerY - 0.5) * 40 * p.depth;
+      ctx.beginPath();
+      for (let i = 0; i < p.ys.length; i++) {
+        const x = i * STEP - offset;
+        const y0 = p.ys[i];
+        const y = (0.5 + (y0 - 0.5) * (1 - conv)) * h + par;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      const offset = acc * STEP;
+      const conv = converge ? progress * 0.85 : 0;
+      const fade = converge ? 1 - progress * 0.9 : 1;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = colors.ink;
+      for (const p of paths) {
+        ctx.globalAlpha = (0.05 + p.depth * 0.13) * fade;
+        line(p, offset, conv);
+      }
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = colors.accent;
+      ctx.shadowColor = colors.accent;
+      ctx.shadowBlur = 14;
+      line(signal, offset, conv);
+      ctx.shadowBlur = 0;
+
+      const i = signal.ys.length - 3;
+      const hx = i * STEP - offset;
+      const hy = (0.5 + (signal.ys[i] - 0.5) * (1 - conv)) * h + (pointerY - 0.5) * 40;
+      const rising = signal.ys[i] < signal.ys[i - 6];
+      ctx.fillStyle = colors.accent;
+      ctx.beginPath();
+      ctx.arc(Math.min(hx, w - 10), hy, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = '500 11px "JetBrains Mono Variable", monospace';
+      ctx.fillStyle = rising ? colors.up : colors.down;
+      ctx.textAlign = 'right';
+      const val = (1 + (0.5 - signal.ys[i]) * 0.6).toFixed(4);
+      ctx.fillText(`${rising ? '▲' : '▼'} ${val}`, Math.min(hx, w - 10) - 10, hy - 10);
+    }
+
+    function frame(now: number) {
+      raf = 0;
+      const dt = Math.min(64, now - last);
+      last = now;
+      acc += dt / 90;
+      while (acc >= 1) {
+        acc -= 1;
+        shift();
+      }
+      pointerY += (pointerTarget - pointerY) * 0.06;
+      draw();
+      loop();
+    }
+
+    function loop() {
+      if (!raf && visible && !reduce.matches && !document.hidden) {
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+    }
+
+    new ResizeObserver(resize).observe(canvas);
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      loop();
+    }).observe(canvas);
+    document.addEventListener('visibilitychange', loop);
+    reduce.addEventListener('change', () => (reduce.matches ? draw() : loop()));
+    addEventListener('themechange', () => {
+      colors = readColors();
+      draw();
+    });
+    addEventListener(
+      'pointermove',
+      (e) => {
+        pointerTarget = e.clientY / innerHeight;
+      },
+      { passive: true },
+    );
+    if (converge) {
+      const host = canvas.parentElement!;
+      addEventListener(
+        'scroll',
+        () => {
+          const r = host.getBoundingClientRect();
+          progress = Math.min(1, Math.max(0, -r.top / r.height));
+          if (reduce.matches || !raf) draw();
+        },
+        { passive: true },
+      );
+    }
+    resize();
+    loop();
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-market]').forEach(setup);
+</script>

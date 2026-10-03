@@ -1,0 +1,75 @@
+---
+import { walk, toPath, seedFrom } from '../lib/series';
+
+interface Props {
+  seed: number | string;
+  width?: number;
+  height?: number;
+  points?: number;
+  class?: string;
+}
+const { seed, width = 160, height = 44, points = 48, class: cls } = Astro.props;
+const s = typeof seed === 'string' ? seedFrom(seed) : seed;
+const ys = walk(s, points, { drift: 0.004, vol: 0.035 });
+const d = toPath(ys, width, height);
+const up = ys[ys.length - 1] >= ys[0];
+const area = `${d}L${width} ${height}L0 ${height}Z`;
+const gid = `sg${s}`;
+---
+
+<svg
+  class:list={['spark', up ? 'up' : 'down', cls]}
+  viewBox={`0 0 ${width} ${height}`}
+  preserveAspectRatio="none"
+  aria-hidden="true">
+  <defs>
+    <linearGradient id={gid} x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="currentColor" stop-opacity=".22"></stop>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0"></stop>
+    </linearGradient>
+  </defs>
+  <path class="area" d={area} fill={`url(#${gid})`}></path>
+  <path class="ln" d={d} pathLength="1" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+</svg>
+
+<style>
+  .spark {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .up {
+    color: var(--up);
+  }
+  .down {
+    color: var(--down);
+  }
+  .ln {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  :global(.js) .ln {
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.6s var(--ease);
+  }
+  :global(.js) .area {
+    opacity: 0;
+    transition: opacity 1.2s 0.5s var(--ease);
+  }
+  :global(.is-in) .ln,
+  :global(.draw) .ln {
+    stroke-dashoffset: 0;
+  }
+  :global(.is-in) .area,
+  :global(.draw) .area {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .ln {
+      stroke-dashoffset: 0;
+    }
+    :global(.js) .area {
+      opacity: 1;
+    }
+  }
+</style>

@@ -1,0 +1,338 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Sparkline from '../../components/Sparkline.astro';
+import { getPosts, fmtDate, readingTime, type Post } from '../../lib/posts';
+import { walk, seedFrom, toPath } from '../../lib/series';
+import '../../styles/prose.css';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}
+
+interface Props {
+  post: Post;
+  posts: Post[];
+}
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+const { title, date, summary, tags, series, seriesPart } = post.data;
+
+const inSeries = series
+  ? posts.filter((p) => p.data.series === series).sort((a, b) => (a.data.seriesPart ?? 0) - (b.data.seriesPart ?? 0))
+  : [];
+const chrono = [...posts].reverse();
+const idx = chrono.findIndex((p) => p.id === post.id);
+const prev = chrono[idx - 1];
+const next = chrono[idx + 1];
+
+const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.03 }), 1000, 28, 3);
+---
+
+<Base title={title} description={summary} type="article" publishedTime={date}>
+  <div class="progress" aria-hidden="true">
+    <svg viewBox="0 0 1000 28" preserveAspectRatio="none">
+      <path class="pg-line" d={progressPath} data-progress></path>
+    </svg>
+  </div>
+
+  <article class="post">
+    <header class="post-head">
+      <div class="head-spark" aria-hidden="true"><Sparkline seed={post.id} width={800} height={200} points={90} class="draw" /></div>
+      <div class="wrap-narrow">
+        <a class="mono back" href="/blog/">← Research log</a>
+        {
+          series && (
+            <p class="kicker">
+              {series} · part {seriesPart} of {inSeries.length}
+            </p>
+          )
+        }
+        <h1>{title}</h1>
+        <p class="summary">{summary}</p>
+        <p class="meta mono muted">
+          <time datetime={date.toISOString()}>{fmtDate(date)}</time>
+          <span>·</span>
+          <span>{readingTime(post.body)} min read</span>
+          <span>·</span>
+          {tags.map((t) => <a href={`/blog/?tag=${t}`}>#{t}</a>)}
+        </p>
+      </div>
+    </header>
+
+    <div class="wrap-narrow prose" data-reveal>
+      <Content />
+    </div>
+
+    {
+      inSeries.length > 1 && (
+        <nav class="wrap-narrow series" aria-label={`${series} series`}>
+          <p class="kicker">The series</p>
+          <ol>
+            {inSeries.map((p) => (
+              <li class:list={{ current: p.id === post.id }}>
+                <a href={`/blog/${p.id}/`} aria-current={p.id === post.id ? 'page' : undefined}>
+                  <span class="mono">{String(p.data.seriesPart).padStart(2, '0')}</span>
+                  <span>{p.data.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    <nav class="wrap-narrow pager" aria-label="More entries">
+      {
+        prev ? (
+          <a class="pager-card" href={`/blog/${prev.id}/`}>
+            <span class="mono muted">← Previous</span>
+            <span class="pager-title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next ? (
+          <a class="pager-card next" href={`/blog/${next.id}/`}>
+            <span class="mono muted">Next →</span>
+            <span class="pager-title">{next.data.title}</span>
+          </a>
+        ) : (
+          <a class="pager-card next" href="/blog/">
+            <span class="mono muted">You're caught up</span>
+            <span class="pager-title">Back to the research log</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 28px;
+    z-index: 60;
+    pointer-events: none;
+  }
+  .progress svg {
+    width: 100%;
+    height: 100%;
+  }
+  .progress path {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+  }
+  .pg-line {
+    stroke: var(--accent);
+    stroke-width: 2;
+    clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0);
+    filter: drop-shadow(0 0 4px var(--accent));
+  }
+  .wrap-narrow {
+    width: min(760px, 100% - 2.5rem);
+    margin-inline: auto;
+  }
+  .post-head {
+    position: relative;
+    padding: 8.5rem 0 3rem;
+    overflow: hidden;
+  }
+  .head-spark {
+    position: absolute;
+    right: -5%;
+    top: 4rem;
+    width: 70%;
+    opacity: 0.18;
+    pointer-events: none;
+    mask-image: linear-gradient(90deg, transparent, #000 40%);
+  }
+  .post-head .wrap-narrow {
+    position: relative;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 2rem;
+    text-decoration: none;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(2.6rem, 7vw, 5rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    margin: 1rem 0 1.25rem;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  }
+  .summary {
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    color: var(--ink-2);
+    line-height: 1.4;
+    margin: 0 0 1.5rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .meta a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  :global(.js) .post-head .wrap-narrow > * {
+    animation: rise 1s var(--ease) both;
+  }
+  :global(.js) .post-head .wrap-narrow > :nth-child(3) {
+    animation-delay: 0.08s;
+  }
+  :global(.js) .post-head .wrap-narrow > :nth-child(4) {
+    animation-delay: 0.16s;
+  }
+  :global(.js) .post-head .wrap-narrow > :nth-child(5) {
+    animation-delay: 0.24s;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+  }
+
+  .series {
+    margin-top: 4rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+  }
+  .series ol {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    position: relative;
+  }
+  .series ol::before {
+    content: '';
+    position: absolute;
+    left: 0.55rem;
+    top: 0.8rem;
+    bottom: 0.8rem;
+    width: 1px;
+    background: var(--line);
+  }
+  .series a {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.55rem 0 0.55rem 2rem;
+    text-decoration: none;
+    color: var(--ink-2);
+  }
+  .series a::before {
+    content: '';
+    position: absolute;
+    left: 0.3rem;
+    top: 1.05rem;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1px solid var(--muted);
+    background: var(--surface);
+  }
+  .series .current a {
+    color: var(--ink);
+  }
+  .series .current a::before {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+  .series a:hover {
+    color: var(--accent);
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 3rem auto 6rem;
+  }
+  .pager-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    transition:
+      border-color 0.3s,
+      transform 0.4s var(--ease);
+  }
+  .pager-card:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+  .pager-card.next {
+    text-align: right;
+  }
+  .pager-title {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    line-height: 1.15;
+  }
+  @media (max-width: 640px) {
+    .pager {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const line = document.querySelector<SVGPathElement>('[data-progress]');
+  if (line) {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const p = max > 0 ? Math.min(1, scrollY / max) : 1;
+      line.style.setProperty('--p', p.toFixed(4));
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+  }
+
+  document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? '');
+        btn.textContent = 'Copied';
+      } catch {
+        btn.textContent = 'Failed';
+      }
+      setTimeout(() => (btn.textContent = 'Copy'), 1600);
+    });
+    pre.append(btn);
+  });
+</script>
