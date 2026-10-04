@@ -2,8 +2,8 @@
 
 Personal site and research log for Nilay Patel, built with [Astro](https://astro.build) + MDX and deployed to GitHub Pages by GitHub Actions.
 
-- `/`: a scroll-driven story (hero with a generative "market tape", a sticky chart that evolves chapter by chapter, about, projects, contact).
-- `/blog/`: the research log, with tag filters, series navigation, RSS (`/rss.xml`), and a sitemap.
+- `/`: hero with a generative "market tape" animation, then short about, projects, latest posts, a research-log entry band, and contact. Each section renders from `src/site.config.ts` and disappears when its config is empty.
+- `/blog/`: the research log, with series navigation, RSS (`/rss.xml`), and a sitemap. All of it is generated from the files in `src/content/blog/`.
 
 ## Run it locally
 
@@ -19,45 +19,44 @@ npm run check     # type-check .astro/.ts files
 
 ## Edit your bio, projects, and links
 
-Everything personal lives in **`src/site.config.ts`**: tagline, "Currently:" status, bio paragraphs, quick facts, projects, and contact links. Any value containing `PLACEHOLDER` is shown on the site with a dashed outline so it's obvious what's left to fill in. Search the file for `PLACEHOLDER`.
+Everything personal lives in **`src/site.config.ts`**: tagline, optional "Currently:" line, a short about, projects, and contact links.
+- An empty value (`''` or `[]`) hides that section, along with its nav link.
+- A value containing `PLACEHOLDER` is shown with a dashed outline so it's obvious what's left to fill in.
 
-The five story chapters on the home page are in `src/pages/index.astro` (the `chapters` array).
+## Write a blog post (3 steps)
 
-## Write a blog post
+1. **Create the file.** Run
 
-1. Create a folder in `src/content/blog/` named after the URL you want, with an `index.mdx` inside:
-
+   ```bash
+   npm run new-post "Pairs trading with cointegration"
    ```
-   src/content/blog/my-new-post/index.mdx   ->  /blog/my-new-post/
-   ```
 
-2. Start the file with frontmatter:
+   This creates `src/content/blog/pairs-trading-with-cointegration.mdx` from `src/content/post-template.mdx`, with the title and today's date filled in. You can also copy the template by hand; the file name becomes the URL (`/blog/pairs-trading-with-cointegration/`).
+
+2. **Write it.** Only `title` and `date` are required:
 
    ```mdx
    ---
    title: Pairs trading with cointegration
    date: 2026-10-01
-   summary: One-sentence teaser shown on the blog index and in link previews.
-   tags: [stat-arb, backtesting]
-   series: Hedge fund from scratch   # optional
-   seriesPart: 5                     # optional, orders the series nav
-   draft: false                      # true = visible in `npm run dev` only
+   description: Optional teaser for the blog index, RSS, and link previews (defaults to the opening of the post).
+   cover: ./pairs-trading-with-cointegration/cover.png   # optional
+   series: Hedge fund from scratch                       # optional, adds "part n of N" navigation
+   draft: true                                           # optional, only visible in `npm run dev`
    ---
    ```
 
-3. Write Markdown below it. Extras that work out of the box:
-   - **Code**: fenced blocks with a language (` ```python `) get syntax highlighting and a copy button.
-   - **Math**: `$\sigma\sqrt{t}$` inline, or `$$ ... $$` on its own lines (KaTeX).
-   - **Charts and images**: put the file next to `index.mdx` and use the `Figure` component, which optimises the image, numbers it, and adds click-to-enlarge:
+   Then write Markdown. Images go in a folder named after the post (`src/content/blog/pairs-trading-with-cointegration/`). Put an image on its own line, and the quoted text becomes a numbered, click-to-enlarge figure:
 
-     ```mdx
-     import Figure from '../../../components/Figure.astro';
-     import equity from './equity-curve.png';
+   ```md
+   ![What the chart shows](./pairs-trading-with-cointegration/spread.png "Caption under the figure.")
+   ```
 
-     <Figure src={equity} alt="Describe what the chart shows" caption="Caption under the figure." />
-     ```
+   Fenced code blocks get syntax highlighting and a copy button. `$...$` and `$$...$$` render as math.
 
-4. Preview with `npm run dev`, then commit and push to `main`. The deploy workflow builds and publishes the site in a couple of minutes.
+3. **Publish.** Preview with `npm run dev`, then commit and push to `main`.
+
+Nothing else needs editing. The home page's latest posts, the blog index, series navigation, RSS, and sitemap all update from the posts folder. Files whose names start with `_` are ignored.
 
 ## Deployment
 
@@ -71,13 +70,15 @@ The old site was a Flutter web app with a service worker. `public/flutter_servic
 
 ```
 src/
-  site.config.ts        bio, projects, links (edit me)
-  content/blog/         posts, one folder each (index.mdx + images)
-  pages/                index, blog index, post template, rss, 404
-  components/           MarketField (hero canvas), Story (sticky chart), Ticker, Sparkline, Figure, Nav, Footer
+  site.config.ts        tagline, about, projects, links (edit me)
+  content/blog/         posts: <slug>.mdx, plus an optional <slug>/ folder for images
+  content/post-template.mdx
+  pages/                home, blog index, post page, rss, 404
+  components/           MarketField (hero canvas), Sparkline, Nav, Footer
   layouts/Base.astro    <head>, SEO/Open Graph tags, theme handling
   styles/               global.css (tokens, light/dark), prose.css (post typography)
-  lib/                  seeded random walks for the visuals, post helpers
+  lib/                  seeded random walks for the visuals, post helpers, rehype figure plugin
+scripts/new-post.mjs    `npm run new-post "Title"`
 public/                 favicon, og.jpg, robots.txt, Flutter service-worker cleanup
 ```
 
