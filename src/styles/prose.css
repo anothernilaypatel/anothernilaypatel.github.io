@@ -147,3 +147,103 @@
   overflow-x: auto;
   padding: 0.5em 0;
 }
+
+/* Figures: `![alt](./img.png "Caption")` on its own line (see src/lib/rehype-figure.mjs). */
+.prose {
+  counter-reset: fig;
+}
+.prose figure {
+  margin: 2.5rem 0;
+}
+.prose figure img,
+.prose .fig-frame {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.prose figure > img,
+.prose .fig-frame {
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.prose .fig-frame {
+  position: relative;
+  cursor: zoom-in;
+  transition:
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.prose .fig-frame img {
+  border-radius: 4px;
+}
+.prose .fig-frame::after {
+  content: '⤢ enlarge';
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: #111;
+  color: #eee;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.prose .fig-frame:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 60px -30px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.prose .fig-frame:hover::after,
+.prose .fig-frame:focus-visible::after {
+  opacity: 1;
+}
+.prose figcaption {
+  margin-top: 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.prose figcaption::before {
+  counter-increment: fig;
+  content: 'FIG.' counter(fig, decimal-leading-zero);
+  margin-right: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.fig-dialog {
+  max-width: 96vw;
+  max-height: 94vh;
+  padding: 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper);
+}
+.fig-dialog::backdrop {
+  background: rgb(0 0 0 / 0.8);
+  backdrop-filter: blur(4px);
+}
+.fig-dialog img {
+  display: block;
+  max-height: calc(94vh - 4rem);
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+.fig-close {
+  display: block;
+  margin: 0 0 0.6rem auto;
+  border: 0;
+  background: none;
+  color: #222;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+}

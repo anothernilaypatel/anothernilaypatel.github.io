@@ -1,0 +1,32 @@
+---
+title: Your post title
+date: 2026-01-01
+description: One sentence shown on the blog index, in RSS, and in link previews. Optional; defaults to the opening of the post.
+# cover: ./your-post-slug/cover.png   # optional image for the post header, blog index, and link previews
+# series: Hedge fund from scratch     # optional; posts sharing a series get "part n of N" navigation, ordered by date
+# draft: true                         # optional; hides the post everywhere except `npm run dev`
+---
+
+Write in Markdown. The first paragraph gets a drop cap.
+
+## A section heading
+
+Code blocks get syntax highlighting and a copy button:
+
+```python
+import pandas as pd
+returns = prices.pct_change().dropna()
+```
+
+Math works inline, like $\sigma\sqrt{t}$, or as a block:
+
+$$
+\text{Sharpe} = \frac{E[R_p - R_f]}{\sigma_p}
+$$
+
+{/*
+  Images: put them in src/content/blog/your-post-slug/ and reference them on their own line.
+  The quoted text becomes a numbered caption, and readers can click to enlarge:
+
+  ![Describe what the chart shows, for screen readers](./your-post-slug/chart.png "Caption shown under the figure.")
+*/}

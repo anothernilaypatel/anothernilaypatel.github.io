@@ -1,71 +1,63 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import MarketField from '../../components/MarketField.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime } from '../../lib/posts';
+import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf } from '../../lib/posts';
+import { site } from '../../site.config';
 
 const posts = await getPosts();
-const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
-const series = [...new Set(posts.map((p) => p.data.series).filter(Boolean))];
+const oldest = posts.at(-1);
 ---
 
-<Base title="Research log" description="Nilay Patel's research log: building a hedge fund from scratch, FX backtests, momentum signals, and post-mortems.">
+<Base title="Research log" description={site.blogIntro}>
   <section class="head">
     <MarketField paths={22} seed={19} />
     <div class="head-veil" aria-hidden="true"></div>
     <div class="wrap head-inner">
       <a class="mono back" href="/">← Home</a>
-      <p class="kicker">anothernilaypatel / research log</p>
+      <p class="kicker">{site.handle} / research log</p>
       <h1>Research <em>log</em></h1>
-      <p class="lede">
-        Notes from building a hedge fund from scratch as a student: data sources, backtests, signals that worked, and the things that broke.
-      </p>
+      <p class="lede">{site.blogIntro}</p>
       <dl class="meta mono">
         <div><dt class="muted">Entries</dt><dd>{posts.length}</dd></div>
-        <div><dt class="muted">Series</dt><dd>{series.length}</dd></div>
-        <div><dt class="muted">Since</dt><dd>{posts.at(-1) && fmtDate(posts.at(-1)!.data.date)}</dd></div>
+        {oldest && <div><dt class="muted">Since</dt><dd>{fmtDate(oldest.data.date)}</dd></div>}
         <div><dt class="muted">Feed</dt><dd><a href="/rss.xml">RSS ↗</a></dd></div>
       </dl>
     </div>
   </section>
 
   <section class="wrap list-wrap" aria-label="Posts">
-    <div class="filters" role="group" aria-label="Filter by tag" data-filters hidden>
-      <button type="button" class="chip mono" aria-pressed="true" data-tag="">All</button>
-      {
-        tags.map((t) => (
-          <button type="button" class="chip mono" aria-pressed="false" data-tag={t}>
-            #{t}
-          </button>
-        ))
-      }
-    </div>
-
-    <ol class="posts" data-posts>
+    {posts.length === 0 && <p class="empty muted mono">First entry coming soon.</p>}
+    <ol class="posts">
       {
         posts.map((p, i) => {
+          const { parts, index } = seriesOf(p, posts);
           return (
-            <li class="post" data-reveal data-tags={p.data.tags.join(' ')} style={`--d:${i}`}>
-              <a href={`/blog/${p.id}/`} class="post-link" data-spot>
+            <li class="post" data-reveal style={`--d:${Math.min(i, 6)}`}>
+              <a href={postUrl(p)} class="post-link" data-spot>
                 <span class="post-num mono" aria-hidden="true">
-                  {String(p.data.seriesPart ?? posts.length - i).padStart(2, '0')}
+                  {String(posts.length - i).padStart(2, '0')}
                 </span>
                 <span class="post-main">
                   <span class="post-meta mono muted">
                     <time datetime={p.data.date.toISOString()}>{fmtDate(p.data.date)}</time>
                     <span>· {readingTime(p.body)} min</span>
-                    {p.data.series && <span class="post-series">· {p.data.series} {p.data.seriesPart && `pt. ${p.data.seriesPart}`}</span>}
+                    {parts.length > 1 && (
+                      <span class="post-series">
+                        · {p.data.series} {index}/{parts.length}
+                      </span>
+                    )}
                   </span>
                   <span class="post-title">{p.data.title}</span>
-                  <span class="post-summary">{p.data.summary}</span>
-                  <span class="post-tags mono">
-                    {p.data.tags.map((t) => (
-                      <span>#{t}</span>
-                    ))}
-                  </span>
+                  <span class="post-summary">{describe(p)}</span>
                 </span>
                 <span class="post-chart" aria-hidden="true">
-                  <Sparkline seed={p.id} width={180} height={56} />
+                  {p.data.cover ? (
+                    <Image src={p.data.cover} alt="" width={360} class="post-cover" />
+                  ) : (
+                    <Sparkline seed={p.id} width={180} height={56} />
+                  )}
                 </span>
               </a>
             </li>
@@ -73,7 +65,6 @@ const series = [...new Set(posts.map((p) => p.data.series).filter(Boolean))];
         })
       }
     </ol>
-    <p class="empty muted mono" data-empty hidden>No entries with that tag yet.</p>
   </section>
 </Base>
 
@@ -136,42 +127,11 @@ const series = [...new Set(posts.map((p) => p.data.series).filter(Boolean))];
   .list-wrap {
     padding: 3rem 0 6rem;
   }
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-  }
-  .filters[hidden] {
-    display: none;
-  }
-  .chip {
-    padding: 0.45rem 0.85rem;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--ink-2);
-    font-size: 0.7rem;
-    cursor: pointer;
-    transition: all 0.25s var(--ease);
-  }
-  .chip:hover {
-    border-color: var(--ink-2);
-    color: var(--ink);
-  }
-  .chip[aria-pressed='true'] {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-ink);
-  }
   .posts {
     list-style: none;
     margin: 0;
     padding: 0;
     border-top: 1px solid var(--line);
-  }
-  .post[hidden] {
-    display: none;
   }
   .post-link {
     position: relative;
@@ -241,12 +201,13 @@ const series = [...new Set(posts.map((p) => p.data.series).filter(Boolean))];
     color: var(--ink-2);
     max-width: 40rem;
   }
-  .post-tags {
-    display: flex;
-    gap: 0.8rem;
-    font-size: 0.68rem;
-    color: var(--accent);
-    text-transform: none;
+  :global(.post-cover) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--line);
   }
   .post-chart {
     display: flex;
@@ -285,32 +246,6 @@ const series = [...new Set(posts.map((p) => p.data.series).filter(Boolean))];
 </style>
 
 <script>
-  const filters = document.querySelector<HTMLElement>('[data-filters]')!;
-  const items = [...document.querySelectorAll<HTMLElement>('[data-posts] > li')];
-  const empty = document.querySelector<HTMLElement>('[data-empty]')!;
-  const chips = [...filters.querySelectorAll<HTMLButtonElement>('[data-tag]')];
-  filters.hidden = false;
-
-  const apply = (tag: string) => {
-    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.tag === tag)));
-    let shown = 0;
-    for (const li of items) {
-      const match = !tag || li.dataset.tags!.split(' ').includes(tag);
-      li.hidden = !match;
-      if (match) {
-        shown++;
-        li.classList.add('is-in');
-      }
-    }
-    empty.hidden = shown > 0;
-    const url = new URL(location.href);
-    tag ? url.searchParams.set('tag', tag) : url.searchParams.delete('tag');
-    history.replaceState(null, '', url);
-  };
-  chips.forEach((c) => c.addEventListener('click', () => apply(c.dataset.tag!)));
-  const initial = new URL(location.href).searchParams.get('tag');
-  if (initial && chips.some((c) => c.dataset.tag === initial)) apply(initial);
-
   document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
     el.addEventListener('pointermove', (e) => {
       const r = el.getBoundingClientRect();

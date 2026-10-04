@@ -1,14 +1,9 @@
 ---
 title: The Crash...
 date: 2025-02-20
-summary: Just as things were picking up, I face a huge setback.
-tags: [data, yfinance, postmortem]
+description: Just as things were picking up, I face a huge setback.
 series: Hedge fund from scratch
-seriesPart: 4
 ---
-
-import Figure from '../../../components/Figure.astro';
-import heatmap from './intraday-overnight-heatmap.png';
 
 It all came crashing down... I was using a (soon-to-be) deprecated function in the yfinance API, and today (or within the past week) was the day that those functions were removed.
 
@@ -16,10 +11,6 @@ All of my scripts use yfinance, and this impacts too many of them: from my tech-
 
 I have attached some proof that I have been analyzing and optimizing older strategies, but I cannot prove it at the moment.
 
-<Figure
-  src={heatmap}
-  alt="Heatmap of intraday category (very down, down, up, very up) against overnight category. Most mass sits in the overnight 'down' and 'up' columns at roughly 38 to 49 percent each, with under 11 percent in the 'very' columns."
-  caption="Intraday vs. overnight direction, bucketed by standard-deviation category (percent of days)."
-/>
+![Heatmap of intraday category (very down, down, up, very up) against overnight category. Most mass sits in the overnight 'down' and 'up' columns at roughly 38 to 49 percent each, with under 11 percent in the 'very' columns.](./the-crash/intraday-overnight-heatmap.png "Intraday vs. overnight direction, bucketed by standard-deviation category (percent of days).")
 
 On the plus side, once I fix this, I feel ready to tackle q and Julia for the projects I am wanting to implement.

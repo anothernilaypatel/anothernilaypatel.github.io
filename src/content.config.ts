@@ -3,16 +3,15 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 const blog = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
+  // Files starting with "_" are ignored, so they can be used for scratch drafts.
+  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/blog' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
       date: z.coerce.date(),
-      summary: z.string(),
-      tags: z.array(z.string()).default([]),
-      series: z.string().optional(),
-      seriesPart: z.number().optional(),
+      description: z.string().optional(),
       cover: image().optional(),
+      series: z.string().optional(),
       draft: z.boolean().default(false),
     }),
 });

@@ -1,8 +1,9 @@
 ---
 import { render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime, type Post } from '../../lib/posts';
+import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, type Post } from '../../lib/posts';
 import { walk, seedFrom, toPath } from '../../lib/series';
 import '../../styles/prose.css';
 
@@ -17,11 +18,10 @@ interface Props {
 }
 const { post, posts } = Astro.props;
 const { Content } = await render(post);
-const { title, date, summary, tags, series, seriesPart } = post.data;
-
-const inSeries = series
-  ? posts.filter((p) => p.data.series === series).sort((a, b) => (a.data.seriesPart ?? 0) - (b.data.seriesPart ?? 0))
-  : [];
+const { title, date, series, cover } = post.data;
+const summary = describe(post);
+const { parts: inSeries, index: seriesIndex } = seriesOf(post, posts);
+const ogImage = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg' })).src : undefined;
 const chrono = [...posts].reverse();
 const idx = chrono.findIndex((p) => p.id === post.id);
 const prev = chrono[idx - 1];
@@ -30,7 +30,7 @@ const next = chrono[idx + 1];
 const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.03 }), 1000, 28, 3);
 ---
 
-<Base title={title} description={summary} type="article" publishedTime={date}>
+<Base title={title} description={summary} type="article" publishedTime={date} image={ogImage}>
   <div class="progress" aria-hidden="true">
     <svg viewBox="0 0 1000 28" preserveAspectRatio="none">
       <path class="pg-line" d={progressPath} data-progress></path>
@@ -43,9 +43,9 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
       <div class="wrap-narrow">
         <a class="mono back" href="/blog/">← Research log</a>
         {
-          series && (
+          inSeries.length > 1 && (
             <p class="kicker">
-              {series} · part {seriesPart} of {inSeries.length}
+              {series} · part {seriesIndex} of {inSeries.length}
             </p>
           )
         }
@@ -55,10 +55,15 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
           <time datetime={date.toISOString()}>{fmtDate(date)}</time>
           <span>·</span>
           <span>{readingTime(post.body)} min read</span>
-          <span>·</span>
-          {tags.map((t) => <a href={`/blog/?tag=${t}`}>#{t}</a>)}
         </p>
       </div>
+      {
+        cover && (
+          <div class="wrap-narrow cover">
+            <Image src={cover} alt="" widths={[760, 1520]} sizes="(max-width: 800px) 100vw, 760px" loading="eager" />
+          </div>
+        )
+      }
     </header>
 
     <div class="wrap-narrow prose" data-reveal>
@@ -70,10 +75,10 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
         <nav class="wrap-narrow series" aria-label={`${series} series`}>
           <p class="kicker">The series</p>
           <ol>
-            {inSeries.map((p) => (
+            {inSeries.map((p, i) => (
               <li class:list={{ current: p.id === post.id }}>
-                <a href={`/blog/${p.id}/`} aria-current={p.id === post.id ? 'page' : undefined}>
-                  <span class="mono">{String(p.data.seriesPart).padStart(2, '0')}</span>
+                <a href={postUrl(p)} aria-current={p.id === post.id ? 'page' : undefined}>
+                  <span class="mono">{String(i + 1).padStart(2, '0')}</span>
                   <span>{p.data.title}</span>
                 </a>
               </li>
@@ -86,7 +91,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     <nav class="wrap-narrow pager" aria-label="More entries">
       {
         prev ? (
-          <a class="pager-card" href={`/blog/${prev.id}/`}>
+          <a class="pager-card" href={postUrl(prev)}>
             <span class="mono muted">← Previous</span>
             <span class="pager-title">{prev.data.title}</span>
           </a>
@@ -96,7 +101,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
       }
       {
         next ? (
-          <a class="pager-card next" href={`/blog/${next.id}/`}>
+          <a class="pager-card next" href={postUrl(next)}>
             <span class="mono muted">Next →</span>
             <span class="pager-title">{next.data.title}</span>
           </a>
@@ -181,9 +186,14 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     padding-bottom: 2rem;
     border-bottom: 1px solid var(--line);
   }
-  .meta a {
-    color: var(--accent);
-    text-decoration: none;
+  .cover {
+    margin-top: 2.5rem;
+  }
+  .cover :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--line);
   }
   :global(.js) .post-head .wrap-narrow > * {
     animation: rise 1s var(--ease) both;
@@ -334,5 +344,27 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
       setTimeout(() => (btn.textContent = 'Copy'), 1600);
     });
     pre.append(btn);
+  });
+
+  const dialog = document.createElement('dialog');
+  dialog.className = 'fig-dialog';
+  dialog.innerHTML = '<form method="dialog"><button class="fig-close" aria-label="Close">close ✕</button></form>';
+  document.body.append(dialog);
+  dialog.addEventListener('click', (e) => e.target === dialog && dialog.close());
+  document.querySelectorAll<HTMLImageElement>('.prose figure img').forEach((img) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'fig-frame';
+    btn.setAttribute('aria-label', `Enlarge figure: ${img.alt}`);
+    img.replaceWith(btn);
+    btn.append(img);
+    btn.addEventListener('click', () => {
+      dialog.querySelector('img')?.remove();
+      const big = img.cloneNode() as HTMLImageElement;
+      big.removeAttribute('sizes');
+      big.removeAttribute('loading');
+      dialog.append(big);
+      dialog.showModal();
+    });
   });
 </script>
