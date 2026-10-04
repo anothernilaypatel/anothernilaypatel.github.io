@@ -1,0 +1,12 @@
+---
+title: Derivatives Implementation (FRED)
+date: 2025-02-10
+description: Upgrading the algorithms for foreign exchange trading.
+series: Hedge fund from scratch
+---
+
+Now that I have the basic implementation with FRED complete, I dove into implementing a Greeks derivative analysis into the USD/EUR market.
+
+![Three stacked charts. Top: EUR/USD with a 50-day moving average. Middle: the first derivative and a 5-day smoothed derivative as momentum measures. Bottom: cumulative returns, where the blended strategy with a trailing stop peaks near 9 in 2015 and ends around 5.5, versus flat buy-and-hold.](./derivatives-implementation/eurusd-derivative-momentum.png "EUR/USD and its 50-day MA, derivative-based momentum measures, and cumulative returns of the blended strategy with a trailing stop.")
+
+After implementing this, I realized that there is a lot to mess around with. There are plenty of variables that I can optimize. It tends to follow a similar approach to the SMA implementation, which is not intrinsically bad. The trading looks less sporadic, but still cannot optimize large upswings/downswings.

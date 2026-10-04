@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anothernilaypatel.github.io/sitemap-index.xml

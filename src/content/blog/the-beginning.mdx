@@ -1,0 +1,25 @@
+---
+title: The Beginning (FRED)
+date: 2025-01-28
+description: Researching the framework for my quantitative finance project using FRED.
+series: Hedge fund from scratch
+---
+
+This marks the start of my journey for building a full-scale hedge fund! This blog will track how I go from nothing to a systematic process of investment. I'm still a university student, so the final scope might be scaled down, but practice is invaluable. Special thanks to Professor Weijie Pang for guidance.
+
+As a start, I'm investigating the world of foreign exchange with currencies. I'm not certain about a strategy yet, so I'll begin by exploring the [FRED API](https://fred.stlouisfed.org/docs/api/fred/) for data, which has information going all the way back to 1962.
+
+```python
+from fredapi import Fred
+fred = Fred(api_key=API_KEY)
+```
+
+After that comes downloading the necessary data from the FRED API. Below is a snippet demonstrating how I pull and sort a EUR/USD series.
+
+```python
+eurusd_series_id = "DEXUSEU"
+eurusd_data = fred.get_series(eurusd_series_id).sort_index()
+eurusd_data.name = "EURUSD"
+```
+
+Although it's important to formulate a trading strategy, I'm first focusing on getting comfortable with the FRED API. Its documentation can be a bit sparse, so some trial and error may be necessary to see all it offers.

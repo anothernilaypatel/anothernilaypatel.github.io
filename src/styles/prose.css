@@ -1,0 +1,249 @@
+.prose {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.prose > * + * {
+  margin-top: 1.4em;
+}
+
+.prose p {
+  margin: 0;
+}
+.prose p + p {
+  margin-top: 1.25em;
+}
+
+.prose > p:first-child::first-letter {
+  float: left;
+  font-family: var(--serif);
+  font-size: 4.2em;
+  line-height: 0.85;
+  padding: 0.08em 0.12em 0 0;
+  color: var(--accent);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+}
+
+.prose h2,
+.prose h3 {
+  color: var(--ink);
+  margin-top: 2.2em;
+}
+.prose h2 {
+  font-size: 2rem;
+}
+.prose h3 {
+  font-size: 1.5rem;
+}
+
+.prose a {
+  color: var(--ink);
+  text-decoration-color: var(--accent);
+}
+
+.prose strong {
+  color: var(--ink);
+}
+
+.prose blockquote {
+  margin: 2em 0;
+  padding: 0.2em 0 0.2em 1.4em;
+  border-left: 2px solid var(--accent);
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.3em;
+}
+.prose li::marker {
+  color: var(--accent);
+}
+
+.prose :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  padding: 0.12em 0.4em;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.prose pre {
+  position: relative;
+  margin: 2em 0;
+  padding: 2.6rem 1.25rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  background: var(--surface) !important;
+}
+.prose pre::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.75rem;
+  left: 1.25rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.prose pre::after {
+  content: '● ● ●';
+  position: absolute;
+  top: 0.7rem;
+  right: 1.25rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--line);
+}
+.prose pre code {
+  font-family: inherit;
+}
+
+/* Shiki dual themes (defaultColor: false) */
+.prose pre span {
+  color: var(--shiki-dark);
+}
+:root[data-theme='light'] .prose pre span {
+  color: var(--shiki-light);
+}
+
+.prose .copy {
+  position: absolute;
+  top: 0.55rem;
+  right: 4.2rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.prose .copy:hover {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+
+.prose hr {
+  border: 0;
+  height: 1px;
+  background: var(--line);
+  margin: 3em 0;
+}
+
+.prose .katex-display {
+  overflow-x: auto;
+  padding: 0.5em 0;
+}
+
+/* Figures: `![alt](./img.png "Caption")` on its own line (see src/lib/rehype-figure.mjs). */
+.prose {
+  counter-reset: fig;
+}
+.prose figure {
+  margin: 2.5rem 0;
+}
+.prose figure img,
+.prose .fig-frame {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.prose figure > img,
+.prose .fig-frame {
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.prose .fig-frame {
+  position: relative;
+  cursor: zoom-in;
+  transition:
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.prose .fig-frame img {
+  border-radius: 4px;
+}
+.prose .fig-frame::after {
+  content: '⤢ enlarge';
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: #111;
+  color: #eee;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.prose .fig-frame:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 60px -30px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.prose .fig-frame:hover::after,
+.prose .fig-frame:focus-visible::after {
+  opacity: 1;
+}
+.prose figcaption {
+  margin-top: 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.prose figcaption::before {
+  counter-increment: fig;
+  content: 'FIG.' counter(fig, decimal-leading-zero);
+  margin-right: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.fig-dialog {
+  max-width: 96vw;
+  max-height: 94vh;
+  padding: 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper);
+}
+.fig-dialog::backdrop {
+  background: rgb(0 0 0 / 0.8);
+  backdrop-filter: blur(4px);
+}
+.fig-dialog img {
+  display: block;
+  max-height: calc(94vh - 4rem);
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+.fig-close {
+  display: block;
+  margin: 0 0 0.6rem auto;
+  border: 0;
+  background: none;
+  color: #222;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+}

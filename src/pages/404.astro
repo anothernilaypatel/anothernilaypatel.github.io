@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import MarketField from '../components/MarketField.astro';
+---
+
+<Base title="Not found">
+  <section class="nf">
+    <MarketField paths={18} seed={404} />
+    <div class="wrap inner">
+      <p class="kicker">Error 404 · position not found</p>
+      <h1>Off the chart.</h1>
+      <p class="muted">This page doesn't exist (or got delisted).</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="/">Back home <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn" href="/blog/">Research log</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    position: relative;
+    min-height: 90svh;
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+  }
+  .inner {
+    position: relative;
+  }
+  h1 {
+    font-size: clamp(3rem, 10vw, 7rem);
+    margin: 1rem 0;
+  }
+  .cta {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+</style>
