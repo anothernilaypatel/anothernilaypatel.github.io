@@ -1,75 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
 import MarketField from '../components/MarketField.astro';
-import Ticker from '../components/Ticker.astro';
-import Story, { type Chapter } from '../components/Story.astro';
 import Sparkline from '../components/Sparkline.astro';
-import { site, isPlaceholder } from '../site.config';
-import { getPosts, fmtDate } from '../lib/posts';
+import { site, isPlaceholder, visibleLinks } from '../site.config';
+import { getPosts, fmtDate, postUrl } from '../lib/posts';
 
 const posts = await getPosts();
 const latest = posts.slice(0, 3);
-const href = (id: string) => `/blog/${id}/`;
-const bySeries = (n: number) => posts.find((p) => p.data.seriesPart === n);
-
-const chapters: Chapter[] = [
-  {
-    num: '01',
-    date: 'Jan 2025',
-    title: 'The dare',
-    body: 'As a university student I set myself a slightly absurd goal: build a full-scale hedge fund from nothing, in public. Step one was boring on purpose: learn the FRED API and pull EUR/USD data going back decades.',
-    fig: 'FIG.01 — raw EUR/USD, daily',
-    href: bySeries(1) && href(bySeries(1)!.id),
-  },
-  {
-    num: '02',
-    date: 'Feb 3, 2025',
-    title: 'A first signal',
-    body: 'A simple moving-average backtest. It works the way stock strategies work, which is exactly the problem: a currency pair is two economies pulling against each other, not one company.',
-    fig: 'FIG.02 — price vs. 30-day moving average',
-    href: bySeries(2) && href(bySeries(2)!.id),
-  },
-  {
-    num: '03',
-    date: 'Feb 10, 2025',
-    title: 'Chasing momentum',
-    body: 'Derivatives of the moving average became a momentum signal, blended with a trailing stop. Fewer sporadic trades, lots of knobs to tune, and big swings still slipped through.',
-    fig: 'FIG.03 — smoothed first derivative',
-    href: bySeries(3) && href(bySeries(3)!.id),
-  },
-  {
-    num: '04',
-    date: 'Feb 20, 2025',
-    title: 'The crash',
-    body: 'yfinance removed the functions every script depended on: the MACD z-score model, the overnight options study, the FX derivatives work. All of it broke in one week. A drawdown of a different kind.',
-    fig: 'FIG.04 — dependency failure',
-    href: bySeries(4) && href(bySeries(4)!.id),
-  },
-  {
-    num: '05',
-    date: 'Next',
-    title: 'Rebuild, faster',
-    body: 'Fix the data layer, then move the research into q and Julia, where speed and time-series tooling are first-class. The fan on the left is every way this could go.',
-    fig: 'FIG.05 — forward paths',
-  },
-];
-
-const ticker = [
-  { label: 'Research log', value: `${posts.length} entries`, dir: 'up' as const },
-  { label: 'Strategies tested', value: '3' },
-  { label: 'Data since', value: '1962 (FRED)' },
-  { label: 'Pair', value: 'EUR/USD' },
-  { label: 'APIs that broke', value: '1', dir: 'down' as const },
-  { label: 'Next', value: 'q · Julia' },
-  { label: 'Currently', value: isPlaceholder(site.currently) ? 'TBD' : site.currently },
-];
-
-const stats = [
-  { n: posts.length, label: 'Research entries' },
-  { n: 3, label: 'Strategies backtested' },
-  { n: 1962, label: 'Earliest data point' },
-  { n: 25, label: 'Years of EUR/USD tested' },
-];
+const show = {
+  about: !!site.about,
+  work: site.projects.length > 0,
+  writing: posts.length > 0,
+  contact: visibleLinks.length > 0,
+};
+const firstSection = (['about', 'work', 'writing', 'contact'] as const).find((k) => show[k]);
 ---
 
 <Base>
@@ -77,16 +21,32 @@ const stats = [
     <MarketField converge paths={36} />
     <div class="hero-veil" aria-hidden="true"></div>
     <div class="wrap hero-inner">
-      <p class="kicker hero-kicker">anothernilaypatel · research desk · est. 2025</p>
-      <h1 class="hero-name">Nilay<br /><span>Patel</span></h1>
+      <p class="kicker hero-kicker">{site.handle} · research desk</p>
+      <h1 class="hero-name">{site.name.split(' ')[0]}<br /><span>{site.name.split(' ').slice(1).join(' ')}</span></h1>
       <p class="hero-tag">{site.tagline}</p>
-      <p class:list={['mono', 'hero-now', { ph: isPlaceholder(site.currently) }]}>
-        <span class="now-dot" aria-hidden="true"></span>
-        Currently: {site.currently}
-      </p>
+      {
+        site.currently && (
+          <p class:list={['mono', 'hero-now', { ph: isPlaceholder(site.currently) }]}>
+            <span class="now-dot" aria-hidden="true" />
+            Currently: {site.currently}
+          </p>
+        )
+      }
       <div class="hero-cta">
-        <a class="btn btn-primary" href="/blog/">Read the research log <span class="arrow" aria-hidden="true">→</span></a>
-        <a class="btn" href="#story">Scroll the story <span class="arrow" aria-hidden="true">↓</span></a>
+        {
+          show.writing && (
+            <a class="btn btn-primary" href="/blog/">
+              Read the research log <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          )
+        }
+        {
+          firstSection && (
+            <a class="btn" href={`#${firstSection}`}>
+              Scroll <span class="arrow" aria-hidden="true">↓</span>
+            </a>
+          )
+        }
       </div>
     </div>
     <div class="wrap hero-foot mono muted" aria-hidden="true">
@@ -96,139 +56,130 @@ const stats = [
     </div>
   </section>
 
-  <Ticker items={ticker} />
-
-  <Story chapters={chapters} />
-
-  <section id="about" class="about" aria-labelledby="about-h">
-    <div class="wrap">
-      <p class="kicker" data-reveal>The desk</p>
-      <div class="about-grid">
-        <div>
-          <h2 id="about-h" data-reveal>Hi, I'm Nilay.</h2>
-          {
-            site.bio.map((p, i) => (
-              <p class:list={['bio', { ph: isPlaceholder(p) }]} data-reveal style={`--d:${i + 1}`}>
-                {p}
-              </p>
-            ))
-          }
+  {
+    show.about && (
+      <section id="about" class="about" aria-labelledby="about-h">
+        <div class="wrap about-inner">
+          <p class="kicker" data-reveal>About</p>
+          <div>
+            <h2 id="about-h" data-reveal>
+              Hi, I'm {site.name.split(' ')[0]}.
+            </h2>
+            <p class:list={['bio', { ph: isPlaceholder(site.about) }]} data-reveal style="--d:1">
+              {site.about}
+            </p>
+          </div>
         </div>
-        <dl class="facts" data-reveal style="--d:2">
-          {
-            site.facts.map((f) => (
-              <div class:list={['fact', { ph: isPlaceholder(f.value) }]}>
-                <dt class="mono muted">{f.label}</dt>
-                <dd>{f.value}</dd>
-              </div>
-            ))
-          }
-        </dl>
-      </div>
-      <ul class="stats">
-        {
-          stats.map((s, i) => (
-            <li data-reveal style={`--d:${i}`}>
-              <span class="stat-n" data-count={s.n}>
-                {s.n}
-              </span>
-              <span class="mono muted">{s.label}</span>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+      </section>
+    )
+  }
 
-  <section id="work" class="work" aria-labelledby="work-h">
-    <div class="wrap">
-      <header class="sec-head" data-reveal>
-        <p class="kicker">Selected work</p>
-        <h2 id="work-h">Strategies on the bench.</h2>
-      </header>
-      <ul class="cards">
-        {
-          site.projects.map((p, i) => (
-            <li data-reveal style={`--d:${i}`}>
-             <div class="card" data-tilt>
-              <div class="card-top mono">
-                <span class="muted">P/{String(i + 1).padStart(2, '0')}</span>
-                {isPlaceholder(p.blurb) && <span class="ph-tag">placeholder</span>}
-              </div>
-              <h3>{p.title}</h3>
-              <p class="muted">{p.blurb}</p>
-              <ul class="chips">
-                {p.stack.map((s) => (
-                  <li class="mono">{s}</li>
-                ))}
-              </ul>
-              <Sparkline seed={p.seed} width={300} height={60} class="card-spark" />
-              {p.href && (
-                <a class="card-link mono" href={p.href}>
-                  View project <span aria-hidden="true">↗</span>
-                </a>
-              )}
-             </div>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  <section id="writing" class="writing" aria-labelledby="writing-h">
-    <div class="wrap">
-      <header class="sec-head" data-reveal>
-        <p class="kicker">Research log</p>
-        <h2 id="writing-h">Everything I try, written down. Including what breaks.</h2>
-      </header>
-      <ol class="latest">
-        {
-          latest.map((p, i) => (
-            <li data-reveal style={`--d:${i}`}>
-              <a href={href(p.id)} class="row">
-                <span class="mono muted">{fmtDate(p.data.date)}</span>
-                <span class="row-title">{p.data.title}</span>
-                <Sparkline seed={p.id} width={120} height={28} class="row-spark" />
-                <span class="row-arrow" aria-hidden="true">→</span>
-              </a>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-    <a class="enter" href="/blog/" data-reveal>
-      <span class="enter-marquee" aria-hidden="true">
-        {[0, 1].map(() => <span>{posts.map((p) => p.data.title).join('  ·  ')}  ·  </span>)}
-      </span>
-      <span class="wrap enter-inner">
-        <span class="kicker">All {posts.length} entries</span>
-        <span class="enter-title">Enter the research log <span class="enter-arrow" aria-hidden="true">→</span></span>
-      </span>
-    </a>
-  </section>
-
-  <section id="contact" class="contact" aria-labelledby="contact-h">
-    <div class="wrap">
-      <p class="kicker" data-reveal>Contact</p>
-      <h2 id="contact-h" data-reveal>Open a position.<br /><span class="muted">Say hello.</span></h2>
-      <ul class="links">
-        {
-          site.links
-            .filter((l) => l.href || l.placeholder)
-            .map((l, i) => (
+  {
+    show.work && (
+      <section id="work" class="work" aria-labelledby="work-h">
+        <div class="wrap">
+          <header class="sec-head" data-reveal>
+            <p class="kicker">Projects</p>
+            <h2 id="work-h">On the bench.</h2>
+          </header>
+          <ul class="cards">
+            {site.projects.map((p, i) => (
               <li data-reveal style={`--d:${i}`}>
-                <a class:list={['link-row', { ph: l.placeholder }]} href={l.href || undefined} aria-disabled={!l.href || undefined}>
-                  <span>{l.label}</span>
-                  {l.placeholder && <span class="ph-tag">placeholder</span>}
-                  <span class="link-arrow" aria-hidden="true">↗</span>
+                <div class="card" data-tilt>
+                  <div class="card-top mono">
+                    <span class="muted">P/{String(i + 1).padStart(2, '0')}</span>
+                    {isPlaceholder(p.blurb) && <span class="ph-tag">placeholder</span>}
+                  </div>
+                  <h3>{p.title}</h3>
+                  <p class="muted">{p.blurb}</p>
+                  {p.stack.length > 0 && (
+                    <ul class="chips">
+                      {p.stack.map((s) => (
+                        <li class="mono">{s}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <Sparkline seed={p.title} width={300} height={56} class="card-spark" />
+                  {p.href && (
+                    <a class="card-link mono" href={p.href}>
+                      View project <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    show.writing && (
+      <section id="writing" class="writing" aria-labelledby="writing-h">
+        <div class="wrap">
+          <header class="sec-head" data-reveal>
+            <p class="kicker">Latest from the research log</p>
+            <h2 id="writing-h">Written down, including what breaks.</h2>
+          </header>
+          <ol class="latest">
+            {latest.map((p, i) => (
+              <li data-reveal style={`--d:${i}`}>
+                <a href={postUrl(p)} class="row">
+                  <span class="mono muted">{fmtDate(p.data.date)}</span>
+                  <span class="row-title">{p.data.title}</span>
+                  <Sparkline seed={p.id} width={120} height={28} class="row-spark" />
+                  <span class="row-arrow" aria-hidden="true">
+                    →
+                  </span>
                 </a>
               </li>
-            ))
-        }
-      </ul>
-    </div>
-  </section>
+            ))}
+          </ol>
+        </div>
+        <a class="enter" href="/blog/" data-reveal>
+          <span class="enter-marquee" aria-hidden="true">
+            {[0, 1].map(() => (
+              <span>{posts.map((p) => p.data.title).join('  ·  ')}  ·  </span>
+            ))}
+          </span>
+          <span class="wrap enter-inner">
+            <span class="kicker">
+              {posts.length} {posts.length === 1 ? 'entry' : 'entries'}
+            </span>
+            <span class="enter-title">
+              Enter the research log <span class="enter-arrow" aria-hidden="true">→</span>
+            </span>
+          </span>
+        </a>
+      </section>
+    )
+  }
+
+  {
+    show.contact && (
+      <section id="contact" class="contact" aria-labelledby="contact-h">
+        <div class="wrap">
+          <p class="kicker" data-reveal>Contact</p>
+          <h2 id="contact-h" data-reveal>
+            Say hello.
+          </h2>
+          <ul class="links">
+            {visibleLinks.map((l, i) => (
+              <li data-reveal style={`--d:${i}`}>
+                <a class="link-row" href={l.href}>
+                  <span>{l.label}</span>
+                  <span class="link-arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 </Base>
 
 <style>
@@ -360,66 +311,34 @@ const stats = [
   }
 
   .about {
-    padding: clamp(4rem, 10vw, 8rem) 0;
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
   }
-  .about-grid {
+  .about-inner {
     display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: clamp(2rem, 6vw, 6rem);
-    margin-top: 1rem;
-    align-items: start;
+    grid-template-columns: 12rem 1fr;
+    gap: 1rem 3rem;
+    align-items: baseline;
+  }
+  .about h2 {
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
   }
   .bio {
     font-family: var(--serif);
-    font-size: clamp(1.15rem, 1.8vw, 1.4rem);
-    line-height: 1.5;
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    line-height: 1.45;
     color: var(--ink-2);
-    margin: 1.5rem 0 0;
+    max-width: 40rem;
+    margin: 1.2rem 0 0;
     padding: 0.2rem 0.4rem;
-  }
-  .facts {
-    margin: 0;
-    border-top: 1px solid var(--line);
-  }
-  .fact {
-    display: grid;
-    grid-template-columns: 7.5rem 1fr;
-    gap: 1rem;
-    padding: 1rem 0.4rem;
-    border-bottom: 1px solid var(--line);
-  }
-  .fact dd {
-    margin: 0;
-  }
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    list-style: none;
-    padding: 0;
-    margin: clamp(3rem, 8vw, 6rem) 0 0;
-  }
-  .stats li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding-top: 1.2rem;
-    border-top: 1px solid var(--accent);
-  }
-  .stat-n {
-    font-family: var(--serif);
-    font-size: clamp(2.4rem, 6vw, 4.5rem);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
   }
 
   .work {
-    padding: clamp(4rem, 10vw, 8rem) 0;
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
     background: linear-gradient(to bottom, transparent, var(--bg-2) 30%, var(--bg-2) 70%, transparent);
   }
   .cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: 1.25rem;
     list-style: none;
     padding: 0;
@@ -498,7 +417,7 @@ const stats = [
   }
 
   .writing {
-    padding: clamp(4rem, 10vw, 8rem) 0 0;
+    padding: clamp(3.5rem, 8vw, 6rem) 0 0;
   }
   .latest {
     list-style: none;
@@ -603,7 +522,7 @@ const stats = [
   }
 
   .contact {
-    padding: clamp(5rem, 12vw, 9rem) 0;
+    padding: clamp(4rem, 10vw, 7rem) 0;
   }
   .contact h2 {
     margin: 1rem 0 3rem;
@@ -639,13 +558,8 @@ const stats = [
   }
 
   @media (max-width: 860px) {
-    .about-grid,
-    .cards {
+    .about-inner {
       grid-template-columns: 1fr;
-    }
-    .stats {
-      grid-template-columns: repeat(2, 1fr);
-      row-gap: 2rem;
     }
     .row {
       grid-template-columns: 1fr auto;
@@ -693,26 +607,6 @@ const stats = [
     );
   }
 
-  const counters = document.querySelectorAll<HTMLElement>('[data-count]');
-  const cio = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      cio.unobserve(e.target);
-      const el = e.target as HTMLElement;
-      const target = Number(el.dataset.count);
-      if (reduce) continue;
-      const from = target > 1000 ? target - 60 : 0;
-      const t0 = performance.now();
-      const tick = (now: number) => {
-        const k = Math.min(1, (now - t0) / 1400);
-        const eased = 1 - Math.pow(1 - k, 3);
-        el.textContent = String(Math.round(from + (target - from) * eased));
-        if (k < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }
-  });
-  counters.forEach((c) => cio.observe(c));
 
   if (!reduce && matchMedia('(hover: hover)').matches) {
     document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {

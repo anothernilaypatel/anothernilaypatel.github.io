@@ -1,6 +1,13 @@
 ---
+import { site, visibleLinks } from '../site.config';
+
 const path = Astro.url.pathname;
 const onBlog = path.startsWith('/blog');
+const anchors = [
+  { href: '/#about', label: 'About', show: !!site.about },
+  { href: '/#work', label: 'Projects', show: site.projects.length > 0 },
+  { href: '/#contact', label: 'Contact', show: visibleLinks.length > 0 },
+].filter((a) => a.show);
 ---
 
 <header class="nav" data-nav>
@@ -14,9 +21,13 @@ const onBlog = path.startsWith('/blog');
     </a>
     <nav aria-label="Primary">
       <ul>
-        <li class="hide-sm"><a href="/#story">Story</a></li>
-        <li class="hide-sm"><a href="/#work">Work</a></li>
-        <li class="hide-sm"><a href="/#contact">Contact</a></li>
+        {
+          anchors.map((a) => (
+            <li class="hide-sm">
+              <a href={a.href}>{a.label}</a>
+            </li>
+          ))
+        }
         <li>
           <a class:list={['blog-link', { active: onBlog }]} href="/blog/" aria-current={onBlog ? 'page' : undefined}>
             <span class="dot" aria-hidden="true"></span>Research log
