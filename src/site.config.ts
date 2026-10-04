@@ -12,7 +12,6 @@
 export const site = {
   name: 'Nilay Patel',
   handle: 'anothernilaypatel',
-  url: 'https://anothernilaypatel.github.io',
   title: 'Nilay Patel: building a hedge fund from scratch',
   description:
     'Nilay Patel is a university student building systematic trading strategies in public: FX backtests, momentum signals, and a research log of everything that breaks along the way.',

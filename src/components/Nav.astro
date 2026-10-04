@@ -1,18 +1,19 @@
 ---
+import { url, withoutBase } from '../lib/url';
 import { site, visibleLinks } from '../site.config';
 
 const path = Astro.url.pathname;
-const onBlog = path.startsWith('/blog');
+const onBlog = withoutBase(path).startsWith('/blog');
 const anchors = [
-  { href: '/#about', label: 'About', show: !!site.about },
-  { href: '/#work', label: 'Projects', show: site.projects.length > 0 },
-  { href: '/#contact', label: 'Contact', show: visibleLinks.length > 0 },
+  { href: url('/#about'), label: 'About', show: !!site.about },
+  { href: url('/#work'), label: 'Projects', show: site.projects.length > 0 },
+  { href: url('/#contact'), label: 'Contact', show: visibleLinks.length > 0 },
 ].filter((a) => a.show);
 ---
 
 <header class="nav" data-nav>
   <div class="wrap nav-inner">
-    <a class="logo" href="/" aria-label="Nilay Patel — home">
+    <a class="logo" href={url('/')} aria-label="Nilay Patel — home">
       <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
         <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="currentColor" stroke-opacity=".35"></rect>
         <path d="M7 22 L12 14 L16 18 L21 9 L25 13" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -29,7 +30,7 @@ const anchors = [
           ))
         }
         <li>
-          <a class:list={['blog-link', { active: onBlog }]} href="/blog/" aria-current={onBlog ? 'page' : undefined}>
+          <a class:list={['blog-link', { active: onBlog }]} href={url('/blog/')} aria-current={onBlog ? 'page' : undefined}>
             <span class="dot" aria-hidden="true"></span>Research log
           </a>
         </li>

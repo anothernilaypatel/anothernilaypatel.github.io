@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import MarketField from '../../components/MarketField.astro';
@@ -15,14 +16,14 @@ const oldest = posts.at(-1);
     <MarketField paths={22} seed={19} />
     <div class="head-veil" aria-hidden="true"></div>
     <div class="wrap head-inner">
-      <a class="mono back" href="/">← Home</a>
+      <a class="mono back" href={url('/')}>← Home</a>
       <p class="kicker">{site.handle} / research log</p>
       <h1>Research <em>log</em></h1>
       <p class="lede">{site.blogIntro}</p>
       <dl class="meta mono">
         <div><dt class="muted">Entries</dt><dd>{posts.length}</dd></div>
         {oldest && <div><dt class="muted">Since</dt><dd>{fmtDate(oldest.data.date)}</dd></div>}
-        <div><dt class="muted">Feed</dt><dd><a href="/rss.xml">RSS ↗</a></dd></div>
+        <div><dt class="muted">Feed</dt><dd><a href={url('/rss.xml')}>RSS ↗</a></dd></div>
       </dl>
     </div>
   </section>

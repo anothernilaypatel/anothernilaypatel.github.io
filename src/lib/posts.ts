@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { url } from './url';
 
 export type Post = CollectionEntry<'blog'>;
 
@@ -8,7 +9,7 @@ export async function getPosts() {
   return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
-export const postUrl = (p: Post) => `/blog/${p.id}/`;
+export const postUrl = (p: Post) => url(`/blog/${p.id}/`);
 
 function plainText(body = '') {
   return body

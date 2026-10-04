@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import { render } from 'astro:content';
 import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
@@ -41,7 +42,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     <header class="post-head">
       <div class="head-spark" aria-hidden="true"><Sparkline seed={post.id} width={800} height={200} points={90} class="draw" /></div>
       <div class="wrap-narrow">
-        <a class="mono back" href="/blog/">← Research log</a>
+        <a class="mono back" href={url('/blog/')}>← Research log</a>
         {
           inSeries.length > 1 && (
             <p class="kicker">
@@ -106,7 +107,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
             <span class="pager-title">{next.data.title}</span>
           </a>
         ) : (
-          <a class="pager-card next" href="/blog/">
+          <a class="pager-card next" href={url('/blog/')}>
             <span class="mono muted">You're caught up</span>
             <span class="pager-title">Back to the research log</span>
           </a>

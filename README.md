@@ -11,7 +11,7 @@ Requires Node 22+.
 
 ```bash
 npm install
-npm run dev       # http://localhost:4321, live reload
+npm run dev       # http://localhost:4321/nilaypatel.github.io/, live reload
 npm run build     # static output in dist/
 npm run preview   # serve dist/ locally
 npm run check     # type-check .astro/.ts files
@@ -60,11 +60,19 @@ Nothing else needs editing. The home page's latest posts, the blog index, series
 
 ## Deployment
 
-`.github/workflows/deploy.yml` builds with `withastro/action` and publishes with `actions/deploy-pages` on every push to `main`.
+`.github/workflows/deploy.yml` builds the site and publishes it with `actions/deploy-pages` on every push to `main`.
 
-One-time setup: in the repo's **Settings → Pages**, set **Source** to **GitHub Actions**.
+**Where the site lives is one value: `SITE_URL`.** Its origin becomes Astro's `site` and its path becomes `base`. Every link, asset, image, the RSS feed, the sitemap, robots.txt, and the canonical and Open Graph URLs follow it. In the workflow, `SITE_URL` comes from the repo's actual Pages URL (`actions/configure-pages`):
+- For a project site such as this repo (`nilaypatel.github.io` under the `anothernilaypatel` account), it's `https://anothernilaypatel.github.io/nilaypatel.github.io/`.
+- If the repo is renamed to `anothernilaypatel.github.io`, or a custom domain is added, it becomes the domain root automatically.
+- To force a value, set a repository variable named `SITE_URL` (Settings → Secrets and variables → Actions → Variables).
+- Locally, `astro.config.mjs` falls back to the project-site URL. To build for a root domain instead, run `SITE_URL=https://example.com/ npm run build`.
 
-The old site was a Flutter web app with a service worker. `public/flutter_service_worker.js` replaces it with a worker that clears its caches and unregisters itself, so returning visitors get the new site instead of the cached Flutter build.
+In code, always build internal links with `url('/path/')` from `src/lib/url.ts` (and `postUrl(post)` for posts), never a bare `/path`. Markdown images and CSS assets are handled by Astro automatically.
+
+One-time setup: in the repo's **Settings → Pages**, set **Source** to **GitHub Actions**. With "Deploy from a branch", GitHub also runs a Jekyll build of the raw source, which fails.
+
+The old site was a Flutter web app with a service worker. Every page removes any registered `flutter_service_worker.js` and its caches, wherever it was registered. `public/flutter_service_worker.js` also replaces the old worker when the site is served from a domain root.
 
 ## Project layout
 
@@ -77,7 +85,7 @@ src/
   components/           MarketField (hero canvas), Sparkline, Nav, Footer
   layouts/Base.astro    <head>, SEO/Open Graph tags, theme handling
   styles/               global.css (tokens, light/dark), prose.css (post typography)
-  lib/                  seeded random walks for the visuals, post helpers, rehype figure plugin
+  lib/                  url() base-path helper, seeded random walks, post helpers, rehype figure plugin
 scripts/new-post.mjs    `npm run new-post "Title"`
 public/                 favicon, og.jpg, robots.txt, Flutter service-worker cleanup
 ```
