@@ -1,4 +1,6 @@
 ---
+import { url } from '../lib/url';
+
 interface Props {
   to: string;
 }
@@ -10,6 +12,7 @@ const { to } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <title>Moved</title>
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="refresh" content={`0;url=${to}`} />
     <link rel="canonical" href={new URL(to, Astro.site)} />
