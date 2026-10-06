@@ -1,6 +1,7 @@
 ---
 import { url } from '../lib/url';
 import { site } from '../site.config';
+import { collections } from '../collections.mjs';
 const year = new Date().getFullYear();
 ---
 
@@ -8,7 +9,8 @@ const year = new Date().getFullYear();
   <div class="wrap row">
     <span class="mono muted">© {year} {site.name}</span>
     <span class="mono muted">
-      <a href={url('/projects/')}>Projects</a> · <a href={url('/daily/')}>Daily</a> · <a href={url('/rss.xml')}>RSS</a> · <a href="https://github.com/anothernilaypatel">GitHub</a>
+      {collections.map((c) => <><a href={url(`/${c.name}/`)}>{c.title}</a> · </>)}
+      <a href={url('/rss.xml')}>RSS</a> · <a href="https://github.com/anothernilaypatel">GitHub</a>
     </span>
   </div>
 </footer>

@@ -1,37 +1,29 @@
 ---
-import Base from '../../layouts/Base.astro';
-import DailyCard from '../../components/DailyCard.astro';
-import { getDaily, fmtDate, type Daily } from '../../lib/posts';
-import { url } from '../../lib/url';
-
-export async function getStaticPaths() {
-  const entries = await getDaily();
-  return entries.map((entry, i) => ({
-    params: { id: entry.id },
-    props: { entry, newer: entries[i - 1], older: entries[i + 1] },
-  }));
-}
+import Base from '../Base.astro';
+import JournalCard from '../../components/JournalCard.astro';
+import { fmtDate, titleOf, describe, entryUrl, indexUrl, type Journal, type CollectionConfig } from '../../lib/collections';
 
 interface Props {
-  entry: Daily;
-  newer?: Daily;
-  older?: Daily;
+  config: CollectionConfig;
+  entry: Journal;
+  newer?: Journal;
+  older?: Journal;
 }
-const { entry, newer, older } = Astro.props;
-const { quote, note } = entry.data;
-const title = `Daily · ${fmtDate(entry.data.date)}`;
-const description = quote ? `“${quote.text}”${quote.author ? ` — ${quote.author}` : ''}` : (note ?? title);
+const { config, entry, newer, older } = Astro.props;
+const title = titleOf(entry);
+const description = describe(entry) || title;
+const indexTitle = [config.title, config.accent].filter(Boolean).join(' ');
 ---
 
 <Base title={title} description={description} type="article" publishedTime={entry.data.date}>
   <div class="page">
-    <a class="mono back" href={url(`/daily/#d-${entry.id}`)}>← Daily log</a>
+    <a class="mono back" href={`${indexUrl(config.name)}#d-${entry.id}`}>← {indexTitle}</a>
     <h1 class="kicker">{title}</h1>
-    <DailyCard entry={entry} link={false} />
+    <JournalCard entry={entry} link={false} />
     <nav class="pager" aria-label="More entries">
       {
         older ? (
-          <a class="pager-card" href={url(`/daily/${older.id}/`)}>
+          <a class="pager-card" href={entryUrl(older)}>
             <span class="mono muted">← Older</span>
             <span class="pager-title">{fmtDate(older.data.date)}</span>
           </a>
@@ -41,14 +33,14 @@ const description = quote ? `“${quote.text}”${quote.author ? ` — ${quote.a
       }
       {
         newer ? (
-          <a class="pager-card next" href={url(`/daily/${newer.id}/`)}>
+          <a class="pager-card next" href={entryUrl(newer)}>
             <span class="mono muted">Newer →</span>
             <span class="pager-title">{fmtDate(newer.data.date)}</span>
           </a>
         ) : (
-          <a class="pager-card next" href={url('/daily/')}>
+          <a class="pager-card next" href={indexUrl(config.name)}>
             <span class="mono muted">Latest</span>
-            <span class="pager-title">Back to the daily log</span>
+            <span class="pager-title">Back to {indexTitle}</span>
           </a>
         )
       }

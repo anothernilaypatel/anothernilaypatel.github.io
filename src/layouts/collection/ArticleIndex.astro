@@ -1,25 +1,29 @@
 ---
-import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
-import Base from '../../layouts/Base.astro';
+import Base from '../Base.astro';
 import MarketField from '../../components/MarketField.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel } from '../../lib/posts';
+import { fmtDate, readingTime, describe, entryUrl, seriesOf, kindOf, type Article, type CollectionConfig } from '../../lib/collections';
+import { url } from '../../lib/url';
 import { site } from '../../site.config';
 
-const posts = await getPosts();
+interface Props {
+  config: CollectionConfig;
+  entries: Article[];
+}
+const { config, entries: posts } = Astro.props;
 const oldest = posts.at(-1);
 ---
 
-<Base title="Projects, ideas & accolades" description={site.projectsIntro}>
+<Base title={[config.title, config.accent].filter(Boolean).join(' ')} description={config.intro}>
   <section class="head">
     <MarketField paths={22} seed={19} />
     <div class="head-veil" aria-hidden="true"></div>
     <div class="wrap head-inner">
       <a class="mono back" href={url('/')}>← Home</a>
-      <p class="kicker">{site.handle} / projects · ideas · accolades</p>
-      <h1>Projects <em>&amp; ideas</em></h1>
-      <p class="lede">{site.projectsIntro}</p>
+      <p class="kicker">{site.handle} / {config.kicker ?? config.name}</p>
+      <h1>{config.title} {config.accent && <em>{config.accent}</em>}</h1>
+      <p class="lede">{config.intro}</p>
       <dl class="meta mono">
         <div><dt class="muted">Entries</dt><dd>{posts.length}</dd></div>
         {oldest && <div><dt class="muted">Since</dt><dd>{fmtDate(oldest.data.date)}</dd></div>}
@@ -36,13 +40,13 @@ const oldest = posts.at(-1);
           const { parts, index } = seriesOf(p, posts);
           return (
             <li class="post" data-reveal style={`--d:${Math.min(i, 6)}`}>
-              <a href={postUrl(p)} class="post-link" data-spot>
+              <a href={entryUrl(p)} class="post-link" data-spot>
                 <span class="post-num mono" aria-hidden="true">
                   {String(posts.length - i).padStart(2, '0')}
                 </span>
                 <span class="post-main">
                   <span class="post-meta mono muted">
-                    <span class:list={['kind', `kind-${p.data.kind}`]}>{kindLabel[p.data.kind]}</span>
+                    {kindOf(p) && <span class:list={['kind', `kind-${(p.data.kind ?? config.defaultKind ?? '').toLowerCase()}`]}>{kindOf(p)}</span>}
                     <time datetime={p.data.date.toISOString()}>{fmtDate(p.data.date)}</time>
                     <span>· {readingTime(p.body)} min</span>
                     {parts.length > 1 && (

@@ -1,23 +1,22 @@
 ---
 import { render } from 'astro:content';
 import Spotify from './Spotify.astro';
-import { extraFields, fmtDay, fmtDate, type Daily } from '../lib/posts';
-import { url } from '../lib/url';
+import { extraFields, fmtDay, fmtDate, entryUrl, type Journal } from '../lib/collections';
 
 interface Props {
-  entry: Daily;
+  entry: Journal;
   /** Link the date to the entry's own page. */
   link?: boolean;
   headingLevel?: 'h2' | 'h3';
 }
 const { entry, link = true, headingLevel = 'h2' } = Astro.props;
 const { date, quote, spotify, note } = entry.data;
-const { Content } = await render(entry);
+const { Content } = await render(entry as never);
 const hasBody = !!entry.body?.trim();
 const day = fmtDay(date);
 const extras = extraFields(entry);
 const H = headingLevel;
-const pageUrl = url(`/daily/${entry.id}/`);
+const pageUrl = entryUrl(entry);
 ---
 
 <article class="daily">

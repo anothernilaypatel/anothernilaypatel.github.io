@@ -1,24 +1,19 @@
 ---
-import { url } from '../../lib/url';
 import { render } from 'astro:content';
 import { Image, getImage } from 'astro:assets';
-import Base from '../../layouts/Base.astro';
+import Base from '../Base.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel, type Post } from '../../lib/posts';
+import { fmtDate, readingTime, describe, entryUrl, indexUrl, seriesOf, kindOf, type Article, type CollectionConfig } from '../../lib/collections';
 import { walk, seedFrom, toPath } from '../../lib/series';
 import '../../styles/prose.css';
 
-export async function getStaticPaths() {
-  const posts = await getPosts();
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
-}
-
 interface Props {
-  post: Post;
-  posts: Post[];
+  config: CollectionConfig;
+  entry: Article;
+  entries: Article[];
 }
-const { post, posts } = Astro.props;
-const { Content } = await render(post);
+const { config, entry: post, entries: posts } = Astro.props;
+const { Content } = await render(post as never);
 const { title, date, series, cover } = post.data;
 const summary = describe(post);
 const { parts: inSeries, index: seriesIndex } = seriesOf(post, posts);
@@ -27,6 +22,7 @@ const chrono = [...posts].reverse();
 const idx = chrono.findIndex((p) => p.id === post.id);
 const prev = chrono[idx - 1];
 const next = chrono[idx + 1];
+const indexTitle = [config.title, config.accent].filter(Boolean).join(' ');
 
 const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.03 }), 1000, 28, 3);
 ---
@@ -42,10 +38,9 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     <header class="post-head">
       <div class="head-spark" aria-hidden="true"><Sparkline seed={post.id} width={800} height={200} points={90} class="draw" /></div>
       <div class="wrap-narrow">
-        <a class="mono back" href={url('/projects/')}>← Projects &amp; ideas</a>
+        <a class="mono back" href={indexUrl(config.name)}>← {indexTitle}</a>
         <p class="kicker">
-          {kindLabel[post.data.kind]}
-          {inSeries.length > 1 && ` · ${series} · part ${seriesIndex} of ${inSeries.length}`}
+          {[kindOf(post), inSeries.length > 1 && `${series} · part ${seriesIndex} of ${inSeries.length}`].filter(Boolean).join(' · ')}
         </p>
         <h1>{title}</h1>
         <p class="summary">{summary}</p>
@@ -75,7 +70,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
           <ol>
             {inSeries.map((p, i) => (
               <li class:list={{ current: p.id === post.id }}>
-                <a href={postUrl(p)} aria-current={p.id === post.id ? 'page' : undefined}>
+                <a href={entryUrl(p)} aria-current={p.id === post.id ? 'page' : undefined}>
                   <span class="mono">{String(i + 1).padStart(2, '0')}</span>
                   <span>{p.data.title}</span>
                 </a>
@@ -89,7 +84,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     <nav class="wrap-narrow pager" aria-label="More entries">
       {
         prev ? (
-          <a class="pager-card" href={postUrl(prev)}>
+          <a class="pager-card" href={entryUrl(prev)}>
             <span class="mono muted">← Previous</span>
             <span class="pager-title">{prev.data.title}</span>
           </a>
@@ -99,14 +94,14 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
       }
       {
         next ? (
-          <a class="pager-card next" href={postUrl(next)}>
+          <a class="pager-card next" href={entryUrl(next)}>
             <span class="mono muted">Next →</span>
             <span class="pager-title">{next.data.title}</span>
           </a>
         ) : (
-          <a class="pager-card next" href={url('/projects/')}>
+          <a class="pager-card next" href={indexUrl(config.name)}>
             <span class="mono muted">You're caught up</span>
-            <span class="pager-title">Back to projects &amp; ideas</span>
+            <span class="pager-title">Back to {indexTitle}</span>
           </a>
         )
       }
