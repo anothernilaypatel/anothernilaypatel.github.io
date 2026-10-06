@@ -1,0 +1,264 @@
+---
+import { url } from '../../lib/url';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import MarketField from '../../components/MarketField.astro';
+import Sparkline from '../../components/Sparkline.astro';
+import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel } from '../../lib/posts';
+import { site } from '../../site.config';
+
+const posts = await getPosts();
+const oldest = posts.at(-1);
+---
+
+<Base title="Projects, ideas & accolades" description={site.projectsIntro}>
+  <section class="head">
+    <MarketField paths={22} seed={19} />
+    <div class="head-veil" aria-hidden="true"></div>
+    <div class="wrap head-inner">
+      <a class="mono back" href={url('/')}>← Home</a>
+      <p class="kicker">{site.handle} / projects · ideas · accolades</p>
+      <h1>Projects <em>&amp; ideas</em></h1>
+      <p class="lede">{site.projectsIntro}</p>
+      <dl class="meta mono">
+        <div><dt class="muted">Entries</dt><dd>{posts.length}</dd></div>
+        {oldest && <div><dt class="muted">Since</dt><dd>{fmtDate(oldest.data.date)}</dd></div>}
+        <div><dt class="muted">Feed</dt><dd><a href={url('/rss.xml')}>RSS ↗</a></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="wrap list-wrap" aria-label="Posts">
+    {posts.length === 0 && <p class="empty muted mono">First entry coming soon.</p>}
+    <ol class="posts">
+      {
+        posts.map((p, i) => {
+          const { parts, index } = seriesOf(p, posts);
+          return (
+            <li class="post" data-reveal style={`--d:${Math.min(i, 6)}`}>
+              <a href={postUrl(p)} class="post-link" data-spot>
+                <span class="post-num mono" aria-hidden="true">
+                  {String(posts.length - i).padStart(2, '0')}
+                </span>
+                <span class="post-main">
+                  <span class="post-meta mono muted">
+                    <span class:list={['kind', `kind-${p.data.kind}`]}>{kindLabel[p.data.kind]}</span>
+                    <time datetime={p.data.date.toISOString()}>{fmtDate(p.data.date)}</time>
+                    <span>· {readingTime(p.body)} min</span>
+                    {parts.length > 1 && (
+                      <span class="post-series">
+                        · {p.data.series} {index}/{parts.length}
+                      </span>
+                    )}
+                  </span>
+                  <span class="post-title">{p.data.title}</span>
+                  <span class="post-summary">{describe(p)}</span>
+                </span>
+                <span class="post-chart" aria-hidden="true">
+                  {p.data.cover ? (
+                    <Image src={p.data.cover} alt="" width={360} class="post-cover" />
+                  ) : (
+                    <Sparkline seed={p.id} width={180} height={56} />
+                  )}
+                </span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </section>
+</Base>
+
+<style>
+  .head {
+    position: relative;
+    overflow: hidden;
+    padding: 8.5rem 0 4rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .head-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 55% 80% at 15% 60%, color-mix(in srgb, var(--bg) 88%, transparent), transparent 75%),
+      linear-gradient(to bottom, transparent 60%, var(--bg));
+  }
+  .head-inner {
+    position: relative;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 2rem;
+    text-decoration: none;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(3.5rem, 12vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    margin: 1rem 0 1.5rem;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  }
+  h1 em {
+    color: var(--accent);
+  }
+  .lede {
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    line-height: 1.45;
+    max-width: 38rem;
+    color: var(--ink-2);
+    margin: 0 0 2.5rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 0;
+  }
+  .meta dd {
+    margin: 0.2rem 0 0;
+    color: var(--ink);
+  }
+  .meta a {
+    text-decoration: none;
+    color: var(--accent);
+  }
+
+  .list-wrap {
+    padding: 3rem 0 6rem;
+  }
+  .posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .post-link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 5rem 1fr 190px;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.2rem 1rem;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .post-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(500px circle at var(--mx, -100%) var(--my, 50%), color-mix(in srgb, var(--accent) 10%, transparent), transparent 45%);
+    transition: opacity 0.3s;
+    opacity: 0;
+  }
+  .post-link:hover::before,
+  .post-link:focus-visible::before {
+    opacity: 1;
+  }
+  .post-link:hover {
+    color: var(--ink);
+  }
+  .post-num {
+    font-size: 3rem;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--muted);
+    transition:
+      color 0.4s var(--ease),
+      -webkit-text-stroke-color 0.4s var(--ease);
+  }
+  .post-link:hover .post-num {
+    color: var(--accent);
+    -webkit-text-stroke-color: var(--accent);
+  }
+  .post-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+  }
+  .kind {
+    color: var(--accent);
+  }
+  .kind-accolade {
+    color: var(--up);
+  }
+  .post-title {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    transition: transform 0.5s var(--ease);
+  }
+  .post-link:hover .post-title {
+    transform: translateX(6px);
+  }
+  .post-summary {
+    color: var(--ink-2);
+    max-width: 40rem;
+  }
+  :global(.post-cover) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .post-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+    opacity: 0.55;
+    transition: opacity 0.4s var(--ease);
+  }
+  .post-link:hover .post-chart {
+    opacity: 1;
+  }
+  .empty {
+    padding: 2rem 0;
+  }
+
+  @media (max-width: 760px) {
+    .post-link {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+      padding: 1.8rem 0.25rem;
+    }
+    .post-num {
+      font-size: 2rem;
+    }
+    .post-chart {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0.8;
+    }
+    .post-chart :global(svg) {
+      width: 50%;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+</script>

@@ -1,0 +1,105 @@
+---
+import Base from '../../layouts/Base.astro';
+import DailyCard from '../../components/DailyCard.astro';
+import { getDaily, fmtDate, type Daily } from '../../lib/posts';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const entries = await getDaily();
+  return entries.map((entry, i) => ({
+    params: { id: entry.id },
+    props: { entry, newer: entries[i - 1], older: entries[i + 1] },
+  }));
+}
+
+interface Props {
+  entry: Daily;
+  newer?: Daily;
+  older?: Daily;
+}
+const { entry, newer, older } = Astro.props;
+const { quote, note } = entry.data;
+const title = `Daily · ${fmtDate(entry.data.date)}`;
+const description = quote ? `“${quote.text}”${quote.author ? ` — ${quote.author}` : ''}` : (note ?? title);
+---
+
+<Base title={title} description={description} type="article" publishedTime={entry.data.date}>
+  <div class="page">
+    <a class="mono back" href={url(`/daily/#d-${entry.id}`)}>← Daily log</a>
+    <h1 class="kicker">{title}</h1>
+    <DailyCard entry={entry} link={false} />
+    <nav class="pager" aria-label="More entries">
+      {
+        older ? (
+          <a class="pager-card" href={url(`/daily/${older.id}/`)}>
+            <span class="mono muted">← Older</span>
+            <span class="pager-title">{fmtDate(older.data.date)}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        newer ? (
+          <a class="pager-card next" href={url(`/daily/${newer.id}/`)}>
+            <span class="mono muted">Newer →</span>
+            <span class="pager-title">{fmtDate(newer.data.date)}</span>
+          </a>
+        ) : (
+          <a class="pager-card next" href={url('/daily/')}>
+            <span class="mono muted">Latest</span>
+            <span class="pager-title">Back to the daily log</span>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</Base>
+
+<style>
+  .page {
+    width: min(760px, 100% - 2.5rem);
+    margin: 0 auto;
+    padding: 8rem 0 6rem;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    color: var(--muted);
+  }
+  h1 {
+    margin: 0 0 1.2rem;
+    font-weight: 400;
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .pager-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    transition:
+      border-color 0.3s,
+      transform 0.4s var(--ease);
+  }
+  .pager-card:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+  .pager-card.next {
+    text-align: right;
+  }
+  .pager-title {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+  }
+</style>

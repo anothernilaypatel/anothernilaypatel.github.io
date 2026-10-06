@@ -14,7 +14,7 @@ const siteUrl = new URL(process.env.SITE_URL || 'https://anothernilaypatel.githu
 export default defineConfig({
   site: siteUrl.origin,
   base: siteUrl.pathname,
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap({ filter: (page) => !/\/blog\//.test(page) })],
   markdown: {
     processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex, rehypeFigure] }),
     shikiConfig: {

@@ -1,0 +1,195 @@
+---
+import Base from '../../layouts/Base.astro';
+import MarketField from '../../components/MarketField.astro';
+import DailyCard from '../../components/DailyCard.astro';
+import { getDaily, fmtDate } from '../../lib/posts';
+import { url } from '../../lib/url';
+import { site } from '../../site.config';
+
+const entries = await getDaily();
+const oldest = entries.at(-1);
+const withMusic = entries.filter((e) => e.data.spotify).length;
+---
+
+<Base title="Daily" description={site.dailyIntro}>
+  <section class="head">
+    <MarketField paths={16} seed={31} />
+    <div class="head-veil" aria-hidden="true"></div>
+    <div class="wrap head-inner">
+      <a class="mono back" href={url('/')}>← Home</a>
+      <p class="kicker">{site.handle} / daily</p>
+      <h1>Daily <em>log</em></h1>
+      <p class="lede">{site.dailyIntro}</p>
+      <dl class="meta mono">
+        <div><dt class="muted">Entries</dt><dd>{entries.length}</dd></div>
+        {withMusic > 0 && <div><dt class="muted">Tracks</dt><dd>{withMusic}</dd></div>}
+        {oldest && <div><dt class="muted">Since</dt><dd>{fmtDate(oldest.data.date)}</dd></div>}
+        <div><dt class="muted">Feed</dt><dd><a href={url('/rss.xml')}>RSS ↗</a></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="wrap-feed feed" aria-label="Daily entries" data-feed>
+    {entries.length === 0 && <p class="muted mono">First entry coming soon.</p>}
+    <div class="rail" aria-hidden="true"><span class="rail-fill" data-rail></span></div>
+    <ol>
+      {
+        entries.map((e, i) => (
+          <li id={`d-${e.id}`} class="entry" data-reveal style={`--d:${Math.min(i, 4)}`}>
+            <span class="dot" aria-hidden="true" />
+            <DailyCard entry={e} />
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+</Base>
+
+<style>
+  .head {
+    position: relative;
+    overflow: hidden;
+    padding: 8.5rem 0 4rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .head-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 55% 80% at 15% 60%, color-mix(in srgb, var(--bg) 88%, transparent), transparent 75%),
+      linear-gradient(to bottom, transparent 60%, var(--bg));
+  }
+  .head-inner {
+    position: relative;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 2rem;
+    text-decoration: none;
+    color: var(--muted);
+  }
+  h1 {
+    font-size: clamp(3.5rem, 12vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    margin: 1rem 0 1.5rem;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  }
+  h1 em {
+    color: var(--accent);
+  }
+  .lede {
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    line-height: 1.45;
+    max-width: 38rem;
+    color: var(--ink-2);
+    margin: 0 0 2.5rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin: 0;
+  }
+  .meta dd {
+    margin: 0.2rem 0 0;
+    color: var(--ink);
+  }
+  .meta a {
+    text-decoration: none;
+    color: var(--accent);
+  }
+
+  .wrap-feed {
+    width: min(760px, 100% - 2.5rem);
+    margin-inline: auto;
+  }
+  .feed {
+    position: relative;
+    padding: 4rem 0 6rem 2.5rem;
+  }
+  .rail {
+    position: absolute;
+    left: 0.45rem;
+    top: 4rem;
+    bottom: 6rem;
+    width: 1px;
+    background: var(--line);
+  }
+  .rail-fill {
+    display: block;
+    width: 100%;
+    height: calc(var(--p, 1) * 100%);
+    background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
+    box-shadow: 0 0 8px var(--accent);
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  .entry {
+    position: relative;
+    scroll-margin-top: 6rem;
+  }
+  .dot {
+    position: absolute;
+    left: calc(-2.5rem + 0.45rem - 5px);
+    top: 2.2rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid var(--muted);
+    background: var(--bg);
+    transition:
+      background 0.4s,
+      border-color 0.4s,
+      box-shadow 0.4s;
+  }
+  .entry.is-in .dot,
+  .entry:target .dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .entry:target :global(.daily) {
+    border-color: var(--accent);
+  }
+  @media (max-width: 640px) {
+    .feed {
+      padding-left: 1.6rem;
+    }
+    .dot {
+      left: calc(-1.6rem + 0.45rem - 5px);
+    }
+  }
+</style>
+
+<script>
+  const feed = document.querySelector<HTMLElement>('[data-feed]');
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  if (feed && rail && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const r = feed.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height));
+      rail.style.setProperty('--p', p.toFixed(3));
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+  }
+</script>
