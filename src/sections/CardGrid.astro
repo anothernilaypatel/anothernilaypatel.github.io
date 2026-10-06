@@ -1,38 +1,66 @@
 ---
-import Sparkline from '../Sparkline.astro';
-import { isPlaceholder } from '../../site.config';
+import SectionHead from '../components/section/SectionHead.astro';
+import Sparkline from '../components/Sparkline.astro';
+import { isPlaceholder } from '../site.config';
+import { href as siteHref } from '../lib/url';
+import { resolveRef } from '../lib/collections';
+import type { SectionProps } from '../lib/sections';
 
-interface Props {
-  items: { name: string; blurb: string; badge?: string; href?: string }[];
-  n: string;
+interface Card {
+  title: string;
+  text?: string;
+  badge?: string;
+  /** Link: a site path ('/projects/x/') or a full URL. */
+  href?: string;
+  /** Link to a post, e.g. 'projects/coffee'. Only links once that post is published. */
+  ref?: string;
+  linkLabel?: string;
 }
-const { items, n } = Astro.props;
+interface Props extends SectionProps {
+  items: Card[];
+  /** 'grid' wraps cards in rows; 'strip' is one horizontal row (pinned to scroll when `animate` is on). */
+  layout?: 'grid' | 'strip';
+  /** Decorative sparkline at the bottom of each card. */
+  sparkline?: boolean;
+  /** Small hint next to the heading in strip layout. */
+  hint?: string;
+}
+const { id, kicker, title, intro, items = [], layout = 'grid', sparkline = true, hint = 'scroll', animate } = Astro.props;
+const cards = await Promise.all(
+  items.map(async (c) => ({ ...c, link: c.href ? siteHref(c.href) : await resolveRef(c.ref) })),
+);
+const pinned = layout === 'strip' && animate;
 ---
 
-<section id="interests" class="int" aria-labelledby="int-h" data-hs>
+<section
+  id={id}
+  class:list={['sec', 'int', `layout-${layout}`]}
+  aria-labelledby={title ? `${id}-h` : undefined}
+  data-hs={pinned ? '' : undefined}>
   <div class="int-sticky">
     <div class="wrap int-head">
-      <div data-reveal>
-        <p class="kicker">{n} / Interests</p>
-        <h2 id="int-h">Off the clock.</h2>
-      </div>
-      <p class="mono muted int-hint" aria-hidden="true">scroll <span>→</span></p>
+      <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
+      {layout === 'strip' && hint && (
+        <p class="mono muted int-hint" aria-hidden="true">
+          {hint} <span>→</span>
+        </p>
+      )}
     </div>
-    <div class="int-viewport" data-hs-viewport>
+    <div class:list={['int-viewport', { wrap: layout === 'grid' }]} data-hs-viewport>
       <ul class="int-track" data-hs-track>
         {
-          items.map((it, i) => (
+          cards.map((it, i) => (
             <li class="int-card" data-tilt>
               <div class="int-top mono">
                 <span class="muted">{String(i + 1).padStart(2, '0')}</span>
                 {it.badge && <span class="badge">{it.badge}</span>}
               </div>
-              <h3>{it.name}</h3>
-              <p class:list={['int-blurb', { ph: isPlaceholder(it.blurb) }]}>{it.blurb}</p>
-              <Sparkline seed={it.name} width={300} height={54} class="int-spark draw" />
-              {it.href && (
-                <a class="int-link mono" href={it.href}>
-                  Read the post <span aria-hidden="true">→</span>
+              <h3>{it.title}</h3>
+              {it.text && <p class:list={['int-blurb', { ph: isPlaceholder(it.text) }]}>{it.text}</p>}
+              {sparkline && <Sparkline seed={it.title} width={300} height={54} class="int-spark draw" />}
+              {it.link && (
+                <a class="int-link mono" href={it.link}>
+                  {it.linkLabel ?? (it.ref && !it.href ? 'Read the post' : 'Open')} <span aria-hidden="true">→</span>
                 </a>
               )}
             </li>
@@ -40,13 +68,12 @@ const { items, n } = Astro.props;
         }
       </ul>
     </div>
-    <div class="wrap int-progress" aria-hidden="true"><span data-hs-bar></span></div>
+    {pinned && <div class="wrap int-progress" aria-hidden="true"><span data-hs-bar /></div>}
   </div>
 </section>
 
 <style>
   .int {
-    position: relative;
     padding: clamp(3.5rem, 8vw, 6rem) 0;
   }
   .int-head {
@@ -56,9 +83,8 @@ const { items, n } = Astro.props;
     gap: 1rem;
     margin-bottom: 2.2rem;
   }
-  .int-head h2 {
-    font-size: clamp(2.2rem, 5.5vw, 4.2rem);
-    margin-top: 1rem;
+  .int-head :global(.sec-head) {
+    margin-bottom: 0;
   }
   .int-hint span {
     display: inline-block;
@@ -133,6 +159,18 @@ const { items, n } = Astro.props;
     color: var(--accent-ink);
     font-size: 0.68rem;
   }
+  .layout-grid .int-track {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    width: auto;
+    padding: 0.5rem 0 1rem;
+  }
+  .layout-grid .int-viewport {
+    overflow: visible;
+  }
+  .layout-grid .int-card {
+    width: auto;
+  }
   .int-card h3 {
     font-size: 1.9rem;
   }
@@ -201,13 +239,12 @@ const { items, n } = Astro.props;
 </style>
 
 <script>
-  const section = document.querySelector<HTMLElement>('[data-hs]');
-  const track = section?.querySelector<HTMLElement>('[data-hs-track]');
-  const viewport = section?.querySelector<HTMLElement>('[data-hs-viewport]');
-  const bar = section?.querySelector<HTMLElement>('[data-hs-bar]');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
-  if (section && track && viewport && bar) {
+  document.querySelectorAll<HTMLElement>('[data-hs]').forEach((section) => {
+    const track = section.querySelector<HTMLElement>('[data-hs-track]')!;
+    const viewport = section.querySelector<HTMLElement>('[data-hs-viewport]')!;
+    const bar = section.querySelector<HTMLElement>('[data-hs-bar]');
     let overflow = 0;
     let on = false;
 
@@ -220,7 +257,7 @@ const { items, n } = Astro.props;
       if (!on) return;
       const p = progress();
       track.style.setProperty('--x', `${(-p * overflow).toFixed(1)}px`);
-      bar.style.setProperty('--p', p.toFixed(3));
+      bar?.style.setProperty('--p', p.toFixed(3));
     };
     const layout = () => {
       section.classList.remove('hs-on');
@@ -262,7 +299,7 @@ const { items, n } = Astro.props;
       const top = section.getBoundingClientRect().top + scrollY;
       scrollTo({ top: top + p * (section.offsetHeight - innerHeight), behavior: 'instant' as ScrollBehavior });
     });
-  }
+  });
 
   if (!reduce.matches && matchMedia('(hover: hover)').matches) {
     document.querySelectorAll<HTMLElement>('.int-card[data-tilt]').forEach((card) => {

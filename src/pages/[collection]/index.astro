@@ -1,0 +1,15 @@
+---
+import ArticleIndex from '../../layouts/collection/ArticleIndex.astro';
+import JournalIndex from '../../layouts/collection/JournalIndex.astro';
+import { collections, getEntries, type CollectionConfig } from '../../lib/collections';
+
+export function getStaticPaths() {
+  return collections.map((config) => ({ params: { collection: config.name }, props: { config } }));
+}
+
+const { config } = Astro.props as { config: CollectionConfig };
+const entries = await getEntries(config.name);
+const Layout = { article: ArticleIndex, journal: JournalIndex }[config.layout];
+---
+
+<Layout config={config} entries={entries as never} />

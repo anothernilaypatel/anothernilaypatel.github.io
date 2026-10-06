@@ -1,0 +1,159 @@
+---
+import { getEntries, getCollectionConfig, indexUrl, titleOf, type Journal } from '../lib/collections';
+import { href as siteHref } from '../lib/url';
+import { reveal, type SectionProps } from '../lib/sections';
+
+interface Band {
+  /** Link to a collection's index; shows its entry count and a ticker of its titles. */
+  collection?: string;
+  /** Or a plain link. */
+  href?: string;
+  title?: string;
+  kicker?: string;
+}
+interface Props extends SectionProps {
+  /** Big full-width link panels. The first is filled with the accent color. */
+  items: Band[];
+}
+const { id, items = [], animate } = Astro.props;
+const bands = await Promise.all(
+  items.map(async (b) => {
+    if (!b.collection) return { ...b, link: b.href ? siteHref(b.href) : undefined, ticker: [] as string[] };
+    const config = getCollectionConfig(b.collection);
+    const entries = await getEntries(b.collection);
+    const noun = config.layout === 'journal' ? ['entry', 'entries'] : ['post', 'posts'];
+    const ticker =
+      config.layout === 'journal'
+        ? (entries as Journal[]).filter((e) => e.data.quote).map((e) => `“${e.data.quote!.text}”`)
+        : entries.map(titleOf);
+    return {
+      ...b,
+      link: indexUrl(b.collection),
+      title: b.title ?? [config.title, config.accent].filter(Boolean).join(' '),
+      kicker: b.kicker ?? `${entries.length} ${entries.length === 1 ? noun[0] : noun[1]}`,
+      ticker,
+    };
+  }),
+);
+const shown = bands.filter((b) => b.link);
+---
+
+{
+  shown.length > 0 && (
+    <section id={id} class="sec bands" style={`--cols:${Math.min(shown.length, 3)}`}>
+      {shown.map((b, i) => (
+        <a class:list={['enter', { 'enter-alt': i > 0 }]} href={b.link} {...reveal(animate, i)}>
+          {b.ticker.length > 0 && (
+            <span class="enter-marquee" aria-hidden="true">
+              {[0, 1].map(() => (
+                <span>{b.ticker.join('  ·  ')}  ·  </span>
+              ))}
+            </span>
+          )}
+          <span class="enter-inner">
+            {b.kicker && <span class="kicker">{b.kicker}</span>}
+            <span class="enter-title">
+              {b.title} <span class="enter-arrow" aria-hidden="true">→</span>
+            </span>
+          </span>
+        </a>
+      ))}
+    </section>
+  )
+}
+
+<style>
+  .bands {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+  }
+  .enter {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: clamp(3.5rem, 9vw, 7rem) 0;
+    background: var(--accent);
+    color: var(--accent-ink);
+    text-decoration: none;
+  }
+  .enter:hover {
+    color: var(--accent-ink);
+  }
+  .enter .kicker {
+    color: var(--accent-ink);
+    opacity: 0.7;
+  }
+  .enter-marquee {
+    position: absolute;
+    inset: auto 0 0.6rem 0;
+    display: flex;
+    white-space: nowrap;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.45;
+  }
+  .enter-marquee span {
+    animation: tape 30s linear infinite;
+    padding-right: 1rem;
+  }
+  @keyframes tape {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  .enter-inner {
+    position: relative;
+    padding-inline: clamp(1.25rem, 5vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .enter-title {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5.5vw, 4.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    font-style: italic;
+  }
+  .enter-arrow {
+    display: inline-block;
+    font-style: normal;
+    transition: transform 0.5s var(--ease);
+  }
+  .enter:hover .enter-arrow {
+    transform: translateX(0.3em);
+  }
+
+  .enter-alt {
+    background: var(--surface);
+    color: var(--ink);
+    border-block: 1px solid var(--line);
+  }
+  .enter-alt:hover {
+    color: var(--ink);
+  }
+  .enter-alt .kicker {
+    color: var(--accent);
+    opacity: 1;
+  }
+  .enter-alt .enter-marquee {
+    color: var(--muted);
+  }
+  .enter-alt .enter-marquee span {
+    animation-duration: 40s;
+    animation-direction: reverse;
+  }
+
+  @media (max-width: 860px) {
+    .bands {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .enter-marquee {
+      display: none;
+    }
+  }
+</style>

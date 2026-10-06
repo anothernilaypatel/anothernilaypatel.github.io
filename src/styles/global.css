@@ -267,3 +267,36 @@ h3 {
     transform: none;
   }
 }
+
+/* Home sections (src/sections/*). Kickers are numbered in page order, so hidden sections leave no gaps. */
+main {
+  counter-reset: sec;
+}
+.sec {
+  position: relative;
+}
+.sec-pad {
+  padding: clamp(3.5rem, 8vw, 6rem) 0;
+}
+.sec:has(.sec-kicker) {
+  counter-increment: sec;
+}
+.sec-kicker::before {
+  content: counter(sec, decimal-leading-zero) ' / ';
+}
+.sec-head {
+  max-width: 48rem;
+  margin-bottom: 2.5rem;
+}
+.sec-title {
+  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+  margin-top: 1rem;
+}
+.sec-intro {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  line-height: 1.45;
+  color: var(--ink-2);
+  max-width: 40rem;
+  margin: 1rem 0 0;
+}

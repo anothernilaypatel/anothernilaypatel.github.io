@@ -1,24 +1,25 @@
 ---
-import { isPlaceholder } from '../../site.config';
-import { href } from '../../lib/url';
+import SectionHead from '../components/section/SectionHead.astro';
+import { isPlaceholder } from '../site.config';
+import { href } from '../lib/url';
+import { reveal, type SectionProps } from '../lib/sections';
 
-interface Props {
+interface Props extends SectionProps {
+  /** Big headline cards. With `animate`, numbers in `value` count in (e.g. "Top 50" counts down). */
   items: { value: string; label: string; detail?: string; href?: string }[];
-  n: string;
 }
-const { items, n } = Astro.props;
+const { id, kicker, title, intro, items = [], animate } = Astro.props;
 ---
 
-<section id="highlights" class="hl" aria-labelledby="hl-h">
+<section id={id} class="sec hl" aria-label={title ?? kicker ?? 'Highlights'} data-anim={animate ? '' : undefined}>
   <div class="wrap">
-    <p class="kicker" data-reveal>{n} / Highlights</p>
-    <h2 id="hl-h" class="sr-only">Highlights</h2>
+    <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
     <ul class="hl-list">
       {
         items.map((h, i) => {
           const Tag = h.href ? 'a' : 'div';
           return (
-            <li data-reveal style={`--d:${i}`}>
+            <li {...reveal(animate, i)}>
               <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
                 <span class="hl-value" data-countdown={h.value}>
                   {h.value}
@@ -38,6 +39,9 @@ const { items, n } = Astro.props;
 <style>
   .hl {
     padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+  .hl :global(.sec-head) {
+    margin-bottom: 0;
   }
   .hl-list {
     display: grid;
@@ -131,5 +135,5 @@ const { items, n } = Astro.props;
       requestAnimationFrame(tick);
     }
   });
-  document.querySelectorAll('[data-countdown]').forEach((el) => io.observe(el));
+  document.querySelectorAll('[data-anim] [data-countdown]').forEach((el) => io.observe(el));
 </script>

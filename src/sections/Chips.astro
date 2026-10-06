@@ -1,24 +1,24 @@
 ---
-import { isPlaceholder } from '../../site.config';
+import SectionHead from '../components/section/SectionHead.astro';
+import { isPlaceholder } from '../site.config';
+import { reveal, type SectionProps } from '../lib/sections';
 
-interface Props {
-  groups: { group: string; items: string[] }[];
-  n: string;
+interface Props extends SectionProps {
+  /** Labeled groups of short items, shown as chips (e.g. skills, tools, languages). */
+  groups: { label: string; items: string[] }[];
 }
-const { groups, n } = Astro.props;
+const { id, kicker, title, intro, groups = [], animate } = Astro.props;
+const shown = groups.filter((g) => g.items.length > 0);
 ---
 
-<section id="skills" class="skills" aria-labelledby="skills-h">
+<section id={id} class:list={['sec', 'skills', { anim: animate }]} aria-labelledby={title ? `${id}-h` : undefined}>
   <div class="wrap">
-    <header class="head" data-reveal>
-      <p class="kicker">{n} / Skills</p>
-      <h2 id="skills-h">The toolkit.</h2>
-    </header>
+    <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
     <dl class="groups">
       {
-        groups.map((g, gi) => (
-          <div class="group" data-reveal style={`--d:${gi}`}>
-            <dt class="mono">{g.group}</dt>
+        shown.map((g, gi) => (
+          <div class="group" {...reveal(animate, gi)}>
+            <dt class="mono">{g.label}</dt>
             <dd>
               <ul>
                 {g.items.map((s, i) => (
@@ -39,13 +39,6 @@ const { groups, n } = Astro.props;
   .skills {
     padding: clamp(3.5rem, 8vw, 6rem) 0;
     background: linear-gradient(to bottom, transparent, var(--bg-2) 30%, var(--bg-2) 70%, transparent);
-  }
-  .head {
-    margin-bottom: 2.5rem;
-  }
-  .head h2 {
-    font-size: clamp(2.2rem, 5.5vw, 4.2rem);
-    margin-top: 1rem;
   }
   .groups {
     margin: 0;
@@ -91,7 +84,7 @@ const { groups, n } = Astro.props;
     border-color: var(--accent);
     color: var(--accent);
   }
-  :global(.js) .group .chip {
+  :global(.js) .anim .group .chip {
     opacity: 0;
     transform: translateY(10px);
     transition:
@@ -115,7 +108,7 @@ const { groups, n } = Astro.props;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    :global(.js) .group .chip {
+    :global(.js) .anim .group .chip {
       opacity: 1;
       transform: none;
     }

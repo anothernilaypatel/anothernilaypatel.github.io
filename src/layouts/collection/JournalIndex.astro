@@ -1,25 +1,29 @@
 ---
-import Base from '../../layouts/Base.astro';
+import Base from '../Base.astro';
 import MarketField from '../../components/MarketField.astro';
-import DailyCard from '../../components/DailyCard.astro';
-import { getDaily, fmtDate } from '../../lib/posts';
+import JournalCard from '../../components/JournalCard.astro';
+import { fmtDate, type Journal, type CollectionConfig } from '../../lib/collections';
 import { url } from '../../lib/url';
 import { site } from '../../site.config';
 
-const entries = await getDaily();
+interface Props {
+  config: CollectionConfig;
+  entries: Journal[];
+}
+const { config, entries } = Astro.props;
 const oldest = entries.at(-1);
 const withMusic = entries.filter((e) => e.data.spotify).length;
 ---
 
-<Base title="Daily" description={site.dailyIntro}>
+<Base title={config.title} description={config.intro}>
   <section class="head">
     <MarketField paths={16} seed={31} />
     <div class="head-veil" aria-hidden="true"></div>
     <div class="wrap head-inner">
       <a class="mono back" href={url('/')}>← Home</a>
-      <p class="kicker">{site.handle} / daily</p>
-      <h1>Daily <em>log</em></h1>
-      <p class="lede">{site.dailyIntro}</p>
+      <p class="kicker">{site.handle} / {config.kicker ?? config.name}</p>
+      <h1>{config.title} {config.accent && <em>{config.accent}</em>}</h1>
+      <p class="lede">{config.intro}</p>
       <dl class="meta mono">
         <div><dt class="muted">Entries</dt><dd>{entries.length}</dd></div>
         {withMusic > 0 && <div><dt class="muted">Tracks</dt><dd>{withMusic}</dd></div>}
@@ -37,7 +41,7 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
         entries.map((e, i) => (
           <li id={`d-${e.id}`} class="entry" data-reveal style={`--d:${Math.min(i, 4)}`}>
             <span class="dot" aria-hidden="true" />
-            <DailyCard entry={e} />
+            <JournalCard entry={e} />
           </li>
         ))
       }

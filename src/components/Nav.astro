@@ -1,28 +1,27 @@
 ---
 import { url, withoutBase } from '../lib/url';
-import { site, visibleLinks } from '../site.config';
+import { site, sections } from '../site.config';
+import { isVisible, sectionId } from '../lib/sections';
+import { collections } from '../collections.mjs';
 
-const path = Astro.url.pathname;
-const current = withoutBase(path);
-const anchors = [
-  { href: url('/#about'), label: 'About', show: site.about.length > 0 },
-  { href: url('/#path'), label: 'Experience', show: site.experience.length + site.education.length > 0 },
-  { href: url('/#contact'), label: 'Contact', show: visibleLinks.length > 0 },
-].filter((a) => a.show);
-const pills = [
-  { href: url('/projects/'), label: 'Projects', active: current.startsWith('/projects') },
-  { href: url('/daily/'), label: 'Daily', active: current.startsWith('/daily') },
-];
+const current = withoutBase(Astro.url.pathname);
+const anchors = sections
+  .map((s, i) => ({ ...s, id: sectionId(s, i) }))
+  .filter((s) => s.nav && isVisible(s))
+  .map((s) => ({ href: url(`/#${s.id}`), label: s.nav! }));
+const pills = collections
+  .filter((c) => c.nav)
+  .map((c) => ({ href: url(`/${c.name}/`), label: c.nav!, active: current.startsWith(`/${c.name}`) }));
 ---
 
 <header class="nav" data-nav>
   <div class="wrap nav-inner">
-    <a class="logo" href={url('/')} aria-label="Nilay Patel — home">
+    <a class="logo" href={url('/')} aria-label={`${site.name}, home`}>
       <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
         <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="currentColor" stroke-opacity=".35"></rect>
         <path d="M7 22 L12 14 L16 18 L21 9 L25 13" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
       </svg>
-      <span class="mono">Nilay Patel</span>
+      <span class="mono">{site.name}</span>
     </a>
     <nav aria-label="Primary">
       <ul>

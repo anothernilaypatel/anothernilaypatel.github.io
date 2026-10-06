@@ -1,0 +1,35 @@
+---
+import ArticlePage from '../../layouts/collection/ArticlePage.astro';
+import JournalPage from '../../layouts/collection/JournalPage.astro';
+import { collections, getEntries, type CollectionConfig, type Entry } from '../../lib/collections';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const config of collections) {
+    const entries = await getEntries(config.name);
+    paths.push(
+      ...entries.map((entry, i) => ({
+        params: { collection: config.name, slug: entry.id },
+        props: { config, entry, entries, newer: entries[i - 1], older: entries[i + 1] },
+      })),
+    );
+  }
+  return paths;
+}
+
+const { config, entry, entries, newer, older } = Astro.props as {
+  config: CollectionConfig;
+  entry: Entry;
+  entries: Entry[];
+  newer?: Entry;
+  older?: Entry;
+};
+---
+
+{
+  config.layout === 'article' ? (
+    <ArticlePage config={config} entry={entry as never} entries={entries as never} />
+  ) : (
+    <JournalPage config={config} entry={entry as never} newer={newer as never} older={older as never} />
+  )
+}
