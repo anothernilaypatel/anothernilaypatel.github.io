@@ -1,0 +1,153 @@
+---
+import SectionHead from '../components/section/SectionHead.astro';
+import JournalCard from '../components/JournalCard.astro';
+import Sparkline from '../components/Sparkline.astro';
+import { getEntries, getCollectionConfig, entryUrl, titleOf, fmtDate, kindOf, type Article, type Journal } from '../lib/collections';
+import { reveal, type SectionProps } from '../lib/sections';
+
+interface Feed {
+  /** A collection name from src/collections.mjs, e.g. 'projects' or 'daily'. */
+  collection: string;
+  /** How many of the newest entries to show. */
+  limit?: number;
+  /** Small label above the column. */
+  label?: string;
+}
+interface Props extends SectionProps {
+  /** One column per feed, side by side. Feeds with no entries are skipped. */
+  feeds: Feed[];
+}
+const { id, kicker, title, intro, feeds = [], animate } = Astro.props;
+const columns = (
+  await Promise.all(
+    feeds.map(async (f) => {
+      const config = getCollectionConfig(f.collection);
+      const entries = (await getEntries(f.collection)).slice(0, f.limit ?? 3);
+      return { ...f, config, entries };
+    }),
+  )
+).filter((c) => c.entries.length > 0);
+---
+
+{
+  columns.length > 0 && (
+    <section id={id} class="sec feed" aria-labelledby={title ? `${id}-h` : undefined}>
+      <div class="wrap">
+        <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
+        <div class:list={['latest-grid', { single: columns.length === 1 }]}>
+          {columns.map((col, ci) => (
+            <div {...reveal(animate, ci)}>
+              {col.label && <p class="mono muted col-label">{col.label}</p>}
+              {col.config.layout === 'journal' ? (
+                <div class="cards">
+                  {(col.entries as Journal[]).map((e) => (
+                    <JournalCard entry={e} headingLevel="h3" />
+                  ))}
+                </div>
+              ) : (
+                <ol class="rows">
+                  {(col.entries as Article[]).map((p) => (
+                    <li>
+                      <a href={entryUrl(p)} class="row">
+                        <span class="mono muted">{[kindOf(p), fmtDate(p.data.date)].filter(Boolean).join(' · ')}</span>
+                        <span class="row-title">{titleOf(p)}</span>
+                        <Sparkline seed={p.id} width={120} height={28} class:list={['row-spark', { draw: !animate }]} />
+                        <span class="row-arrow" aria-hidden="true">
+                          →
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .latest-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+    margin-bottom: 4rem;
+  }
+  .latest-grid.single {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 52rem;
+  }
+  .col-label {
+    margin: 0 0 1rem;
+  }
+  .rows {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 90px 1.5rem;
+    grid-template-areas: 'meta meta meta' 'title spark arrow';
+    align-items: center;
+    gap: 0.4rem 1rem;
+    padding: 1.2rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    transition:
+      background 0.3s var(--ease),
+      padding 0.4s var(--ease);
+  }
+  .row > :first-child {
+    grid-area: meta;
+  }
+  .row-title {
+    grid-area: title;
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    line-height: 1.15;
+  }
+  :global(.row-spark) {
+    grid-area: spark;
+    opacity: 0.35;
+    transition: opacity 0.3s;
+  }
+  .row-arrow {
+    grid-area: arrow;
+    font-size: 1.3rem;
+    transition: transform 0.4s var(--ease);
+  }
+  .row:hover {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    padding-left: 1.1rem;
+  }
+  .row:hover .row-arrow {
+    transform: translateX(6px);
+    color: var(--accent);
+  }
+  .row:hover :global(.row-spark) {
+    opacity: 1;
+  }
+
+  .feed {
+    padding: clamp(3.5rem, 8vw, 6rem) 0 4rem;
+  }
+  .latest-grid {
+    margin-bottom: 0;
+  }
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  @media (max-width: 860px) {
+    .latest-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

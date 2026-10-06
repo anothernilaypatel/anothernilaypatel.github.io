@@ -1,0 +1,30 @@
+---
+import { reveal } from '../../lib/sections';
+
+interface Props {
+  id: string;
+  kicker?: string;
+  title?: string;
+  intro?: string;
+  animate?: boolean;
+  /** Visually hide the title (still read by screen readers). */
+  hideTitle?: boolean;
+  class?: string;
+}
+const { id, kicker, title, intro, animate, hideTitle, class: cls } = Astro.props;
+---
+
+{
+  (kicker || title || intro) && (
+    <header class:list={['sec-head', cls]} {...reveal(animate)}>
+      {kicker && <p class="kicker sec-kicker">{kicker}</p>}
+      {title && (
+        <h2 id={`${id}-h`} class:list={['sec-title', { 'sr-only': hideTitle }]}>
+          {title}
+        </h2>
+      )}
+      {intro && <p class="sec-intro">{intro}</p>}
+      <slot />
+    </header>
+  )
+}

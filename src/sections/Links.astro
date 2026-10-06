@@ -1,0 +1,76 @@
+---
+import SectionHead from '../components/section/SectionHead.astro';
+import { href as siteHref } from '../lib/url';
+import { reveal, type SectionProps } from '../lib/sections';
+
+interface Props extends SectionProps {
+  /** Big link rows. Entries with an empty href are hidden. */
+  items: { label: string; href: string; icon?: string }[];
+}
+const { id, kicker, title, intro, items = [], animate } = Astro.props;
+const links = items.filter((l) => l.href);
+---
+
+{
+  links.length > 0 && (
+    <section id={id} class="sec contact" aria-labelledby={title ? `${id}-h` : undefined}>
+      <div class="wrap">
+        <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} class="links-head" />
+        <ul class="links">
+          {links.map((l, i) => (
+            <li {...reveal(animate, i)}>
+              <a class="link-row" href={siteHref(l.href)}>
+                <span>{l.label}</span>
+                <span class="link-arrow" aria-hidden="true">
+                  {l.icon ?? '↗'}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .contact {
+    padding: clamp(4rem, 10vw, 7rem) 0;
+  }
+  .contact :global(.links-head) {
+    margin-bottom: 0;
+  }
+  .contact :global(.sec-title) {
+    margin: 1rem 0 3rem;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+  }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+  .link-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.3rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    text-decoration: none;
+    transition: padding 0.4s var(--ease);
+    outline-offset: -3px;
+  }
+  .link-arrow {
+    margin-left: auto;
+    transition: transform 0.4s var(--ease);
+  }
+  .link-row[href]:hover {
+    padding-left: 1.2rem;
+  }
+  .link-row[href]:hover .link-arrow {
+    transform: translate(4px, -4px);
+  }
+
+</style>

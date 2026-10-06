@@ -1,0 +1,123 @@
+---
+import SectionHead from '../components/section/SectionHead.astro';
+import Spotify from '../components/Spotify.astro';
+import { href as siteHref } from '../lib/url';
+import { reveal, type SectionProps } from '../lib/sections';
+
+interface MediaItem {
+  /** 'spotify' and 'youtube' take a normal share link; 'image'/'video' take a file in public/ ('/media/x.jpg') or a URL. */
+  kind: 'spotify' | 'youtube' | 'image' | 'video' | 'iframe';
+  src: string;
+  /** Required for images (alt text) and iframes (title). */
+  alt?: string;
+  caption?: string;
+}
+interface Props extends SectionProps {
+  items: MediaItem[];
+  /** Number of columns on wide screens. */
+  columns?: 1 | 2 | 3;
+}
+const { id, kicker, title, intro, items = [], columns = 2, animate } = Astro.props;
+
+const youtubeId = (u: string) => u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/)?.[1];
+---
+
+{
+  items.length > 0 && (
+    <section id={id} class="sec sec-pad media" aria-labelledby={title ? `${id}-h` : undefined}>
+      <div class="wrap">
+        <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
+        <ul class="grid" style={`--cols:${columns}`}>
+          {items.map((m, i) => {
+            const src = siteHref(m.src);
+            const yt = m.kind === 'youtube' ? youtubeId(m.src) : undefined;
+            return (
+              <li {...reveal(animate, i)}>
+                <figure>
+                  {m.kind === 'spotify' && <Spotify src={m.src} />}
+                  {m.kind === 'youtube' && yt && (
+                    <div class="frame">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${yt}`}
+                        title={m.alt ?? 'YouTube video'}
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                      />
+                    </div>
+                  )}
+                  {m.kind === 'iframe' && (
+                    <div class="frame">
+                      <iframe src={src} title={m.alt ?? 'Embedded content'} loading="lazy" />
+                    </div>
+                  )}
+                  {m.kind === 'image' && <img src={src} alt={m.alt ?? ''} loading="lazy" decoding="async" />}
+                  {m.kind === 'video' && <video src={src} controls preload="metadata" />}
+                  {(m.caption || m.kind === 'youtube' || m.kind === 'iframe') && (
+                    <figcaption class="mono">
+                      {m.caption}
+                      {(m.kind === 'youtube' || m.kind === 'iframe') && (
+                        <a href={m.src} target="_blank" rel="noopener">
+                          Open <span aria-hidden="true">↗</span>
+                        </a>
+                      )}
+                    </figcaption>
+                  )}
+                </figure>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  figure {
+    margin: 0;
+  }
+  img,
+  video,
+  .frame {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .frame {
+    aspect-ratio: 16 / 9;
+  }
+  .frame iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: none;
+  }
+  figcaption a {
+    margin-left: auto;
+    text-decoration: none;
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

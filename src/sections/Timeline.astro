@@ -1,39 +1,41 @@
 ---
-import { isPlaceholder } from '../../site.config';
-import { href } from '../../lib/url';
+import SectionHead from '../components/section/SectionHead.astro';
+import { isPlaceholder } from '../site.config';
+import { href } from '../lib/url';
+import { reveal, type SectionProps } from '../lib/sections';
 
-type Item = { title: string; sub: string; period: string; detail?: string; href?: string };
-interface Props {
-  groups: { label: string; items: Item[] }[];
-  n: string;
+type Item = { title: string; sub?: string; period?: string; detail?: string; href?: string };
+interface Props extends SectionProps {
+  /** Groups shown top to bottom (e.g. Experience, Education). Empty groups are skipped. */
+  groups: { label?: string; items: Item[] }[];
 }
-const { groups, n } = Astro.props;
+const { id, kicker, title, intro, groups = [], animate } = Astro.props;
+const shown = groups.filter((g) => g.items.length > 0);
 const ph = (s?: string) => isPlaceholder(s);
 ---
 
-<section id="path" class="path" aria-labelledby="path-h">
+<section id={id} class="sec path" aria-labelledby={title ? `${id}-h` : undefined}>
   <div class="wrap path-grid">
-    <header class="path-head" data-reveal>
-      <p class="kicker">{n} / Path</p>
-      <h2 id="path-h">Where I've been.</h2>
-    </header>
-    <div class="tl" data-tl>
+    <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} class="path-head" />
+    <div class="tl" data-tl data-anim={animate ? '' : undefined}>
       <div class="tl-rail" aria-hidden="true"><span data-tl-fill></span></div>
       {
-        groups.map((g) => (
+        shown.map((g) => (
           <div class="tl-group">
-            <h3 class="mono tl-label" data-reveal>
-              {g.label}
-            </h3>
+            {g.label && (
+              <h3 class="mono tl-label" {...reveal(animate)}>
+                {g.label}
+              </h3>
+            )}
             <ol>
               {g.items.map((it, i) => (
-                <li class="tl-item" data-reveal style={`--d:${i}`}>
+                <li class:list={['tl-item', { 'is-in': !animate }]} {...reveal(animate, i)}>
                   <span class="tl-dot" aria-hidden="true" />
-                  <p class:list={['mono', 'tl-period', { ph: ph(it.period) }]}>{it.period}</p>
+                  {it.period && <p class:list={['mono', 'tl-period', { ph: ph(it.period) }]}>{it.period}</p>}
                   <p class:list={['tl-title', { ph: ph(it.title) }]}>
                     {it.href ? <a href={href(it.href)}>{it.title}</a> : it.title}
                   </p>
-                  <p class:list={['tl-sub', { ph: ph(it.sub) }]}>{it.sub}</p>
+                  {it.sub && <p class:list={['tl-sub', { ph: ph(it.sub) }]}>{it.sub}</p>}
                   {it.detail && <p class:list={['tl-detail', { ph: ph(it.detail) }]}>{it.detail}</p>}
                 </li>
               ))}
@@ -54,15 +56,12 @@ const ph = (s?: string) => isPlaceholder(s);
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     gap: clamp(2rem, 6vw, 6rem);
   }
-  .path-head {
+  .path-grid :global(.path-head) {
     position: sticky;
     top: 7rem;
     align-self: start;
   }
-  .path-head h2 {
-    font-size: clamp(2.2rem, 5.5vw, 4.2rem);
-    margin-top: 1rem;
-  }
+
   .tl {
     position: relative;
     padding-left: 2.2rem;
@@ -77,7 +76,8 @@ const ph = (s?: string) => isPlaceholder(s);
   }
   .tl-rail span {
     display: block;
-    height: calc(var(--p, 1) * 100%);
+    --p: 1;
+    height: calc(var(--p) * 100%);
     background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
     box-shadow: 0 0 8px var(--accent);
   }
@@ -149,21 +149,24 @@ const ph = (s?: string) => isPlaceholder(s);
     .path-grid {
       grid-template-columns: 1fr;
     }
-    .path-head {
+    .path-grid :global(.path-head) {
       position: static;
     }
   }
 </style>
 
 <script>
-  const tl = document.querySelector<HTMLElement>('[data-tl]');
-  const fill = document.querySelector<HTMLElement>('[data-tl-fill]');
-  if (tl && fill && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const timelines = [...document.querySelectorAll<HTMLElement>('[data-tl][data-anim]')];
+  if (!reduce && timelines.length) {
     let ticking = false;
     const update = () => {
       ticking = false;
-      const r = tl.getBoundingClientRect();
-      fill.style.setProperty('--p', Math.min(1, Math.max(0, (innerHeight * 0.65 - r.top) / r.height)).toFixed(3));
+      for (const tl of timelines) {
+        const fill = tl.querySelector<HTMLElement>('[data-tl-fill]')!;
+        const r = tl.getBoundingClientRect();
+        fill.style.setProperty('--p', Math.min(1, Math.max(0, (innerHeight * 0.65 - r.top) / r.height)).toFixed(3));
+      }
     };
     addEventListener(
       'scroll',

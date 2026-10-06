@@ -1,0 +1,50 @@
+---
+/**
+ * Example section type. Files starting with "_" are ignored, so this one is not registered.
+ *
+ * To make your own:
+ *   1. Copy this file to src/sections/Quote.astro (the file name becomes the type: 'quote';
+ *      CardGrid.astro -> 'card-grid').
+ *   2. Change the Props and markup below.
+ *   3. Add an entry to `sections` in src/site.config.ts:
+ *        { type: 'quote', id: 'motto', animate: true, kicker: 'Motto', text: 'Stay curious.', author: 'Me' },
+ */
+import SectionHead from '../components/section/SectionHead.astro';
+import { reveal, type SectionProps } from '../lib/sections';
+
+// SectionProps gives you id, animate, kicker, title, and intro. Add your own fields here.
+interface Props extends SectionProps {
+  text: string;
+  author?: string;
+}
+const { id, kicker, title, intro, text, author, animate } = Astro.props;
+---
+
+<section id={id} class="sec sec-pad quote" aria-labelledby={title ? `${id}-h` : undefined}>
+  <div class="wrap">
+    <!-- Numbered kicker + heading, same look as every other section. -->
+    <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
+
+    <!-- reveal(animate, delay) adds the fade-up-on-scroll animation only when `animate: true`. -->
+    <figure {...reveal(animate, 1)}>
+      <blockquote>{text}</blockquote>
+      {author && <figcaption class="mono muted">— {author}</figcaption>}
+    </figure>
+  </div>
+</section>
+
+<style>
+  /* Styles here only apply to this section. Theme colors: var(--ink), var(--accent), var(--surface), var(--line). */
+  blockquote {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.2;
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    padding-left: 1.2rem;
+  }
+  figcaption {
+    margin-top: 1rem;
+  }
+</style>

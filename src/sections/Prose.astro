@@ -1,0 +1,65 @@
+---
+import SectionHead from '../components/section/SectionHead.astro';
+import { isPlaceholder } from '../site.config';
+import { reveal, type SectionProps } from '../lib/sections';
+
+interface Props extends SectionProps {
+  /** Paragraphs of text. */
+  paragraphs: string[];
+  /** 'side' puts the kicker in a left column (like the About section); 'stack' puts it above. */
+  layout?: 'side' | 'stack';
+}
+const { id, kicker, title, intro, paragraphs = [], layout = 'side', animate } = Astro.props;
+---
+
+<section id={id} class:list={['sec', 'prose-sec', `layout-${layout}`]} aria-labelledby={title ? `${id}-h` : undefined}>
+  <div class="wrap inner">
+    {kicker && <p class="kicker sec-kicker" {...reveal(animate)}>{kicker}</p>}
+    <div>
+      <SectionHead id={id} title={title} intro={intro} animate={animate} class="prose-head" />
+      {
+        paragraphs.map((p, i) => (
+          <p class:list={['bio', { ph: isPlaceholder(p) }]} {...reveal(animate, i + 1)}>
+            {p}
+          </p>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .prose-sec {
+    padding: clamp(4rem, 9vw, 7rem) 0 clamp(2rem, 5vw, 3rem);
+  }
+  .layout-side .inner {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: 1rem 3rem;
+    align-items: baseline;
+  }
+  .layout-stack .sec-kicker {
+    margin-bottom: 1rem;
+  }
+  :global(.prose-head) {
+    margin-bottom: 0 !important;
+  }
+  .prose-sec :global(.sec-title) {
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    margin-top: 0;
+  }
+  .bio {
+    font-family: var(--serif);
+    font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: 42rem;
+    margin: 1.2rem 0 0;
+    padding: 0.2rem 0.4rem;
+  }
+  @media (max-width: 860px) {
+    .layout-side .inner {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
