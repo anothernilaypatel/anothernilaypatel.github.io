@@ -1,4 +1,5 @@
 ---
+import { url, absoluteUrl } from '../lib/url';
 import '../styles/global.css';
 import 'katex/dist/katex.min.css';
 import Nav from '../components/Nav.astro';
@@ -16,7 +17,7 @@ interface Props {
 const { title, description = site.description, type = 'website', publishedTime, image } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL(image ?? '/og.jpg', Astro.site);
+const ogImage = image ? new URL(image, Astro.site) : absoluteUrl('/og.jpg', Astro.site!);
 ---
 
 <!doctype html>
@@ -27,9 +28,9 @@ const ogImage = new URL(image ?? '/og.jpg', Astro.site);
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${site.name} — research log`} href="/rss.xml" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} — research log`} href={url('/rss.xml')} />
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
     <meta name="theme-color" content="#0a0c0b" />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={fullTitle} />
@@ -46,6 +47,16 @@ const ogImage = new URL(image ?? '/og.jpg', Astro.site);
         if (t) document.documentElement.dataset.theme = t;
         else if (matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'light';
       } catch {}
+      // Returning visitors may still have the old Flutter app's service worker, possibly
+      // registered at a different path than this site's base. Remove it and its caches.
+      navigator.serviceWorker?.getRegistrations().then((regs) => {
+        for (const r of regs) {
+          const script = (r.active || r.waiting || r.installing)?.scriptURL || '';
+          if (!script.includes('flutter_service_worker')) continue;
+          r.unregister();
+          caches?.keys().then((keys) => keys.filter((k) => k.startsWith('flutter')).forEach((k) => caches.delete(k)));
+        }
+      });
     </script>
   </head>
   <body>

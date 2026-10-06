@@ -1,0 +1,53 @@
+---
+interface Props {
+  src: string;
+  compact?: boolean;
+}
+const { src, compact = false } = Astro.props;
+const m = src.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/);
+const kind = m?.[1] ?? 'track';
+const embed = m ? `https://open.spotify.com/embed/${kind}/${m[2]}?utm_source=generator&theme=0` : undefined;
+const height = compact || kind === 'track' || kind === 'episode' ? 152 : 352;
+---
+
+{
+  embed && (
+    <div class="spotify">
+      <iframe
+        src={embed}
+        title={`Spotify player (${kind})`}
+        width="100%"
+        height={height}
+        loading="lazy"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+      />
+      <a class="mono sp-link" href={src} target="_blank" rel="noopener">
+        Open in Spotify <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  )
+}
+
+<style>
+  .spotify {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  iframe {
+    display: block;
+    border: 0;
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .sp-link {
+    align-self: flex-end;
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .sp-link:hover {
+    color: var(--accent);
+  }
+</style>

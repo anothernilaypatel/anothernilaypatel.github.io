@@ -19,9 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: withastro/action@v5
+      - id: pages
+        uses: actions/configure-pages@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # The one value that decides site + base. Defaults to this repo's Pages URL
+          # (a /<repo>/ subpath for project sites, the root for user sites or custom
+          # domains). Set a repository variable SITE_URL to override it.
+          SITE_URL: ${{ vars.SITE_URL || steps.pages.outputs.base_url }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
   deploy:
     needs: build
