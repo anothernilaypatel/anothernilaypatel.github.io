@@ -1,0 +1,180 @@
+---
+import { isPlaceholder } from '../../site.config';
+import { href } from '../../lib/url';
+
+type Item = { title: string; sub: string; period: string; detail?: string; href?: string };
+interface Props {
+  groups: { label: string; items: Item[] }[];
+  n: string;
+}
+const { groups, n } = Astro.props;
+const ph = (s?: string) => isPlaceholder(s);
+---
+
+<section id="path" class="path" aria-labelledby="path-h">
+  <div class="wrap path-grid">
+    <header class="path-head" data-reveal>
+      <p class="kicker">{n} / Path</p>
+      <h2 id="path-h">Where I've been.</h2>
+    </header>
+    <div class="tl" data-tl>
+      <div class="tl-rail" aria-hidden="true"><span data-tl-fill></span></div>
+      {
+        groups.map((g) => (
+          <div class="tl-group">
+            <h3 class="mono tl-label" data-reveal>
+              {g.label}
+            </h3>
+            <ol>
+              {g.items.map((it, i) => (
+                <li class="tl-item" data-reveal style={`--d:${i}`}>
+                  <span class="tl-dot" aria-hidden="true" />
+                  <p class:list={['mono', 'tl-period', { ph: ph(it.period) }]}>{it.period}</p>
+                  <p class:list={['tl-title', { ph: ph(it.title) }]}>
+                    {it.href ? <a href={href(it.href)}>{it.title}</a> : it.title}
+                  </p>
+                  <p class:list={['tl-sub', { ph: ph(it.sub) }]}>{it.sub}</p>
+                  {it.detail && <p class:list={['tl-detail', { ph: ph(it.detail) }]}>{it.detail}</p>}
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .path {
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
+  }
+  .path-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  .path-head {
+    position: sticky;
+    top: 7rem;
+    align-self: start;
+  }
+  .path-head h2 {
+    font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+    margin-top: 1rem;
+  }
+  .tl {
+    position: relative;
+    padding-left: 2.2rem;
+  }
+  .tl-rail {
+    position: absolute;
+    left: 0.4rem;
+    top: 0.4rem;
+    bottom: 0.4rem;
+    width: 1px;
+    background: var(--line);
+  }
+  .tl-rail span {
+    display: block;
+    height: calc(var(--p, 1) * 100%);
+    background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .tl-group + .tl-group {
+    margin-top: 2.5rem;
+  }
+  .tl-label {
+    margin: 0 0 1rem;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  .tl-item {
+    position: relative;
+  }
+  .tl-item p {
+    margin: 0;
+  }
+  .tl-dot {
+    position: absolute;
+    left: calc(-2.2rem + 0.4rem - 5px);
+    top: 0.3rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid var(--muted);
+    background: var(--bg);
+    transition: all 0.4s;
+  }
+  .tl-item.is-in .tl-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+  .tl-period {
+    color: var(--muted);
+    margin-bottom: 0.35rem !important;
+  }
+  .tl-title {
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+    line-height: 1.15;
+  }
+  .tl-title a {
+    text-decoration-color: var(--accent);
+  }
+  .tl-sub {
+    color: var(--ink-2);
+  }
+  .tl-detail {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 0.4rem !important;
+    max-width: 36rem;
+  }
+  .ph {
+    display: inline-block;
+    padding: 0 0.3rem;
+  }
+  @media (max-width: 860px) {
+    .path-grid {
+      grid-template-columns: 1fr;
+    }
+    .path-head {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  const tl = document.querySelector<HTMLElement>('[data-tl]');
+  const fill = document.querySelector<HTMLElement>('[data-tl-fill]');
+  if (tl && fill && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const r = tl.getBoundingClientRect();
+      fill.style.setProperty('--p', Math.min(1, Math.max(0, (innerHeight * 0.65 - r.top) / r.height)).toFixed(3));
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+  }
+</script>

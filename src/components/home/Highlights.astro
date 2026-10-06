@@ -1,0 +1,135 @@
+---
+import { isPlaceholder } from '../../site.config';
+import { href } from '../../lib/url';
+
+interface Props {
+  items: { value: string; label: string; detail?: string; href?: string }[];
+  n: string;
+}
+const { items, n } = Astro.props;
+---
+
+<section id="highlights" class="hl" aria-labelledby="hl-h">
+  <div class="wrap">
+    <p class="kicker" data-reveal>{n} / Highlights</p>
+    <h2 id="hl-h" class="sr-only">Highlights</h2>
+    <ul class="hl-list">
+      {
+        items.map((h, i) => {
+          const Tag = h.href ? 'a' : 'div';
+          return (
+            <li data-reveal style={`--d:${i}`}>
+              <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
+                <span class="hl-value" data-countdown={h.value}>
+                  {h.value}
+                </span>
+                <span class="hl-label">{h.label}</span>
+                {h.detail && <span class:list={['hl-detail', { ph: isPlaceholder(h.detail) }]}>{h.detail}</span>}
+                <span class="hl-glow" aria-hidden="true" />
+              </Tag>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hl {
+    padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+  .hl-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 1.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+  .hl-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    height: 100%;
+    padding: clamp(1.6rem, 4vw, 2.6rem);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+    border-radius: 20px;
+    background:
+      radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+      var(--surface);
+    overflow: hidden;
+    isolation: isolate;
+    text-decoration: none;
+  }
+  .hl-card:hover {
+    color: var(--ink);
+  }
+  .hl-value {
+    font-family: var(--serif);
+    font-size: clamp(4rem, 12vw, 8.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  }
+  .hl-label {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    line-height: 1.1;
+  }
+  .hl-detail {
+    color: var(--ink-2);
+    max-width: 34rem;
+    padding: 0.15rem 0.35rem;
+    margin-left: -0.35rem;
+  }
+  .hl-glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(420px circle at var(--mx, 80%) var(--my, 20%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .hl-card:hover .hl-glow {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-hl-card]').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+
+  // "Top 50" counts down from a much bigger rank when it scrolls into view.
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      io.unobserve(e.target);
+      const el = e.target as HTMLElement;
+      const text = el.dataset.countdown ?? '';
+      const m = text.match(/\d[\d,]*/);
+      if (!m || reduce) continue;
+      const target = Number(m[0].replace(/,/g, ''));
+      const from = Math.max(target * 40, 1000);
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const k = Math.min(1, (now - t0) / 1600);
+        const eased = 1 - Math.pow(1 - k, 4);
+        const v = Math.round(from + (target - from) * eased);
+        el.textContent = text.replace(m[0], v.toLocaleString('en-US'));
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  });
+  document.querySelectorAll('[data-countdown]').forEach((el) => io.observe(el));
+</script>
