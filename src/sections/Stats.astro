@@ -1,8 +1,8 @@
 ---
 import SectionHead from '../components/section/SectionHead.astro';
-import { isPlaceholder } from '../site.config';
+import { isPlaceholder } from '../lib/config';
 import { href } from '../lib/url';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 interface Props extends SectionProps {
   /** Big headline cards. With `animate`, numbers in `value` count in (e.g. "Top 50" counts down). */
@@ -11,7 +11,7 @@ interface Props extends SectionProps {
 const { id, kicker, title, intro, items = [], animate } = Astro.props;
 ---
 
-<section id={id} class="sec hl" aria-label={title ?? kicker ?? 'Highlights'} data-anim={animate ? '' : undefined}>
+<section id={id} class="sec hl" aria-label={title ?? kicker ?? 'Highlights'}>
   <div class="wrap">
     <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
     <ul class="hl-list">
@@ -20,8 +20,8 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
           const Tag = h.href ? 'a' : 'div';
           return (
             <li {...reveal(animate, i)}>
-              <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
-                <span class="hl-value" data-countdown={h.value}>
+              <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-spotlight>
+                <span class="hl-value" data-countdown={animate ? h.value : undefined}>
                   {h.value}
                 </span>
                 <span class="hl-label">{h.label}</span>
@@ -45,7 +45,7 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
   }
   .hl-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min-lg)), 1fr));
     gap: 1.25rem;
     list-style: none;
     padding: 0;
@@ -58,8 +58,8 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
     gap: 0.6rem;
     height: 100%;
     padding: clamp(1.6rem, 4vw, 2.6rem);
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
-    border-radius: 20px;
+    border: var(--hairline) solid color-mix(in srgb, var(--accent) 40%, var(--line));
+    border-radius: var(--radius-feature);
     background:
       radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
       var(--surface);
@@ -94,7 +94,7 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(420px circle at var(--mx, 80%) var(--my, 20%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 45%);
+    background: radial-gradient(var(--spotlight) circle at var(--mx, 80%) var(--my, 20%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 45%);
     opacity: 0;
     transition: opacity 0.3s;
   }
@@ -104,36 +104,6 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
 </style>
 
 <script>
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.querySelectorAll<HTMLElement>('[data-hl-card]').forEach((card) => {
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      card.style.setProperty('--my', `${e.clientY - r.top}px`);
-    });
-  });
-
-  // "Top 50" counts down from a much bigger rank when it scrolls into view.
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      io.unobserve(e.target);
-      const el = e.target as HTMLElement;
-      const text = el.dataset.countdown ?? '';
-      const m = text.match(/\d[\d,]*/);
-      if (!m || reduce) continue;
-      const target = Number(m[0].replace(/,/g, ''));
-      const from = Math.max(target * 40, 1000);
-      const t0 = performance.now();
-      const tick = (now: number) => {
-        const k = Math.min(1, (now - t0) / 1600);
-        const eased = 1 - Math.pow(1 - k, 4);
-        const v = Math.round(from + (target - from) * eased);
-        el.textContent = text.replace(m[0], v.toLocaleString('en-US'));
-        if (k < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }
-  });
-  document.querySelectorAll('[data-anim] [data-countdown]').forEach((el) => io.observe(el));
+  import '../scripts/motion/spotlight';
+  import '../scripts/motion/countdown';
 </script>

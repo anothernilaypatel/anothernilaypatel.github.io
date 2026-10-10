@@ -1,11 +1,22 @@
 ---
+# ── Article post (projects, ideas, accolades) ─────────────────────────────
+# Created by: npm run new-post projects "Title". The file name is the URL: /projects/<file-name>/
+# Required: title, date. Everything else is optional. Delete lines you don't use.
+#
+# title: shown as the big heading, in the index, RSS, and link previews. Keep the quotes.
 title: Your post title
+# date: YYYY-MM-DD. Posts are listed newest first by this date.
 date: 2026-01-01
-description: One sentence shown on the index, in RSS, and in link previews. Optional; defaults to the opening of the post.
-kind: project                         # optional label, e.g. project | idea | accolade
-# cover: ./your-post-slug/cover.png   # optional image for the post header, index, and link previews
-# series: Hedge fund from scratch     # optional; posts sharing a series get "part n of N" navigation, ordered by date
-# draft: true                         # optional; hides the post everywhere except `npm run dev`
+# description: one sentence for the index, RSS, and link previews. If left out, the first ~160 characters of the post are used.
+# description: One sentence about the post.
+# kind: a small label shown above the title. Usually project, idea, or accolade.
+kind: project
+# cover: an image next to this file (in a folder named after it), shown in the header, index, and link previews.
+# cover: ./your-post-slug/cover.png
+# series: posts with the same series name get "part n of N" navigation, ordered by date.
+# series: Hedge fund from scratch
+# draft: true hides the post on the live site (it still shows in `npm run dev`). Delete this line to publish.
+draft: true
 ---
 
 Write in Markdown. The first paragraph gets a drop cap.

@@ -1,8 +1,8 @@
 ---
 import SectionHead from '../components/section/SectionHead.astro';
-import { isPlaceholder } from '../site.config';
+import { isPlaceholder } from '../lib/config';
 import { href } from '../lib/url';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 type Item = { title: string; sub?: string; period?: string; detail?: string; href?: string };
 interface Props extends SectionProps {
@@ -17,8 +17,8 @@ const ph = (s?: string) => isPlaceholder(s);
 <section id={id} class="sec path" aria-labelledby={title ? `${id}-h` : undefined}>
   <div class="wrap path-grid">
     <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} class="path-head" />
-    <div class="tl" data-tl data-anim={animate ? '' : undefined}>
-      <div class="tl-rail" aria-hidden="true"><span data-tl-fill></span></div>
+    <div class="tl" data-fill-track={animate ? '' : undefined}>
+      <div class="tl-rail" aria-hidden="true"><span data-fill></span></div>
       {
         shown.map((g) => (
           <div class="tl-group">
@@ -71,7 +71,7 @@ const ph = (s?: string) => isPlaceholder(s);
     left: 0.4rem;
     top: 0.4rem;
     bottom: 0.4rem;
-    width: 1px;
+    width: var(--hairline);
     background: var(--line);
   }
   .tl-rail span {
@@ -79,7 +79,7 @@ const ph = (s?: string) => isPlaceholder(s);
     --p: 1;
     height: calc(var(--p) * 100%);
     background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: var(--glow-sm) var(--accent);
   }
   .tl-group + .tl-group {
     margin-top: 2.5rem;
@@ -106,19 +106,19 @@ const ph = (s?: string) => isPlaceholder(s);
   }
   .tl-dot {
     position: absolute;
-    left: calc(-2.2rem + 0.4rem - 5px);
+    left: calc(-2.2rem + 0.4rem - var(--dot-lg-half));
     top: 0.3rem;
-    width: 11px;
-    height: 11px;
+    width: var(--dot-lg);
+    height: var(--dot-lg);
     border-radius: 50%;
-    border: 1px solid var(--muted);
+    border: var(--hairline) solid var(--muted);
     background: var(--bg);
     transition: all 0.4s;
   }
   .tl-item.is-in .tl-dot {
     background: var(--accent);
     border-color: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
+    box-shadow: var(--glow) var(--accent);
   }
   .tl-period {
     color: var(--muted);
@@ -156,28 +156,5 @@ const ph = (s?: string) => isPlaceholder(s);
 </style>
 
 <script>
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const timelines = [...document.querySelectorAll<HTMLElement>('[data-tl][data-anim]')];
-  if (!reduce && timelines.length) {
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      for (const tl of timelines) {
-        const fill = tl.querySelector<HTMLElement>('[data-tl-fill]')!;
-        const r = tl.getBoundingClientRect();
-        fill.style.setProperty('--p', Math.min(1, Math.max(0, (innerHeight * 0.65 - r.top) / r.height)).toFixed(3));
-      }
-    };
-    addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      },
-      { passive: true },
-    );
-    update();
-  }
+  import '../scripts/motion/scroll-fill';
 </script>

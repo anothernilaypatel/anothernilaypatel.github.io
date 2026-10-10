@@ -1,44 +1,7 @@
 @import '@fontsource-variable/fraunces';
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/jetbrains-mono';
-
-:root {
-  --bg: #0a0c0b;
-  --bg-2: #101412;
-  --surface: #141917;
-  --line: #222a26;
-  --ink: #ebe7dc;
-  --ink-2: #b9b6ac;
-  --muted: #7d847f;
-  --accent: #f6b23c;
-  --accent-ink: #1a1203;
-  --up: #57e3a1;
-  --down: #ff6a5c;
-  --paper: #f3efe4;
-
-  --serif: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
-  --sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-
-  --wrap: min(1180px, 100% - 2.5rem);
-  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
-  color-scheme: dark;
-}
-
-:root[data-theme='light'] {
-  --bg: #f4f0e6;
-  --bg-2: #ece7da;
-  --surface: #fbf8f1;
-  --line: #d8d1c0;
-  --ink: #16181a;
-  --ink-2: #3b3f3c;
-  --muted: #6c6f68;
-  --accent: #b5650b;
-  --accent-ink: #fff8ec;
-  --up: #11845a;
-  --down: #c2372b;
-  color-scheme: light;
-}
+@import './tokens.css';
 
 *,
 *::before,
@@ -71,10 +34,10 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 75%);
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 4%, transparent) var(--hairline), transparent var(--hairline)),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 4%, transparent) var(--hairline), transparent var(--hairline));
+  background-size: var(--grid-cell) var(--grid-cell);
+  mask-image: radial-gradient(ellipse at 50% 0%, var(--mask) 0%, transparent 75%);
 }
 
 main,
@@ -95,7 +58,7 @@ a {
   color: inherit;
   text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent);
   text-underline-offset: 0.2em;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--hairline);
 }
 
 a:hover {
@@ -103,9 +66,9 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 2px;
+  outline: var(--rule) solid var(--accent);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-focus);
 }
 
 ::selection {
@@ -150,8 +113,8 @@ h3 {
 
 .sr-only {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: var(--hairline);
+  height: var(--hairline);
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
@@ -179,8 +142,8 @@ h3 {
   align-items: center;
   gap: 0.7rem;
   padding: 0.95rem 1.35rem;
-  border: 1px solid var(--b);
-  border-radius: 999px;
+  border: var(--hairline) solid var(--b);
+  border-radius: var(--radius-pill);
   font-family: var(--mono);
   font-size: 0.8rem;
   letter-spacing: 0.08em;
@@ -188,7 +151,7 @@ h3 {
   text-decoration: none;
   color: var(--ink);
   background: color-mix(in srgb, var(--bg) 60%, transparent);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(var(--blur));
   transition:
     transform 0.35s var(--ease),
     background 0.35s var(--ease),
@@ -198,13 +161,13 @@ h3 {
 .btn:hover {
   color: var(--ink);
   border-color: var(--ink-2);
-  transform: translateY(-2px);
+  transform: translateY(var(--lift));
 }
 .btn .arrow {
   transition: transform 0.35s var(--ease);
 }
 .btn:hover .arrow {
-  transform: translateX(4px);
+  transform: translateX(var(--nudge-sm));
 }
 .btn-primary {
   background: var(--accent);
@@ -215,21 +178,21 @@ h3 {
 .btn-primary:hover {
   color: var(--accent-ink);
   border-color: var(--accent);
-  box-shadow: 0 10px 40px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: var(--shadow-lift) color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
 /* Placeholder marker for unfilled content from site.config.ts */
 .ph {
-  outline: 1px dashed color-mix(in srgb, var(--accent) 70%, transparent);
-  outline-offset: 3px;
-  border-radius: 3px;
+  outline: var(--hairline) dashed color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-tag);
   position: relative;
 }
 .ph-tag {
   display: inline-block;
   margin-left: 0.4rem;
   padding: 0.05rem 0.4rem;
-  border-radius: 3px;
+  border-radius: var(--radius-tag);
   font-family: var(--mono);
   font-size: 0.62rem;
   letter-spacing: 0.1em;
@@ -242,7 +205,7 @@ h3 {
 /* Reveal-on-scroll. Only hidden when JS is available, so content is always crawlable. */
 .js [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(var(--reveal));
   transition:
     opacity 0.9s var(--ease),
     transform 0.9s var(--ease);

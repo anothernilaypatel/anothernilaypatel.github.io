@@ -1,7 +1,7 @@
 ---
 import { getEntries, getCollectionConfig, indexUrl, titleOf, type Journal } from '../lib/collections';
 import { href as siteHref } from '../lib/url';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 interface Band {
   /** Link to a collection's index; shows its entry count and a ticker of its titles. */
@@ -129,7 +129,7 @@ const shown = bands.filter((b) => b.link);
   .enter-alt {
     background: var(--surface);
     color: var(--ink);
-    border-block: 1px solid var(--line);
+    border-block: var(--hairline) solid var(--line);
   }
   .enter-alt:hover {
     color: var(--ink);

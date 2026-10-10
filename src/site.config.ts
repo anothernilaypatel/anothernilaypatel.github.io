@@ -1,5 +1,3 @@
-import type { SectionEntry } from './lib/sections';
-
 /**
  * ─────────────────────────────────────────────────────────────────────────
  *  SITE CONTENT: the one file to edit for the home page.
@@ -32,7 +30,7 @@ export const site = {
   ],
 };
 
-export const sections: SectionEntry[] = [
+export const sections = [
   {
     type: 'hero',
     animate: true,
@@ -155,5 +153,3 @@ export const sections: SectionEntry[] = [
   // More section types you can drop in (see README): 'media' (Spotify/YouTube/images), a 'card-grid'
   // with layout: 'grid', another 'prose' block, or a 'collection-feed' for any collection.
 ];
-
-export const isPlaceholder = (value: string | undefined) => !!value && value.includes('PLACEHOLDER');

@@ -49,7 +49,7 @@
 .prose blockquote {
   margin: 2em 0;
   padding: 0.2em 0 0.2em 1.4em;
-  border-left: 2px solid var(--accent);
+  border-left: var(--rule) solid var(--accent);
   font-family: var(--serif);
   font-size: 1.3rem;
   color: var(--ink);
@@ -67,9 +67,9 @@
   font-family: var(--mono);
   font-size: 0.86em;
   padding: 0.12em 0.4em;
-  border-radius: 4px;
+  border-radius: var(--radius-img);
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: var(--hairline) solid var(--line);
   color: var(--ink);
 }
 
@@ -77,8 +77,8 @@
   position: relative;
   margin: 2em 0;
   padding: 2.6rem 1.25rem 1.25rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius-block);
   overflow-x: auto;
   font-family: var(--mono);
   font-size: 0.88rem;
@@ -121,8 +121,8 @@
   top: 0.55rem;
   right: 4.2rem;
   padding: 0.2rem 0.55rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius-pill);
   background: var(--bg);
   color: var(--muted);
   font-family: var(--mono);
@@ -138,7 +138,7 @@
 
 .prose hr {
   border: 0;
-  height: 1px;
+  height: var(--hairline);
   background: var(--line);
   margin: 3em 0;
 }
@@ -164,8 +164,8 @@
 .prose figure > img,
 .prose .fig-frame {
   padding: 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: var(--hairline) solid var(--line);
+  border-radius: var(--radius-block);
   background: var(--paper);
 }
 .prose .fig-frame {
@@ -176,7 +176,7 @@
     box-shadow 0.5s var(--ease);
 }
 .prose .fig-frame img {
-  border-radius: 4px;
+  border-radius: var(--radius-img);
 }
 .prose .fig-frame::after {
   content: '⤢ enlarge';
@@ -184,9 +184,9 @@
   right: 1.2rem;
   bottom: 1.2rem;
   padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  background: #111;
-  color: #eee;
+  border-radius: var(--radius-pill);
+  background: var(--overlay-bg);
+  color: var(--overlay-ink);
   font-family: var(--mono);
   font-size: 0.65rem;
   letter-spacing: 0.06em;
@@ -195,8 +195,8 @@
   transition: opacity 0.3s;
 }
 .prose .fig-frame:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 24px 60px -30px color-mix(in srgb, var(--accent) 60%, transparent);
+  transform: translateY(var(--lift-lg));
+  box-shadow: var(--shadow-float) color-mix(in srgb, var(--accent) 60%, transparent);
 }
 .prose .fig-frame:hover::after,
 .prose .fig-frame:focus-visible::after {
@@ -222,12 +222,12 @@
   max-height: 94vh;
   padding: 1rem;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-dialog);
   background: var(--paper);
 }
 .fig-dialog::backdrop {
-  background: rgb(0 0 0 / 0.8);
-  backdrop-filter: blur(4px);
+  background: var(--backdrop);
+  backdrop-filter: blur(var(--blur-sm));
 }
 .fig-dialog img {
   display: block;
@@ -242,7 +242,7 @@
   margin: 0 0 0.6rem auto;
   border: 0;
   background: none;
-  color: #222;
+  color: var(--paper-ink);
   font-family: var(--mono);
   font-size: 0.75rem;
   cursor: pointer;

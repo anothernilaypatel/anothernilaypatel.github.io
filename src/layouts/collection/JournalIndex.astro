@@ -4,7 +4,7 @@ import MarketField from '../../components/MarketField.astro';
 import JournalCard from '../../components/JournalCard.astro';
 import { fmtDate, type Journal, type CollectionConfig } from '../../lib/collections';
 import { url } from '../../lib/url';
-import { site } from '../../site.config';
+import { site } from '../../lib/config';
 
 interface Props {
   config: CollectionConfig;
@@ -33,9 +33,9 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
     </div>
   </section>
 
-  <section class="wrap-feed feed" aria-label="Daily entries" data-feed>
+  <section class="wrap-feed feed" aria-label="Daily entries" data-fill-track data-fill-start="0.6">
     {entries.length === 0 && <p class="muted mono">First entry coming soon.</p>}
-    <div class="rail" aria-hidden="true"><span class="rail-fill" data-rail></span></div>
+    <div class="rail" aria-hidden="true"><span class="rail-fill" data-fill></span></div>
     <ol>
       {
         entries.map((e, i) => (
@@ -54,7 +54,7 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
     position: relative;
     overflow: hidden;
     padding: 8.5rem 0 4rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--hairline) solid var(--line);
   }
   .head-veil {
     position: absolute;
@@ -106,7 +106,7 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
   }
 
   .wrap-feed {
-    width: min(760px, 100% - 2.5rem);
+    width: min(var(--measure), 100% - 2.5rem);
     margin-inline: auto;
   }
   .feed {
@@ -118,7 +118,7 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
     left: 0.45rem;
     top: 4rem;
     bottom: 6rem;
-    width: 1px;
+    width: var(--hairline);
     background: var(--line);
   }
   .rail-fill {
@@ -126,7 +126,7 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
     width: 100%;
     height: calc(var(--p, 1) * 100%);
     background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: var(--glow-sm) var(--accent);
   }
   ol {
     list-style: none;
@@ -142,12 +142,12 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
   }
   .dot {
     position: absolute;
-    left: calc(-2.5rem + 0.45rem - 5px);
+    left: calc(-2.5rem + 0.45rem - var(--dot-lg-half));
     top: 2.2rem;
-    width: 11px;
-    height: 11px;
+    width: var(--dot-lg);
+    height: var(--dot-lg);
     border-radius: 50%;
-    border: 1px solid var(--muted);
+    border: var(--hairline) solid var(--muted);
     background: var(--bg);
     transition:
       background 0.4s,
@@ -158,7 +158,7 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
   .entry:target .dot {
     background: var(--accent);
     border-color: var(--accent);
-    box-shadow: 0 0 12px var(--accent);
+    box-shadow: var(--glow-lg) var(--accent);
   }
   .entry:target :global(.daily) {
     border-color: var(--accent);
@@ -168,32 +168,11 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
       padding-left: 1.6rem;
     }
     .dot {
-      left: calc(-1.6rem + 0.45rem - 5px);
+      left: calc(-1.6rem + 0.45rem - var(--dot-lg-half));
     }
   }
 </style>
 
 <script>
-  const feed = document.querySelector<HTMLElement>('[data-feed]');
-  const rail = document.querySelector<HTMLElement>('[data-rail]');
-  if (feed && rail && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const r = feed.getBoundingClientRect();
-      const p = Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height));
-      rail.style.setProperty('--p', p.toFixed(3));
-    };
-    addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      },
-      { passive: true },
-    );
-    update();
-  }
+  import '../../scripts/motion/scroll-fill';
 </script>

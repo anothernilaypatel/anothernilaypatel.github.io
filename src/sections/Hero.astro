@@ -1,8 +1,8 @@
 ---
 import MarketField from '../components/MarketField.astro';
-import { site, isPlaceholder } from '../site.config';
+import { site, isPlaceholder } from '../lib/config';
 import { href } from '../lib/url';
-import type { SectionProps } from '../lib/sections';
+import type { SectionProps } from '../lib/section-utils';
 
 interface Props extends SectionProps {
   tagline?: string;
@@ -70,7 +70,7 @@ const shown = buttons.filter((b) => b.href);
   }
   .hero-inner {
     position: relative;
-    transform: translateY(calc(var(--hp, 0) * -80px));
+    transform: translateY(calc(var(--hp, 0) * -1 * var(--hero-parallax)));
     opacity: calc(1 - var(--hp, 0) * 1.2);
   }
   .hero-name {
@@ -103,11 +103,11 @@ const shown = buttons.filter((b) => b.href);
     padding: 0.2rem 0.4rem;
   }
   .now-dot {
-    width: 8px;
-    height: 8px;
+    width: var(--dot-sm);
+    height: var(--dot-sm);
     border-radius: 50%;
     background: var(--up);
-    box-shadow: 0 0 12px var(--up);
+    box-shadow: var(--glow-lg) var(--up);
   }
   .hero-cta {
     display: flex;
@@ -124,8 +124,8 @@ const shown = buttons.filter((b) => b.href);
     gap: 1rem;
   }
   .scroll-line {
-    width: 60px;
-    height: 1px;
+    width: var(--scroll-hint);
+    height: var(--hairline);
     background: var(--muted);
     transform-origin: left;
     animation: scrollhint 2.2s var(--ease) infinite;
@@ -163,8 +163,8 @@ const shown = buttons.filter((b) => b.href);
   @keyframes rise {
     from {
       opacity: 0;
-      transform: translateY(40px);
-      filter: blur(6px);
+      transform: translateY(var(--reveal-lg));
+      filter: blur(var(--blur));
     }
   }
 
@@ -182,20 +182,5 @@ const shown = buttons.filter((b) => b.href);
 </style>
 
 <script>
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  if (hero && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let ticking = false;
-    addEventListener(
-      'scroll',
-      () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          ticking = false;
-          hero.style.setProperty('--hp', Math.min(1, Math.max(0, scrollY / hero.offsetHeight)).toFixed(3));
-        });
-      },
-      { passive: true },
-    );
-  }
+  import '../scripts/motion/hero-parallax';
 </script>

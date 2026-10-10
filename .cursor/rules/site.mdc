@@ -1,0 +1,10 @@
+---
+description: How to work on Nilay's site (read AGENTS.md and STYLE.md)
+alwaysApply: true
+---
+
+- Read `AGENTS.md` (site map, golden rules, recipes) before editing, and `STYLE.md` before any styling.
+- Prefer editing `src/site.config.ts`, `src/content/**`, and `public/`. Use existing section types before making new ones.
+- Never hardcode colors, px values, or font names. Use `var(--token)` from `src/styles/tokens.css`. Use `url()` for internal links.
+- Never invent facts about Nilay. Leave `PLACEHOLDER` text in place when information is missing.
+- Finish with `npm run check` and fix anything it reports.
