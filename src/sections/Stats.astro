@@ -11,7 +11,7 @@ interface Props extends SectionProps {
 const { id, kicker, title, intro, items = [], animate } = Astro.props;
 ---
 
-<section id={id} class="sec hl" aria-label={title ?? kicker ?? 'Highlights'} data-anim={animate ? '' : undefined}>
+<section id={id} class="sec hl" aria-label={title ?? kicker ?? 'Highlights'}>
   <div class="wrap">
     <SectionHead id={id} kicker={kicker} title={title} intro={intro} animate={animate} />
     <ul class="hl-list">
@@ -20,8 +20,8 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
           const Tag = h.href ? 'a' : 'div';
           return (
             <li {...reveal(animate, i)}>
-              <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
-                <span class="hl-value" data-countdown={h.value}>
+              <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-spotlight>
+                <span class="hl-value" data-countdown={animate ? h.value : undefined}>
                   {h.value}
                 </span>
                 <span class="hl-label">{h.label}</span>
@@ -104,36 +104,6 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
 </style>
 
 <script>
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.querySelectorAll<HTMLElement>('[data-hl-card]').forEach((card) => {
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      card.style.setProperty('--my', `${e.clientY - r.top}px`);
-    });
-  });
-
-  // "Top 50" counts down from a much bigger rank when it scrolls into view.
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      io.unobserve(e.target);
-      const el = e.target as HTMLElement;
-      const text = el.dataset.countdown ?? '';
-      const m = text.match(/\d[\d,]*/);
-      if (!m || reduce) continue;
-      const target = Number(m[0].replace(/,/g, ''));
-      const from = Math.max(target * 40, 1000);
-      const t0 = performance.now();
-      const tick = (now: number) => {
-        const k = Math.min(1, (now - t0) / 1600);
-        const eased = 1 - Math.pow(1 - k, 4);
-        const v = Math.round(from + (target - from) * eased);
-        el.textContent = text.replace(m[0], v.toLocaleString('en-US'));
-        if (k < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }
-  });
-  document.querySelectorAll('[data-anim] [data-countdown]').forEach((el) => io.observe(el));
+  import '../scripts/motion/spotlight';
+  import '../scripts/motion/countdown';
 </script>

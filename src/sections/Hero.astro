@@ -182,20 +182,5 @@ const shown = buttons.filter((b) => b.href);
 </style>
 
 <script>
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  if (hero && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let ticking = false;
-    addEventListener(
-      'scroll',
-      () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          ticking = false;
-          hero.style.setProperty('--hp', Math.min(1, Math.max(0, scrollY / hero.offsetHeight)).toFixed(3));
-        });
-      },
-      { passive: true },
-    );
-  }
+  import '../scripts/motion/hero-parallax';
 </script>

@@ -67,18 +67,7 @@ const ogImage = image ? new URL(image, Astro.site) : absoluteUrl('/og.jpg', Astr
     </main>
     <Footer />
     <script>
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) {
-              e.target.classList.add('is-in');
-              io.unobserve(e.target);
-            }
-          }
-        },
-        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-      );
-      document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+      import '../scripts/motion/reveal';
     </script>
   </body>
 </html>

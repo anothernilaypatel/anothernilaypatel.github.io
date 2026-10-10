@@ -33,9 +33,9 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
     </div>
   </section>
 
-  <section class="wrap-feed feed" aria-label="Daily entries" data-feed>
+  <section class="wrap-feed feed" aria-label="Daily entries" data-fill-track data-fill-start="0.6">
     {entries.length === 0 && <p class="muted mono">First entry coming soon.</p>}
-    <div class="rail" aria-hidden="true"><span class="rail-fill" data-rail></span></div>
+    <div class="rail" aria-hidden="true"><span class="rail-fill" data-fill></span></div>
     <ol>
       {
         entries.map((e, i) => (
@@ -174,26 +174,5 @@ const withMusic = entries.filter((e) => e.data.spotify).length;
 </style>
 
 <script>
-  const feed = document.querySelector<HTMLElement>('[data-feed]');
-  const rail = document.querySelector<HTMLElement>('[data-rail]');
-  if (feed && rail && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const r = feed.getBoundingClientRect();
-      const p = Math.min(1, Math.max(0, (innerHeight * 0.6 - r.top) / r.height));
-      rail.style.setProperty('--p', p.toFixed(3));
-    };
-    addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      },
-      { passive: true },
-    );
-    update();
-  }
+  import '../../scripts/motion/scroll-fill';
 </script>

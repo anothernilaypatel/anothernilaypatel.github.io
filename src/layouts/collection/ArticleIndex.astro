@@ -40,7 +40,7 @@ const oldest = posts.at(-1);
           const { parts, index } = seriesOf(p, posts);
           return (
             <li class="post" data-reveal style={`--d:${Math.min(i, 6)}`}>
-              <a href={entryUrl(p)} class="post-link" data-spot>
+              <a href={entryUrl(p)} class="post-link" data-spotlight>
                 <span class="post-num mono" aria-hidden="true">
                   {String(posts.length - i).padStart(2, '0')}
                 </span>
@@ -258,11 +258,5 @@ const oldest = posts.at(-1);
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-spot]').forEach((el) => {
-    el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--my', `${e.clientY - r.top}px`);
-    });
-  });
+  import '../../scripts/motion/spotlight';
 </script>
