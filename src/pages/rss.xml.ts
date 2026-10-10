@@ -1,7 +1,7 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { collections, getEntries, titleOf, describe, entryUrl, layoutOf, kindOf, type Article } from '../lib/collections';
-import { site } from '../site.config';
+import { site } from '../lib/config';
 import { absoluteUrl } from '../lib/url';
 
 export async function GET(context: APIContext) {

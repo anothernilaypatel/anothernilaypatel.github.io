@@ -3,7 +3,7 @@ import SectionHead from '../components/section/SectionHead.astro';
 import JournalCard from '../components/JournalCard.astro';
 import Sparkline from '../components/Sparkline.astro';
 import { getEntries, getCollectionConfig, entryUrl, titleOf, fmtDate, kindOf, type Article, type Journal } from '../lib/collections';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 interface Feed {
   /** A collection name from src/collections.mjs, e.g. 'projects' or 'daily'. */

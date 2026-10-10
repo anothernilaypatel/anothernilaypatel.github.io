@@ -1,12 +1,11 @@
 ---
 import { url, withoutBase } from '../lib/url';
-import { site, sections } from '../site.config';
-import { isVisible, sectionId } from '../lib/sections';
-import { collections } from '../collections.mjs';
+import { site, sections } from '../lib/config';
+import { isVisible } from '../lib/section-visibility';
+import { collections } from '../lib/collection-config';
 
 const current = withoutBase(Astro.url.pathname);
 const anchors = sections
-  .map((s, i) => ({ ...s, id: sectionId(s, i) }))
   .filter((s) => s.nav && isVisible(s))
   .map((s) => ({ href: url(`/#${s.id}`), label: s.nav! }));
 const pills = collections

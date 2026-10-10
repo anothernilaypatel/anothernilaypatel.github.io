@@ -1,8 +1,8 @@
 ---
 import MarketField from '../components/MarketField.astro';
-import { site, isPlaceholder } from '../site.config';
+import { site, isPlaceholder } from '../lib/config';
 import { href } from '../lib/url';
-import type { SectionProps } from '../lib/sections';
+import type { SectionProps } from '../lib/section-utils';
 
 interface Props extends SectionProps {
   tagline?: string;

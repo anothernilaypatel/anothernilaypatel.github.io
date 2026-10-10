@@ -2,7 +2,7 @@
 import SectionHead from '../components/section/SectionHead.astro';
 import Spotify from '../components/Spotify.astro';
 import { href as siteHref } from '../lib/url';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 interface MediaItem {
   /** 'spotify' and 'youtube' take a normal share link; 'image'/'video' take a file in public/ ('/media/x.jpg') or a URL. */

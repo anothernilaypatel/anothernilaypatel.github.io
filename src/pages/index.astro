@@ -1,16 +1,16 @@
 ---
-// The home page is just the `sections` list from src/site.config.ts, rendered in order.
-// To change it, edit that list or add a component to src/sections/. No edits needed here.
+// The home page is the `sections` list from src/site.config.ts (validated in src/lib/config.ts),
+// rendered in order. To change it, edit that list or add a section type in src/sections/.
 import Base from '../layouts/Base.astro';
-import { sections } from '../site.config';
-import { componentFor, isVisible, sectionId } from '../lib/sections';
+import { sections } from '../lib/config';
+import { componentFor, isVisible } from '../lib/sections';
 
-const entries = sections.map((s, i) => ({ ...s, id: sectionId(s, i) })).filter(isVisible);
+const visible = sections.filter(isVisible);
 ---
 
 <Base>
   {
-    entries.map(({ type, nav, hidden, ...props }) => {
+    visible.map(({ type, nav, hidden, ...props }) => {
       const Section = componentFor({ type, ...props });
       return <Section {...props} />;
     })

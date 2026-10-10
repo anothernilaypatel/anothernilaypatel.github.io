@@ -1,7 +1,7 @@
 ---
 import SectionHead from '../components/section/SectionHead.astro';
-import { isPlaceholder } from '../site.config';
-import { reveal, type SectionProps } from '../lib/sections';
+import { isPlaceholder } from '../lib/config';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 interface Props extends SectionProps {
   /** Labeled groups of short items, shown as chips (e.g. skills, tools, languages). */

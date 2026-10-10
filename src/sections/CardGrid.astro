@@ -1,10 +1,10 @@
 ---
 import SectionHead from '../components/section/SectionHead.astro';
 import Sparkline from '../components/Sparkline.astro';
-import { isPlaceholder } from '../site.config';
+import { isPlaceholder } from '../lib/config';
 import { href as siteHref } from '../lib/url';
 import { resolveRef } from '../lib/collections';
-import type { SectionProps } from '../lib/sections';
+import type { SectionProps } from '../lib/section-utils';
 
 interface Card {
   title: string;

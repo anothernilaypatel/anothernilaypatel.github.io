@@ -1,10 +1,9 @@
 import { getCollection, type CollectionEntry, type CollectionKey } from 'astro:content';
 import type { ImageMetadata } from 'astro';
-import { collections, getCollectionConfig } from '../collections.mjs';
+import { collections, getCollectionConfig, type CollectionConfig } from './collection-config';
 import { url } from './url';
 
-export { collections, getCollectionConfig };
-export type CollectionConfig = (typeof collections)[number];
+export { collections, getCollectionConfig, type CollectionConfig };
 
 export interface ArticleData {
   title: string;

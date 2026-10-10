@@ -7,7 +7,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
+    "lint:style": "node scripts/lint-style.mjs",
+    "typecheck": "astro check",
+    "check": "npm run lint:style && npm run typecheck && npm run build",
     "new-post": "node scripts/new-post.mjs"
   },
   "dependencies": {

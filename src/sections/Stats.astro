@@ -1,8 +1,8 @@
 ---
 import SectionHead from '../components/section/SectionHead.astro';
-import { isPlaceholder } from '../site.config';
+import { isPlaceholder } from '../lib/config';
 import { href } from '../lib/url';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 interface Props extends SectionProps {
   /** Big headline cards. With `animate`, numbers in `value` count in (e.g. "Top 50" counts down). */
