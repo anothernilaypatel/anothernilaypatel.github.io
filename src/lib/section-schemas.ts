@@ -34,7 +34,7 @@ const schemaFor = (def: SectionDefinition) => {
 export type ParsedSection = { type: string; id: string; nav?: string; hidden?: boolean; [k: string]: unknown };
 
 export function validateSections(raw: unknown): ParsedSection[] {
-  if (!Array.isArray(raw)) throw new ConfigError('src/site.config.ts', '  • `sections` must be a list: export const sections = [ … ]', 'See AGENTS.md → "Home sections".');
+  if (!Array.isArray(raw)) throw new ConfigError('src/site.config.ts', '  • `sections` must be a list: export const sections = [ … ]', 'See AGENTS.md, recipe 3 (home sections).');
   const problems: string[] = [];
   const ids = new Map<string, number>();
   const out: ParsedSection[] = [];
@@ -62,7 +62,7 @@ export function validateSections(raw: unknown): ParsedSection[] {
     throw new ConfigError(
       'src/site.config.ts (sections)',
       problems.join('\n'),
-      `Each section's fields are defined in src/sections/<Type>.schema.ts. See AGENTS.md → "Home sections".`,
+      `Each section's fields are defined in src/sections/<Type>.schema.ts. See AGENTS.md, recipe 3 (home sections).`,
     );
   }
   return out;
