@@ -67,12 +67,14 @@ const journal = (name: string) =>
         note: z.string().optional(),
         draft: z.boolean({ error: 'draft must be true or false' }).default(false),
       })
-      .catchall(z.union([z.string(), z.number(), z.boolean()], { error: 'extra fields must be a single value (text, number, true/false)' }))
+      .catchall(z.unknown())
       .superRefine((value, ctx) => {
-        for (const key of Object.keys(value)) {
+        for (const [key, v] of Object.entries(value)) {
           if (JOURNAL_FIELDS.includes(key)) continue;
           const hint = suggest(key, JOURNAL_FIELDS);
           if (hint) ctx.addIssue({ code: 'custom', path: [key], message: `"${key}" looks like a typo of "${hint}"` });
+          else if (!['string', 'number', 'boolean'].includes(typeof v))
+            ctx.addIssue({ code: 'custom', path: [key], message: `extra field "${key}" must be a single value (text, number, or true/false)` });
         }
       }),
   });

@@ -2,12 +2,14 @@
 /**
  * Example section type. Files starting with "_" are ignored, so this one is not registered.
  *
- * To make your own:
- *   1. Copy this file to src/sections/Quote.astro (the file name becomes the type: 'quote';
- *      CardGrid.astro -> 'card-grid').
- *   2. Change the Props and markup below.
- *   3. Add an entry to `sections` in src/site.config.ts:
+ * To make your own (two files, same name):
+ *   1. Copy this file to src/sections/Quote.astro and _Example.schema.ts to src/sections/Quote.schema.ts.
+ *      The file name becomes the type: Quote -> 'quote', CardGrid -> 'card-grid'.
+ *   2. List every field in the schema file, and use the same fields in Props below.
+ *   3. Style only with tokens (var(--…)) from src/styles/tokens.css. See STYLE.md.
+ *   4. Add an entry to `sections` in src/site.config.ts:
  *        { type: 'quote', id: 'motto', animate: true, kicker: 'Motto', text: 'Stay curious.', author: 'Me' },
+ *   5. Run npm run check.
  */
 import SectionHead from '../components/section/SectionHead.astro';
 import { reveal, type SectionProps } from '../lib/section-utils';

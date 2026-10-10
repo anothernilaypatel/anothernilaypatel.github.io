@@ -26,6 +26,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Style check
+        run: npm run lint:style
       - name: Build
         run: npm run build
         env:

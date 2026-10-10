@@ -16,8 +16,22 @@ npm install
 npm run dev       # http://localhost:4321, live reload
 npm run build     # static output in dist/
 npm run preview   # serve dist/ locally
-npm run check     # type-check .astro/.ts files
+npm run check     # style lint + typecheck + build. Run before every commit.
 ```
+
+## Working with AI assistants
+
+The repo is set up so simpler AI models can make changes without breaking the look:
+- **[AGENTS.md](AGENTS.md):** the site map, the golden rules, and step-by-step recipes (daily entry, project post, home sections, new section type, new post type, résumé info). `CLAUDE.md` and `.cursor/rules/site.mdc` point models to it automatically.
+- **[STYLE.md](STYLE.md):** the "market tape" look, design tokens, do/don't examples, and the components and animations to reuse.
+- **[docs/prompts/](docs/prompts/):** copy-paste prompts for common tasks. Fill in the brackets and hand one to a model.
+- **Guardrails:** `npm run check` fails loudly, saying which file and field is wrong and what to do, when:
+  - a config, section, or frontmatter field is misspelled, missing, or the wrong type;
+  - a link is malformed;
+  - a color, px value, or font is hardcoded outside `src/styles/tokens.css`;
+  - an internal link skips the base path.
+
+  The same checks run on every pull request (`.github/workflows/check.yml`), and the style lint also runs before each deploy.
 
 ## Edit the home page
 
@@ -50,7 +64,7 @@ To add, move, or design sections, see [Customizing the site](#customizing-the-si
    - **Images:** put them in a folder named after the post (`src/content/projects/pairs-trading-with-cointegration/`). An image on its own line becomes a numbered figure you can click to enlarge, and the quoted text becomes its caption: `![What the chart shows](./pairs-trading-with-cointegration/spread.png "Caption.")`.
    - **Code and math:** fenced code gets highlighting and a copy button, and `$...$` / `$$...$$` render as math.
 
-3. **Publish:** preview with `npm run dev`, then commit and push to `main`.
+3. **Publish:** new posts start with `draft: true`. Delete that line, preview with `npm run dev`, run `npm run check`, then commit and push to `main`.
 
 There are draft stubs for coffee, jazz, Brawl Stars, Super Auto Pets, and MTG. Write them up and delete `draft: true` to publish.
 
@@ -75,7 +89,7 @@ There are draft stubs for coffee, jazz, Brawl Stars, Super Auto Pets, and MTG. W
 
    **New fields:** any simple field you add (text, number, or yes/no) appears on the entry as a label without code changes. To give a field its own design, add it to the `journal` schema in `src/content.config.ts` and render it in `src/components/JournalCard.astro`.
 
-3. **Publish:** commit and push to `main`.
+3. **Publish:** delete the `draft: true` line, run `npm run check`, then commit and push to `main`.
 
 The two dated entries in `src/content/daily/` are samples (`sample: true`). Delete them once you have your own.
 
@@ -136,18 +150,29 @@ Site paths like `/projects/` or `/media/setup.jpg` (files in `public/`) get the 
 
 ### Create a new section type
 
-A section type is one `.astro` file in `src/sections/`. It's picked up automatically, with no registry or page edits.
+A section type is two files with the same name in `src/sections/`: the component (`Quote.astro`) and its schema (`Quote.schema.ts`), which lists the allowed fields. Both are picked up automatically, with no registry or page edits.
 
-1. Copy `src/sections/_Example.astro` to `src/sections/Quote.astro`. The file name becomes the type in kebab-case: `Quote.astro` is `'quote'`, and `CardGrid.astro` is `'card-grid'`. Files starting with `_` are ignored, which is why the example itself isn't registered.
-2. Edit its `Props` and markup. Every field of the config entry arrives as a prop.
-3. Add it to `sections`: `{ type: 'quote', id: 'motto', animate: true, kicker: 'Motto', text: 'Stay curious.', author: 'Me' }`.
+1. Copy `src/sections/_Example.astro` to `src/sections/Quote.astro`, and `src/sections/_Example.schema.ts` to `src/sections/Quote.schema.ts`. The file name becomes the type in kebab-case: `Quote` is `'quote'`, and `CardGrid` is `'card-grid'`. Files starting with `_` are ignored, which is why the example itself isn't registered.
+2. List the fields in the schema file, then use them in the component's `Props` and markup. Every field of the config entry arrives as a prop.
+3. Add it to `sections`: `{ type: 'quote', id: 'motto', animate: true, kicker: 'Motto', text: 'Stay curious.', author: 'Me' }`, then run `npm run check`.
+
+The schema file:
+
+```ts
+import { defineSection, z, text } from '../lib/section-kit';
+
+export default defineSection({
+  text, // required, non-empty
+  author: z.string().optional(),
+});
+```
 
 The example file, trimmed:
 
 ```astro
 ---
 import SectionHead from '../components/section/SectionHead.astro';
-import { reveal, type SectionProps } from '../lib/sections';
+import { reveal, type SectionProps } from '../lib/section-utils';
 
 // SectionProps gives you id, animate, kicker, title, and intro. Add your own fields here.
 interface Props extends SectionProps {
@@ -172,7 +197,7 @@ const { id, kicker, title, intro, text, author, animate } = Astro.props;
     margin: 0;
     font-family: var(--serif);
     font-size: clamp(1.8rem, 4vw, 3rem);
-    border-left: 2px solid var(--accent);
+    border-left: var(--rule) solid var(--accent);
     padding-left: 1.2rem;
   }
 </style>
@@ -183,7 +208,7 @@ Building blocks to use:
 - `SectionHead` renders the kicker, title, and intro.
 - `reveal(animate, delay)` adds the scroll fade-in only when `animate` is on.
 - `.wrap` is the page width.
-- Colors and fonts are CSS variables: `--ink`, `--accent`, `--surface`, `--line`, `--serif`, `--mono`.
+- All design values are tokens in `src/styles/tokens.css` (`--ink`, `--accent`, `--surface`, `--line`, `--serif`, `--mono`, `--radius-card`, …). See [STYLE.md](STYLE.md) for the reusable motion scripts (`src/scripts/motion/`).
 - **Render nothing when empty:** wrap the markup in `{items.length > 0 && (...)}` so an empty section disappears.
 
 ### Add a new collection (post type)
@@ -220,19 +245,22 @@ The old site was a Flutter web app with a service worker. Every page removes any
 ## Project layout
 
 ```
+AGENTS.md, STYLE.md     how to change the site / how it should look (start here)
+docs/prompts/           copy-paste prompts for AI assistants
 src/
   site.config.ts        site name, links, and the home page `sections` list (edit me)
   collections.mjs       collections (post types): name, layout, titles, nav
-  sections/             one component per home section type (auto-discovered)
+  sections/             <Name>.astro + <Name>.schema.ts per home section type (auto-discovered)
   content/<collection>/ posts: <slug>.mdx (+ optional <slug>/ image folder), or <date>.md for journals
-  content/templates/    templates used by `npm run new-post`
+  content/templates/    commented templates used by `npm run new-post`
   content.config.ts     frontmatter schemas, built from collections.mjs
+  styles/               tokens.css (every design value), global.css (base + utilities), prose.css (posts)
+  scripts/motion/       reusable animations, one per file (reveal, tilt, spotlight, scroll-fill, …)
   pages/                home, [collection] index + entry routes, rss, robots, 404, /blog redirects
   layouts/              Base (<head>, SEO, theme), collection/ (article + journal pages)
   components/           MarketField (hero canvas), JournalCard, Spotify, Sparkline, Nav, Footer, section/SectionHead
-  styles/               global.css (tokens, light/dark, section basics), prose.css (post typography)
-  lib/                  sections registry, collection helpers, url() base-path helpers, rehype figure plugin
-scripts/new-post.mjs    `npm run new-post <collection> ...`
+  lib/                  config validation, section registry and schemas, collection helpers, url() helpers
+scripts/                new-post.mjs (`npm run new-post`), lint-style.mjs (design guardrails)
 public/                 favicon, og.jpg, Flutter service-worker cleanup
 ```
 

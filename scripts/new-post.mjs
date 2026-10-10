@@ -64,11 +64,13 @@ if (config.layout === 'article') {
   write(path.join(dir, `${slug}.mdx`), body, [
     `Images (optional): put them in src/content/${config.name}/${slug}/`,
     `Preview: npm run dev, then open /${config.name}/${slug}/`,
+    'It starts as a draft: delete the `draft: true` line to publish. Then run npm run check.',
   ]);
 } else {
   const date = rest[0] ?? today();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) fail('Date must look like 2026-10-05.');
   write(path.join(dir, `${date}.md`), template('journal.md').replace(/^date: .*$/m, `date: ${date}`), [
     `Preview: npm run dev, then open /${config.name}/`,
+    'It starts as a draft: delete the `draft: true` line to publish. Then run npm run check.',
   ]);
 }
