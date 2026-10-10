@@ -61,11 +61,11 @@ const pills = collections
       background 0.4s var(--ease),
       border-color 0.4s var(--ease),
       transform 0.4s var(--ease);
-    border-bottom: 1px solid transparent;
+    border-bottom: var(--hairline) solid transparent;
   }
   .nav.scrolled {
     background: color-mix(in srgb, var(--bg) 78%, transparent);
-    backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(var(--blur-lg)) saturate(1.2);
     border-bottom-color: var(--line);
   }
   .nav.hidden {
@@ -107,8 +107,8 @@ const pills = collections
     align-items: center;
     gap: 0.55rem;
     padding: 0.55rem 0.95rem;
-    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-    border-radius: 999px;
+    border: var(--hairline) solid color-mix(in srgb, var(--accent) 55%, transparent);
+    border-radius: var(--radius-pill);
     color: var(--ink);
     transition: background 0.3s var(--ease);
   }
@@ -117,8 +117,8 @@ const pills = collections
     background: color-mix(in srgb, var(--accent) 14%, transparent);
   }
   .dot {
-    width: 7px;
-    height: 7px;
+    width: var(--dot-xs);
+    height: var(--dot-xs);
     border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 0 0 var(--accent);
@@ -126,7 +126,7 @@ const pills = collections
   }
   @keyframes pulse {
     70% {
-      box-shadow: 0 0 0 7px transparent;
+      box-shadow: var(--glow-pulse) transparent;
     }
     100% {
       box-shadow: 0 0 0 0 transparent;
@@ -138,7 +138,7 @@ const pills = collections
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 50%;
-    border: 1px solid var(--line);
+    border: var(--hairline) solid var(--line);
     background: transparent;
     color: var(--ink-2);
     cursor: pointer;

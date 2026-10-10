@@ -48,19 +48,19 @@ const links = items.filter((l) => l.href);
     list-style: none;
     padding: 0;
     margin: 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--hairline) solid var(--line);
   }
   .link-row {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     padding: 1.3rem 0.5rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--hairline) solid var(--line);
     font-family: var(--serif);
     font-size: clamp(1.4rem, 3vw, 2.2rem);
     text-decoration: none;
     transition: padding 0.4s var(--ease);
-    outline-offset: -3px;
+    outline-offset: calc(-1 * var(--focus-offset));
   }
   .link-arrow {
     margin-left: auto;
@@ -70,7 +70,7 @@ const links = items.filter((l) => l.href);
     padding-left: 1.2rem;
   }
   .link-row[href]:hover .link-arrow {
-    transform: translate(4px, -4px);
+    transform: translate(var(--nudge-sm), calc(-1 * var(--nudge-sm)));
   }
 
 </style>

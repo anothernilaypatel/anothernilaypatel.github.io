@@ -71,7 +71,7 @@ const ph = (s?: string) => isPlaceholder(s);
     left: 0.4rem;
     top: 0.4rem;
     bottom: 0.4rem;
-    width: 1px;
+    width: var(--hairline);
     background: var(--line);
   }
   .tl-rail span {
@@ -79,7 +79,7 @@ const ph = (s?: string) => isPlaceholder(s);
     --p: 1;
     height: calc(var(--p) * 100%);
     background: linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: var(--glow-sm) var(--accent);
   }
   .tl-group + .tl-group {
     margin-top: 2.5rem;
@@ -106,19 +106,19 @@ const ph = (s?: string) => isPlaceholder(s);
   }
   .tl-dot {
     position: absolute;
-    left: calc(-2.2rem + 0.4rem - 5px);
+    left: calc(-2.2rem + 0.4rem - var(--dot-lg-half));
     top: 0.3rem;
-    width: 11px;
-    height: 11px;
+    width: var(--dot-lg);
+    height: var(--dot-lg);
     border-radius: 50%;
-    border: 1px solid var(--muted);
+    border: var(--hairline) solid var(--muted);
     background: var(--bg);
     transition: all 0.4s;
   }
   .tl-item.is-in .tl-dot {
     background: var(--accent);
     border-color: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
+    box-shadow: var(--glow) var(--accent);
   }
   .tl-period {
     color: var(--muted);

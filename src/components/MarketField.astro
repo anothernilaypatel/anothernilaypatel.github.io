@@ -41,6 +41,7 @@ const { paths = 34, seed = 7, converge = false, class: cls } = Astro.props;
       accent: s.getPropertyValue('--accent').trim(),
       up: s.getPropertyValue('--up').trim(),
       down: s.getPropertyValue('--down').trim(),
+      label: s.getPropertyValue('--canvas-label').trim(),
     };
   }
 
@@ -136,7 +137,7 @@ const { paths = 34, seed = 7, converge = false, class: cls } = Astro.props;
       ctx.beginPath();
       ctx.arc(Math.min(hx, w - 10), hy, 4, 0, Math.PI * 2);
       ctx.fill();
-      ctx.font = '500 11px "JetBrains Mono Variable", monospace';
+      ctx.font = colors.label;
       ctx.fillStyle = rising ? colors.up : colors.down;
       ctx.textAlign = 'right';
       const val = (1 + (0.5 - signal.ys[i]) * 0.6).toFixed(4);

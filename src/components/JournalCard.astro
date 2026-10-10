@@ -69,8 +69,8 @@ const pageUrl = entryUrl(entry);
     flex-direction: column;
     gap: 1.1rem;
     padding: 1.6rem;
-    border: 1px solid var(--line);
-    border-radius: 16px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-card);
     background: var(--surface);
     transition: border-color 0.3s;
   }
@@ -107,14 +107,14 @@ const pageUrl = entryUrl(entry);
   }
   .d-extras li {
     padding: 0.25rem 0.6rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-pill);
     color: var(--ink-2);
   }
   .d-quote {
     margin: 0;
     padding-left: 1.2rem;
-    border-left: 2px solid var(--accent);
+    border-left: var(--rule) solid var(--accent);
   }
   blockquote {
     margin: 0;

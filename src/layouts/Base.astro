@@ -31,7 +31,7 @@ const ogImage = image ? new URL(image, Astro.site) : absoluteUrl('/og.jpg', Astr
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={`${site.name} — research log`} href={url('/rss.xml')} />
     <link rel="sitemap" href={url('/sitemap-index.xml')} />
-    <meta name="theme-color" content="#0a0c0b" />
+    <meta name="theme-color" content="#0a0c0b" /> {/* style-ok: meta tags cannot read CSS variables; keep in sync with --bg */}
     <meta property="og:type" content={type} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />

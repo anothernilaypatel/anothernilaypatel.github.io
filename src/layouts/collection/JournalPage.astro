@@ -50,7 +50,7 @@ const indexTitle = [config.title, config.accent].filter(Boolean).join(' ');
 
 <style>
   .page {
-    width: min(760px, 100% - 2.5rem);
+    width: min(var(--measure), 100% - 2.5rem);
     margin: 0 auto;
     padding: 8rem 0 6rem;
   }
@@ -75,8 +75,8 @@ const indexTitle = [config.title, config.accent].filter(Boolean).join(' ');
     flex-direction: column;
     gap: 0.5rem;
     padding: 1.2rem 1.4rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-panel);
     text-decoration: none;
     transition:
       border-color 0.3s,
@@ -85,7 +85,7 @@ const indexTitle = [config.title, config.accent].filter(Boolean).join(' ');
   .pager-card:hover {
     color: var(--ink);
     border-color: var(--accent);
-    transform: translateY(-3px);
+    transform: translateY(var(--lift-lg));
   }
   .pager-card.next {
     text-align: right;

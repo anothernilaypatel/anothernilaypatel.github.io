@@ -1,0 +1,116 @@
+/*
+ * DESIGN TOKENS: the only place raw colors, fonts, and px values may appear.
+ * Everything else uses var(--token). `npm run check` fails on hardcoded values elsewhere.
+ * See STYLE.md for how and when to use each group.
+ *
+ * Breakpoints (CSS variables can't be used in @media, so these are the allowed literals):
+ *   640px  small phones      720px  phones      760px  narrow layouts      860px  tablets / one column
+ */
+
+:root {
+  /* ── Color: dark theme (default) ─────────────────────────────── */
+  --bg: #0a0c0b; /* page background (also <meta name="theme-color">) */
+  --bg-2: #101412; /* alternate band background */
+  --surface: #141917; /* cards, panels */
+  --line: #222a26; /* hairlines, borders */
+  --ink: #ebe7dc; /* main text */
+  --ink-2: #b9b6ac; /* secondary text */
+  --muted: #7d847f; /* labels, metadata */
+  --accent: #f6b23c; /* the one accent: amber "signal" */
+  --accent-ink: #1a1203; /* text on accent backgrounds */
+  --up: #57e3a1; /* positive / rising (charts only) */
+  --down: #ff6a5c; /* negative / falling (charts only) */
+  --paper: #f3efe4; /* frame behind chart images */
+  --paper-ink: #222; /* text on paper */
+  --overlay-bg: #111; /* small badges over images */
+  --overlay-ink: #eee;
+  --backdrop: rgb(0 0 0 / 0.8); /* behind dialogs */
+  --mask: #000; /* opaque stop in mask-image gradients */
+
+  /* ── Type ────────────────────────────────────────────────────── */
+  --serif: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif; /* headings, big numbers, quotes */
+  --sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif; /* body text */
+  --mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace; /* kickers, labels, code */
+  --canvas-label: 500 11px var(--mono); /* text drawn on the hero canvas */
+
+  /* ── Lines ───────────────────────────────────────────────────── */
+  --hairline: 1px; /* every border and divider */
+  --rule: 2px; /* accent rules (quote bars, focus outlines, progress) */
+  --focus-offset: 3px; /* gap between an element and its focus outline */
+
+  /* ── Radius ──────────────────────────────────────────────────── */
+  --radius-focus: 2px;
+  --radius-tag: 3px; /* placeholder tags, small markers */
+  --radius-img: 4px; /* images inside frames */
+  --radius-thumb: 8px; /* cover thumbnails */
+  --radius-dialog: 10px;
+  --radius-block: 12px; /* code blocks, figures, embeds */
+  --radius-panel: 14px; /* panels, pager cards, media */
+  --radius-card: 16px; /* cards */
+  --radius-card-lg: 18px; /* interest cards */
+  --radius-feature: 20px; /* highlight (stats) cards */
+  --radius-pill: 999px; /* buttons, chips, badges */
+
+  /* ── Sizes ───────────────────────────────────────────────────── */
+  --wrap: min(1180px, 100% - 2.5rem); /* page width */
+  --wrap-max: 1180px;
+  --measure: 760px; /* reading column for posts and the daily feed */
+  --dot-xs: 7px; /* pulsing nav dot */
+  --dot-sm: 8px; /* status dot */
+  --dot-md: 9px; /* series dots */
+  --dot-lg: 11px; /* timeline dots */
+  --dot-lg-half: 5px;
+  --card-min: 280px; /* min card width in auto-fit grids */
+  --card-min-lg: 340px;
+  --strip-card: 340px; /* card width in the pinned strip */
+  --col-chart: 190px; /* sparkline column on index rows */
+  --col-spark: 90px; /* small sparkline column */
+  --progress-h: 28px; /* reading-progress line on posts */
+  --grid-cell: 64px; /* background graph-paper grid */
+  --scroll-hint: 60px; /* "scroll" line in the hero */
+
+  /* ── Effects ─────────────────────────────────────────────────── */
+  --blur-sm: 4px;
+  --blur: 6px;
+  --blur-lg: 12px;
+  --glow-sm: 0 0 8px; /* + a color, e.g. box-shadow: var(--glow-sm) var(--accent) */
+  --glow: 0 0 10px;
+  --glow-lg: 0 0 12px;
+  --glow-pulse: 0 0 0 7px;
+  --shadow-lift: 0 10px 40px -10px; /* + color: hover shadow on primary buttons */
+  --shadow-float: 0 24px 60px -30px; /* + color: hover shadow on figures */
+  --spotlight-sm: 380px; /* cursor spotlight radius on cards */
+  --spotlight: 420px;
+  --spotlight-lg: 500px;
+  --perspective: 1200px; /* 3D tilt on cards */
+
+  /* ── Motion ──────────────────────────────────────────────────── */
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1); /* the one easing curve */
+  --lift: -2px; /* hover: buttons move up */
+  --lift-lg: -3px; /* hover: cards move up */
+  --nudge-sm: 4px; /* hover: small arrows move right */
+  --nudge: 6px; /* hover: row arrows move right */
+  --reveal-sm: 10px; /* chip stagger rise */
+  --reveal: 28px; /* scroll-reveal rise */
+  --reveal-md: 30px; /* post header rise */
+  --reveal-lg: 40px; /* hero rise */
+  --hero-parallax: 80px; /* hero text drift while scrolling away */
+
+  color-scheme: dark;
+}
+
+/* ── Color: light theme ──────────────────────────────────────── */
+:root[data-theme='light'] {
+  --bg: #f4f0e6;
+  --bg-2: #ece7da;
+  --surface: #fbf8f1;
+  --line: #d8d1c0;
+  --ink: #16181a;
+  --ink-2: #3b3f3c;
+  --muted: #6c6f68;
+  --accent: #b5650b;
+  --accent-ink: #fff8ec;
+  --up: #11845a;
+  --down: #c2372b;
+  color-scheme: light;
+}

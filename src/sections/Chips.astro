@@ -42,7 +42,7 @@ const shown = groups.filter((g) => g.items.length > 0);
   }
   .groups {
     margin: 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--hairline) solid var(--line);
   }
   .group {
     display: grid;
@@ -50,7 +50,7 @@ const shown = groups.filter((g) => g.items.length > 0);
     gap: 1rem 2rem;
     align-items: baseline;
     padding: 1.4rem 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--hairline) solid var(--line);
   }
   dt {
     color: var(--muted);
@@ -68,8 +68,8 @@ const shown = groups.filter((g) => g.items.length > 0);
   }
   .chip {
     padding: 0.45rem 0.95rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-pill);
     font-family: var(--serif);
     font-size: 1.15rem;
     color: var(--ink);
@@ -80,13 +80,13 @@ const shown = groups.filter((g) => g.items.length > 0);
       color 0.35s;
   }
   .chip:hover {
-    transform: translateY(-3px) rotate(-1.5deg);
+    transform: translateY(var(--lift-lg)) rotate(-1.5deg);
     border-color: var(--accent);
     color: var(--accent);
   }
   :global(.js) .anim .group .chip {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(var(--reveal-sm));
     transition:
       opacity 0.6s var(--ease),
       transform 0.6s var(--ease),
@@ -99,7 +99,7 @@ const shown = groups.filter((g) => g.items.length > 0);
     transform: none;
   }
   :global(.js) .group.is-in .chip:hover {
-    transform: translateY(-3px) rotate(-1.5deg);
+    transform: translateY(var(--lift-lg)) rotate(-1.5deg);
     transition-delay: 0s;
   }
   @media (max-width: 720px) {

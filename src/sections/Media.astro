@@ -89,8 +89,8 @@ const youtubeId = (u: string) => u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\
   video,
   .frame {
     width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-panel);
     background: var(--surface);
     overflow: hidden;
   }

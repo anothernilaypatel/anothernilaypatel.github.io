@@ -113,7 +113,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
   .progress {
     position: fixed;
     inset: 0 0 auto 0;
-    height: 28px;
+    height: var(--progress-h);
     z-index: 60;
     pointer-events: none;
   }
@@ -129,10 +129,10 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     stroke: var(--accent);
     stroke-width: 2;
     clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0);
-    filter: drop-shadow(0 0 4px var(--accent));
+    filter: drop-shadow(0 0 var(--blur-sm) var(--accent));
   }
   .wrap-narrow {
-    width: min(760px, 100% - 2.5rem);
+    width: min(var(--measure), 100% - 2.5rem);
     margin-inline: auto;
   }
   .post-head {
@@ -147,7 +147,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     width: 70%;
     opacity: 0.18;
     pointer-events: none;
-    mask-image: linear-gradient(90deg, transparent, #000 40%);
+    mask-image: linear-gradient(90deg, transparent, var(--mask) 40%);
   }
   .post-head .wrap-narrow {
     position: relative;
@@ -177,7 +177,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     flex-wrap: wrap;
     gap: 0.6rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--hairline) solid var(--line);
   }
   .cover {
     margin-top: 2.5rem;
@@ -185,8 +185,8 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
   .cover :global(img) {
     width: 100%;
     height: auto;
-    border-radius: 12px;
-    border: 1px solid var(--line);
+    border-radius: var(--radius-block);
+    border: var(--hairline) solid var(--line);
   }
   :global(.js) .post-head .wrap-narrow > * {
     animation: rise 1s var(--ease) both;
@@ -203,15 +203,15 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
   @keyframes rise {
     from {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(var(--reveal-md));
     }
   }
 
   .series {
     margin-top: 4rem;
     padding: 1.5rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-panel);
     background: var(--surface);
   }
   .series ol {
@@ -226,7 +226,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     left: 0.55rem;
     top: 0.8rem;
     bottom: 0.8rem;
-    width: 1px;
+    width: var(--hairline);
     background: var(--line);
   }
   .series a {
@@ -243,10 +243,10 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     position: absolute;
     left: 0.3rem;
     top: 1.05rem;
-    width: 9px;
-    height: 9px;
+    width: var(--dot-md);
+    height: var(--dot-md);
     border-radius: 50%;
-    border: 1px solid var(--muted);
+    border: var(--hairline) solid var(--muted);
     background: var(--surface);
   }
   .series .current a {
@@ -255,7 +255,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
   .series .current a::before {
     background: var(--accent);
     border-color: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
+    box-shadow: var(--glow) var(--accent);
   }
   .series a:hover {
     color: var(--accent);
@@ -272,8 +272,8 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     flex-direction: column;
     gap: 0.5rem;
     padding: 1.4rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-panel);
     text-decoration: none;
     transition:
       border-color 0.3s,
@@ -282,7 +282,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
   .pager-card:hover {
     color: var(--ink);
     border-color: var(--accent);
-    transform: translateY(-3px);
+    transform: translateY(var(--lift-lg));
   }
   .pager-card.next {
     text-align: right;

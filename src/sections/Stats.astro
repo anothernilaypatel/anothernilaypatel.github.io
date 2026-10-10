@@ -45,7 +45,7 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
   }
   .hl-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min-lg)), 1fr));
     gap: 1.25rem;
     list-style: none;
     padding: 0;
@@ -58,8 +58,8 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
     gap: 0.6rem;
     height: 100%;
     padding: clamp(1.6rem, 4vw, 2.6rem);
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
-    border-radius: 20px;
+    border: var(--hairline) solid color-mix(in srgb, var(--accent) 40%, var(--line));
+    border-radius: var(--radius-feature);
     background:
       radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
       var(--surface);
@@ -94,7 +94,7 @@ const { id, kicker, title, intro, items = [], animate } = Astro.props;
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(420px circle at var(--mx, 80%) var(--my, 20%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 45%);
+    background: radial-gradient(var(--spotlight) circle at var(--mx, 80%) var(--my, 20%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 45%);
     opacity: 0;
     transition: opacity 0.3s;
   }

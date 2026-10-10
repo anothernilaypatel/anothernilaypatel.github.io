@@ -79,7 +79,7 @@ const oldest = posts.at(-1);
     position: relative;
     overflow: hidden;
     padding: 8.5rem 0 4rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--hairline) solid var(--line);
   }
   .head-veil {
     position: absolute;
@@ -137,16 +137,16 @@ const oldest = posts.at(-1);
     list-style: none;
     margin: 0;
     padding: 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--hairline) solid var(--line);
   }
   .post-link {
     position: relative;
     display: grid;
-    grid-template-columns: 5rem 1fr 190px;
+    grid-template-columns: 5rem 1fr var(--col-chart);
     gap: 2rem;
     align-items: center;
     padding: 2.2rem 1rem;
-    border-bottom: 1px solid var(--line);
+    border-bottom: var(--hairline) solid var(--line);
     text-decoration: none;
     overflow: hidden;
     isolation: isolate;
@@ -156,7 +156,7 @@ const oldest = posts.at(-1);
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(500px circle at var(--mx, -100%) var(--my, 50%), color-mix(in srgb, var(--accent) 10%, transparent), transparent 45%);
+    background: radial-gradient(var(--spotlight-lg) circle at var(--mx, -100%) var(--my, 50%), color-mix(in srgb, var(--accent) 10%, transparent), transparent 45%);
     transition: opacity 0.3s;
     opacity: 0;
   }
@@ -172,7 +172,7 @@ const oldest = posts.at(-1);
     line-height: 1;
     letter-spacing: -0.04em;
     color: transparent;
-    -webkit-text-stroke: 1px var(--muted);
+    -webkit-text-stroke: var(--hairline) var(--muted);
     transition:
       color 0.4s var(--ease),
       -webkit-text-stroke-color 0.4s var(--ease);
@@ -207,7 +207,7 @@ const oldest = posts.at(-1);
     transition: transform 0.5s var(--ease);
   }
   .post-link:hover .post-title {
-    transform: translateX(6px);
+    transform: translateX(var(--nudge));
   }
   .post-summary {
     color: var(--ink-2);
@@ -218,8 +218,8 @@ const oldest = posts.at(-1);
     height: auto;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid var(--line);
+    border-radius: var(--radius-thumb);
+    border: var(--hairline) solid var(--line);
   }
   .post-chart {
     display: flex;

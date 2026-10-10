@@ -92,7 +92,7 @@ const pinned = layout === 'strip' && animate;
   }
   @keyframes nudge {
     50% {
-      transform: translateX(6px);
+      transform: translateX(var(--nudge));
     }
   }
   .int-viewport {
@@ -105,14 +105,14 @@ const pinned = layout === 'strip' && animate;
     display: none;
   }
   .int-track {
-    --pad: calc((100vw - min(1180px, 100vw - 2.5rem)) / 2);
+    --pad: calc((100vw - min(var(--wrap-max), 100vw - 2.5rem)) / 2);
     display: flex;
     gap: 1.25rem;
     width: max-content;
     list-style: none;
     margin: 0;
     padding: 0.5rem var(--pad) 1rem;
-    perspective: 1200px;
+    perspective: var(--perspective);
     will-change: transform;
   }
   .int-card {
@@ -120,10 +120,10 @@ const pinned = layout === 'strip' && animate;
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
-    width: min(78vw, 340px);
+    width: min(78vw, var(--strip-card));
     padding: 1.6rem;
-    border: 1px solid var(--line);
-    border-radius: 18px;
+    border: var(--hairline) solid var(--line);
+    border-radius: var(--radius-card-lg);
     background: var(--surface);
     scroll-snap-align: center;
     transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
@@ -137,7 +137,7 @@ const pinned = layout === 'strip' && animate;
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--accent) 12%, transparent), transparent 40%);
+    background: radial-gradient(var(--spotlight-sm) circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--accent) 12%, transparent), transparent 40%);
     opacity: 0;
     transition: opacity 0.3s;
   }
@@ -154,14 +154,14 @@ const pinned = layout === 'strip' && animate;
   }
   .badge {
     padding: 0.2rem 0.6rem;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--accent);
     color: var(--accent-ink);
     font-size: 0.68rem;
   }
   .layout-grid .int-track {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min)), 1fr));
     width: auto;
     padding: 0.5rem 0 1rem;
   }
@@ -195,7 +195,7 @@ const pinned = layout === 'strip' && animate;
     inset: 0;
   }
   .int-progress {
-    height: 2px;
+    height: var(--rule);
     margin-top: 1.5rem;
     background: var(--line);
     display: none;
@@ -226,7 +226,7 @@ const pinned = layout === 'strip' && animate;
     scroll-snap-type: none;
   }
   .int.hs-on .int-track {
-    transform: translate3d(var(--x, 0px), 0, 0);
+    transform: translate3d(var(--x, 0), 0, 0);
   }
   .int.hs-on .int-progress {
     display: block;
