@@ -17,10 +17,12 @@ const { items, n } = Astro.props;
       {
         items.map((h, i) => {
           const Tag = h.href ? 'a' : 'div';
+          const longest = Math.max(...h.value.split(/\s+/).map((word) => word.length));
+          const scale = longest > 8 ? 'compact' : longest > 4 ? 'medium' : '';
           return (
             <li data-reveal style={`--d:${i}`}>
               <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
-                <span class="hl-value" data-countdown={h.value}>
+                <span class:list={['hl-value', scale]} data-countdown={h.value}>
                   {h.value}
                 </span>
                 <span class="hl-label">{h.label}</span>
@@ -75,6 +77,15 @@ const { items, n } = Astro.props;
     font-variant-numeric: tabular-nums;
     font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
   }
+  .hl-value.medium {
+    font-size: clamp(3.2rem, 8vw, 4.75rem);
+    line-height: 0.95;
+  }
+  .hl-value.compact {
+    font-size: clamp(1.85rem, 4.6vw, 2.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
   .hl-label {
     font-family: var(--serif);
     font-size: clamp(1.5rem, 3vw, 2.2rem);
@@ -116,16 +127,17 @@ const { items, n } = Astro.props;
       io.unobserve(e.target);
       const el = e.target as HTMLElement;
       const text = el.dataset.countdown ?? '';
-      const m = text.match(/\d[\d,]*/);
+      // Only a bare rank ("Top 50") counts down. "2nd" and "Top 2%" stay put.
+      const m = text.match(/(?:^|\s)(\d[\d,]*)(?=$|\s)/);
       if (!m || reduce) continue;
-      const target = Number(m[0].replace(/,/g, ''));
+      const target = Number(m[1].replace(/,/g, ''));
       const from = Math.max(target * 40, 1000);
       const t0 = performance.now();
       const tick = (now: number) => {
         const k = Math.min(1, (now - t0) / 1600);
         const eased = 1 - Math.pow(1 - k, 4);
         const v = Math.round(from + (target - from) * eased);
-        el.textContent = text.replace(m[0], v.toLocaleString('en-US'));
+        el.textContent = text.replace(m[1], v.toLocaleString('en-US'));
         if (k < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);

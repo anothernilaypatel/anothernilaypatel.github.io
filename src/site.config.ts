@@ -36,7 +36,43 @@ export const site = {
     {
       value: 'Top 50',
       label: 'Brawl Stars',
-      detail: 'PLACEHOLDER: ranked among the top 50 players (season, region, or leaderboard).',
+      detail: '',
+      href: '/projects/brawl-stars-top-50/',
+    },
+    {
+      value: 'Top 2%',
+      label: 'Magic the Gathering',
+      detail: '',
+      href: '/projects/mtg/',
+    },
+    {
+      value: 'Leaderboard',
+      label: 'Super Auto Pets',
+      detail: '',
+      href: '/projects/super-auto-pets/',
+    },
+    {
+      value: 'Coach',
+      label: 'Valorant',
+      detail: '',
+      href: '',
+    },
+    {
+      value: 'HackHarvard',
+      label: 'DocScribe',
+      detail: 'Medical assistant AI with a team of four: realtime transcription that flags errors in doctor-patient visits. October 2024.',
+      href: '',
+    },
+    {
+      value: '2nd',
+      label: 'HackPrinceton',
+      detail: "Coinbase's Best Use of OnChainKit. ReliefChain, a funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
+      href: '',
+    },
+    {
+      value: '2nd',
+      label: "TechStars' Startup Weekend",
+      detail: 'My Little Adventure, with a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
       href: '',
     },
   ],
@@ -92,7 +128,7 @@ export const site = {
   /** Contact links. Entries with an empty `href` are hidden. */
   links: [
     { label: 'Email', href: '' }, // e.g. 'mailto:you@example.com'
-    { label: 'GitHub', href: 'https://github.com/anothernilaypatel' },
+    { label: 'GitHub', href: '' }, // https://github.com/anothernilaypatel — footer still links here. Empty href hides Say hello.
     { label: 'LinkedIn', href: '' }, // e.g. 'https://www.linkedin.com/in/your-handle'
   ],
 
