@@ -85,29 +85,58 @@ export const site = {
   ],
 
   /** Education, newest first. [] hides it. */
-  education: [
-    {
-      school: 'PLACEHOLDER university',
-      credential: 'PLACEHOLDER degree, major',
-      period: 'PLACEHOLDER – PLACEHOLDER',
-      detail: '',
-    },
-  ],
+  education: [],
 
   /** Experience, newest first. [] hides it. `href` is optional. */
   experience: [
     {
-      role: 'Independent research',
-      org: 'Hedge fund from scratch',
-      period: 'Jan 2025 – present',
-      detail: 'Building and backtesting systematic FX strategies in Python, with Professor Weijie Pang as a guide. Written up in the projects log.',
-      href: '/projects/the-beginning/',
+      role: 'Jaguar Health',
+      org: 'In person',
+      period: 'May 2023 – October 2023',
+      detail: 'Launched Centage Maestro for finance planning, reconciled $1.4 million, and tracked $700 thousand in prepaid balances.',
+      href: '',
+    },
+  ],
+
+  /** Startup projects from the résumé, newest first. */
+  startups: [
+    {
+      role: 'HackPrinceton',
+      org: 'ReliefChain',
+      period: 'November 2024',
+      detail: 'Team of four. A funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts.',
+      href: '',
     },
     {
-      role: 'PLACEHOLDER role',
-      org: 'PLACEHOLDER organization',
-      period: 'PLACEHOLDER',
-      detail: 'PLACEHOLDER: one line on what you did and the result.',
+      role: 'HackHarvard',
+      org: 'DocScribe',
+      period: 'October 2024',
+      detail: 'Team of four. A medical assistant that transcribes visits in real time and flags errors.',
+      href: '',
+    },
+    {
+      role: "Techstars' Startup Weekend",
+      org: 'My Little Adventure',
+      period: 'October 2023',
+      detail: 'Team of eleven. A tourism product with JavaScript geolocation and a Python montage tool. Launched an alpha.',
+      href: '',
+    },
+  ],
+
+  /** Competitions from the résumé, newest first. */
+  competitions: [
+    {
+      role: 'CyberStart America',
+      org: 'Scholar, top 1,000',
+      period: '2020–2024',
+      detail: 'Highest prestige. Cybersecurity.',
+      href: '',
+    },
+    {
+      role: 'USACO',
+      org: 'Gold, top 2,000',
+      period: '2018–2022',
+      detail: 'Data structures and algorithms.',
       href: '',
     },
   ],
