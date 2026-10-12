@@ -2,38 +2,51 @@
 import { isPlaceholder } from '../../site.config';
 import { href } from '../../lib/url';
 
+interface Item {
+  value: string;
+  label: string;
+  detail?: string;
+  href?: string;
+}
 interface Props {
-  items: { value: string; label: string; detail?: string; href?: string }[];
+  groups: { label: string; items: Item[] }[];
   n: string;
 }
-const { items, n } = Astro.props;
+const { groups, n } = Astro.props;
 ---
 
 <section id="highlights" class="hl" aria-labelledby="hl-h">
   <div class="wrap">
     <p class="kicker" data-reveal>{n} / Highlights</p>
     <h2 id="hl-h" class="sr-only">Highlights</h2>
-    <ul class="hl-list">
-      {
-        items.map((h, i) => {
-          const Tag = h.href ? 'a' : 'div';
-          const longest = Math.max(...h.value.split(/\s+/).map((word) => word.length));
-          const scale = longest > 8 ? 'compact' : longest > 4 ? 'medium' : '';
-          return (
-            <li data-reveal style={`--d:${i}`}>
-              <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
-                <span class:list={['hl-value', scale]} data-countdown={h.value}>
-                  {h.value}
-                </span>
-                <span class="hl-label">{h.label}</span>
-                {h.detail && <span class:list={['hl-detail', { ph: isPlaceholder(h.detail) }]}>{h.detail}</span>}
-                <span class="hl-glow" aria-hidden="true" />
-              </Tag>
-            </li>
-          );
-        })
-      }
-    </ul>
+    {
+      groups.map((group) => (
+        <div class="hl-group">
+          <h3 class="hl-cat kicker" data-reveal>
+            {group.label}
+          </h3>
+          <ul class="hl-list">
+            {group.items.map((h, i) => {
+              const Tag = h.href ? 'a' : 'div';
+              const longest = Math.max(...h.value.split(/\s+/).map((word) => word.length));
+              const scale = longest > 8 ? 'compact' : longest > 4 ? 'medium' : '';
+              return (
+                <li data-reveal style={`--d:${i}`}>
+                  <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
+                    <span class:list={['hl-value', scale]} data-countdown={h.value}>
+                      {h.value}
+                    </span>
+                    <span class="hl-label">{h.label}</span>
+                    {h.detail && <span class:list={['hl-detail', { ph: isPlaceholder(h.detail) }]}>{h.detail}</span>}
+                    <span class="hl-glow" aria-hidden="true" />
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))
+    }
   </div>
 </section>
 
@@ -41,13 +54,20 @@ const { items, n } = Astro.props;
   .hl {
     padding: clamp(3rem, 7vw, 5rem) 0;
   }
+  .hl-group + .hl-group {
+    margin-top: clamp(2.25rem, 5vw, 3.5rem);
+  }
+  .hl-cat {
+    margin: 1.6rem 0 0;
+    font-size: 0.85rem;
+  }
   .hl-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.25rem;
     list-style: none;
     padding: 0;
-    margin: 1.5rem 0 0;
+    margin: 0.9rem 0 0;
   }
   .hl-card {
     position: relative;
@@ -107,6 +127,11 @@ const { items, n } = Astro.props;
   }
   .hl-card:hover .hl-glow {
     opacity: 1;
+  }
+  @media (max-width: 860px) {
+    .hl-list {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 

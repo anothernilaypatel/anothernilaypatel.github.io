@@ -31,49 +31,56 @@ export const site = {
     'PLACEHOLDER: who you are in two sentences: where you study, what you build, and what drives you.',
   ],
 
-  /** Big highlight cards. `value` is the headline (numbers count in on scroll). [] hides the section. */
+  /**
+   * Highlight rows. `value` is the headline (a bare rank counts in on scroll).
+   * [] hides the section. A row with no cards is skipped.
+   */
   highlights: [
     {
-      value: 'Top 50',
-      label: 'Brawl Stars',
-      detail: '',
-      href: '/projects/brawl-stars-top-50/',
+      label: 'Hackathons',
+      items: [
+        {
+          value: 'HackHarvard',
+          label: 'DocScribe',
+          detail: 'Medical assistant AI with a team of four: realtime transcription that flags errors in doctor-patient visits. October 2024.',
+          href: '',
+        },
+        {
+          value: '2nd',
+          label: 'HackPrinceton',
+          detail: "Coinbase's Best Use of OnChainKit. ReliefChain, a funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
+          href: '',
+        },
+        {
+          value: '2nd',
+          label: "TechStars' Startup Weekend",
+          detail: 'My Little Adventure, with a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
+          href: '',
+        },
+      ],
     },
     {
-      value: 'Top 2%',
-      label: 'Magic the Gathering',
-      detail: '',
-      href: '/projects/mtg/',
-    },
-    {
-      value: 'Leaderboard',
-      label: 'Super Auto Pets',
-      detail: '',
-      href: '/projects/super-auto-pets/',
-    },
-    {
-      value: 'Coach',
-      label: 'Valorant',
-      detail: '',
-      href: '',
-    },
-    {
-      value: 'HackHarvard',
-      label: 'DocScribe',
-      detail: 'Medical assistant AI with a team of four: realtime transcription that flags errors in doctor-patient visits. October 2024.',
-      href: '',
-    },
-    {
-      value: '2nd',
-      label: 'HackPrinceton',
-      detail: "Coinbase's Best Use of OnChainKit. ReliefChain, a funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
-      href: '',
-    },
-    {
-      value: '2nd',
-      label: "TechStars' Startup Weekend",
-      detail: 'My Little Adventure, with a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
-      href: '',
+      label: 'Quant x Games',
+      items: [
+        {
+          value: 'Leaderboard',
+          label: 'Super Auto Pets',
+          detail: '',
+          href: '/projects/super-auto-pets/',
+        },
+        {
+          value: 'Top 2%',
+          label: 'Magic the Gathering: Arena',
+          detail: '',
+          href: '/projects/mtg/',
+        },
+        {
+          value: 'Top 50',
+          label: 'Brawl Stars',
+          detail: '',
+          href: '/projects/brawl-stars-top-50/',
+        },
+      ],
     },
   ],
 

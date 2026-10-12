@@ -32,14 +32,19 @@ const interests = site.interests.map((i) => ({
   href: i.post && published.has(i.post) ? url(`/projects/${i.post}/`) : undefined,
 }));
 
-const highlights = site.highlights.map((h) => {
-  const slug = h.href?.match(/^\/projects\/([^/]+)\/?$/)?.[1];
-  return slug && !published.has(slug) ? { ...h, href: '' } : h;
-});
+const highlights = site.highlights
+  .map((group) => ({
+    ...group,
+    items: group.items.map((h) => {
+      const slug = h.href?.match(/^\/projects\/([^/]+)\/?$/)?.[1];
+      return slug && !published.has(slug) ? { ...h, href: '' } : h;
+    }),
+  }))
+  .filter((group) => group.items.length > 0);
 
 const show = {
   about: site.about.length > 0,
-  highlights: site.highlights.length > 0,
+  highlights: highlights.length > 0,
   path: timeline.length > 0,
   skills: site.skills.length > 0,
   interests: interests.length > 0,
@@ -103,7 +108,7 @@ const [first, ...rest] = site.name.split(' ');
     )
   }
 
-  {show.highlights && <Highlights items={highlights} n={num('highlights')} />}
+  {show.highlights && <Highlights groups={highlights} n={num('highlights')} />}
   {show.path && <Timeline groups={timeline} n={num('path')} />}
   {show.skills && <Skills groups={site.skills} n={num('skills')} />}
   {show.interests && <Interests items={interests} n={num('interests')} />}
