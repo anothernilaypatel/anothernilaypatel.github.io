@@ -32,7 +32,7 @@ export const site = {
   ],
 
   /**
-   * Highlight rows. `value` is the headline (a bare rank counts in on scroll).
+   * Highlight rows. `value` is the headline (any number counts in on scroll).
    * [] hides the section. A row with no cards is skipped.
    */
   highlights: [
@@ -124,12 +124,9 @@ export const site = {
    * (src/content/projects/<slug>.mdx); the card links to it once that post is published.
    */
   interests: [
-    { name: 'Coffee', blurb: 'PLACEHOLDER: brew method, favorite beans, or the café you work from.', post: 'coffee' },
-    { name: 'Jazz', blurb: 'PLACEHOLDER: what you listen to (or play) and the record on repeat.', post: 'jazz' },
-    { name: 'Brawl Stars', blurb: 'Competitive play, good enough for the global top 50.', badge: 'Top 50', post: 'brawl-stars-top-50' },
-    { name: 'Super Auto Pets', blurb: 'PLACEHOLDER: favorite pack, team comps, or a bot idea.', post: 'super-auto-pets' },
-    { name: 'Magic: The Gathering', blurb: 'PLACEHOLDER: paper and MTG Arena. Formats, decks, and the draft you are proudest of.', post: 'mtg' },
-    { name: 'Markets & quant', blurb: 'Building a hedge fund from scratch, one backtest at a time.', post: 'the-beginning' },
+    { name: 'Coffee', blurb: 'Usually with a coffee in hand.', post: 'coffee' },
+    { name: 'Jazz', blurb: 'Usually with jazz on.', post: 'jazz' },
+    { name: 'F1', blurb: 'Formula 1.', post: 'f1' },
   ],
 
   /** Contact links. Entries with an empty `href` are hidden. */

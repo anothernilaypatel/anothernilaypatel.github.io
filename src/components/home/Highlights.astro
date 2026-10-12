@@ -145,24 +145,35 @@ const { groups, n } = Astro.props;
     });
   });
 
-  // "Top 50" counts down from a much bigger rank when it scrolls into view.
+  // Every highlight number counts down into place, the way "Top 2%" does:
+  // "2nd" keeps a real ordinal, and a percent keeps its % sign.
+  const ordinal = (n: number) => {
+    const teen = n % 100;
+    if (teen >= 11 && teen <= 13) return 'th';
+    return ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th';
+  };
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (!e.isIntersecting) continue;
       io.unobserve(e.target);
       const el = e.target as HTMLElement;
       const text = el.dataset.countdown ?? '';
-      // Only a bare rank ("Top 50") counts down. "2nd" and "Top 2%" stay put.
-      const m = text.match(/(?:^|\s)(\d[\d,]*)(?=$|\s)/);
+      const m = text.match(/^(.*?)(\d[\d,]*)(%|st|nd|rd|th)?(.*)$/i);
       if (!m || reduce) continue;
-      const target = Number(m[1].replace(/,/g, ''));
-      const from = Math.max(target * 40, 1000);
+      const [, prefix, digits, suffix = '', rest] = m;
+      const target = Number(digits.replace(/,/g, ''));
+      if (!Number.isFinite(target)) continue;
+      const ordinalSuffix = /^(st|nd|rd|th)$/i.test(suffix);
+      const from = target >= 10 ? Math.max(target * 40, 1000) : Math.max(target * 24, 12);
+      const paint = (n: number) => {
+        const end = suffix === '%' ? '%' : ordinalSuffix ? ordinal(n) : suffix;
+        el.textContent = `${prefix}${n.toLocaleString('en-US')}${end}${rest}`;
+      };
       const t0 = performance.now();
       const tick = (now: number) => {
         const k = Math.min(1, (now - t0) / 1600);
         const eased = 1 - Math.pow(1 - k, 4);
-        const v = Math.round(from + (target - from) * eased);
-        el.textContent = text.replace(m[1], v.toLocaleString('en-US'));
+        paint(Math.round(from + (target - from) * eased));
         if (k < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
