@@ -13,12 +13,11 @@
 export const site = {
   name: 'Nilay Patel',
   handle: 'anothernilaypatel',
-  title: 'Nilay Patel: student, builder, competitor',
-  description:
-    'Nilay Patel: student, builder, and competitive gamer. Projects, ideas, and accolades, plus a daily log of quotes and music.',
+  title: 'Nilay Patel: Failure is not falling down, but refusing to get up.',
+  description: 'Failure is not falling down, but refusing to get up.',
 
   /** Big line under the name in the hero. */
-  tagline: 'Student, builder, and competitor. Usually with a coffee in hand and jazz on.',
+  tagline: 'Failure is not falling down, but refusing to get up.',
 
   /** Optional "Currently: …" line in the hero. '' hides it. */
   currently: '',
@@ -28,7 +27,7 @@ export const site = {
 
   /** About: 1–2 short paragraphs. [] hides the section. */
   about: [
-    'PLACEHOLDER: who you are in two sentences: where you study, what you build, and what drives you.',
+    'I am a Computer Science graduate with plenty of ambitions for my future education and career.',
   ],
 
   /**
@@ -157,6 +156,8 @@ export const site = {
     { name: 'Jazz', blurb: 'Usually with jazz on.', post: 'jazz' },
     { name: 'F1', blurb: 'Formula 1.', post: 'f1' },
     { name: 'Coding', blurb: 'Coding.', post: 'coding' },
+    { name: 'Poker', blurb: 'Poker.', post: 'poker' },
+    { name: 'Golf', blurb: 'Golf.', post: 'golf' },
   ],
 
   /** Contact links. Entries with an empty `href` are hidden. */
