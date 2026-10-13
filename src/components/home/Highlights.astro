@@ -145,7 +145,7 @@ const { groups, n } = Astro.props;
     });
   });
 
-  // Every highlight number counts down into place, the way "Top 2%" does:
+  // Every highlight number counts down into place, the way "Top 1%" does:
   // "2nd" keeps a real ordinal, and a percent keeps its % sign.
   const ordinal = (n: number) => {
     const teen = n % 100;

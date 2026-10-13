@@ -63,13 +63,13 @@ export const site = {
       label: 'Quant x Games',
       items: [
         {
-          value: 'Leaderboard',
+          value: 'Top 1',
           label: 'Super Auto Pets',
-          detail: '',
+          detail: 'Monthly leaderboard.',
           href: '/projects/super-auto-pets/',
         },
         {
-          value: 'Top 2%',
+          value: 'Top 1%',
           label: 'Magic the Gathering: Arena',
           detail: '',
           href: '/projects/mtg/',
@@ -156,6 +156,7 @@ export const site = {
     { name: 'Coffee', blurb: 'Usually with a coffee in hand.', post: 'coffee' },
     { name: 'Jazz', blurb: 'Usually with jazz on.', post: 'jazz' },
     { name: 'F1', blurb: 'Formula 1.', post: 'f1' },
+    { name: 'Coding', blurb: 'Coding.', post: 'coding' },
   ],
 
   /** Contact links. Entries with an empty `href` are hidden. */

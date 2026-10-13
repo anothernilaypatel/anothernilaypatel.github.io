@@ -18,12 +18,12 @@ const published = new Set(posts.map((p) => p.id));
 
 const timeline = [
   {
-    label: 'Startups',
-    items: site.startups.map((e) => ({ title: e.role, sub: e.org, period: e.period, detail: e.detail, href: e.href })),
-  },
-  {
     label: 'Intern',
     items: site.experience.map((e) => ({ title: e.role, sub: e.org, period: e.period, detail: e.detail, href: e.href })),
+  },
+  {
+    label: 'Hackathons',
+    items: site.startups.map((e) => ({ title: e.role, sub: e.org, period: e.period, detail: e.detail, href: e.href })),
   },
   {
     label: 'Competitions',
