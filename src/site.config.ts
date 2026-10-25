@@ -36,6 +36,17 @@ export const site = {
    */
   highlights: [
     {
+      label: '',
+      items: [
+        {
+          value: 'S13: Passing the SIE with 13 Hours of Studying',
+          detail: 'Leveraging AI beyond the point of the corporate buzzword.',
+          href: '/projects/passing-the-sie/',
+          wide: true,
+        },
+      ],
+    },
+    {
       label: 'Hackathons',
       items: [
         {
@@ -81,17 +92,6 @@ export const site = {
           label: 'Brawl Stars',
           detail: 'National leaderboard.',
           href: '/projects/brawl-stars-top-50/',
-        },
-      ],
-    },
-    {
-      label: '',
-      items: [
-        {
-          value: 'S13: Passing the SIE with 13 Hours of Studying',
-          detail: 'Leveraging AI beyond the point of the corporate buzzword.',
-          href: '/projects/passing-the-sie/',
-          wide: true,
         },
       ],
     },
