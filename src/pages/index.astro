@@ -2,18 +2,15 @@
 import Base from '../layouts/Base.astro';
 import MarketField from '../components/MarketField.astro';
 import Sparkline from '../components/Sparkline.astro';
-import DailyCard from '../components/DailyCard.astro';
 import Highlights from '../components/home/Highlights.astro';
 import Timeline from '../components/home/Timeline.astro';
-import Skills from '../components/home/Skills.astro';
 import Interests from '../components/home/Interests.astro';
 import { site, isPlaceholder, visibleLinks } from '../site.config';
-import { getPosts, getDaily, fmtDate, postUrl, kindLabel } from '../lib/posts';
+import { getPosts, fmtDate, postUrl, kindLabel } from '../lib/posts';
 import { url, href } from '../lib/url';
 
-const [posts, daily] = await Promise.all([getPosts(), getDaily()]);
+const posts = await getPosts();
 const latestPosts = posts.slice(0, 5);
-const latestDaily = daily[0];
 const published = new Set(posts.map((p) => p.id));
 
 const timeline = [
@@ -54,9 +51,8 @@ const show = {
   about: site.about.length > 0,
   highlights: highlights.length > 0,
   path: timeline.length > 0,
-  skills: site.skills.length > 0,
   interests: interests.length > 0,
-  latest: posts.length > 0 || daily.length > 0,
+  latest: posts.length > 0,
   contact: visibleLinks.length > 0 || !!site.resume,
 };
 const order = (Object.keys(show) as (keyof typeof show)[]).filter((k) => show[k]);
@@ -82,8 +78,7 @@ const [first, ...rest] = site.name.split(' ');
         )
       }
       <div class="hero-cta">
-        <a class="btn btn-primary" href={url('/projects/')}>Projects &amp; ideas <span class="arrow" aria-hidden="true">→</span></a>
-        <a class="btn" href={url('/daily/')}>Daily log <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn-primary" href={url('/projects/')}>Hobbies, sprints &amp; accolades <span class="arrow" aria-hidden="true">→</span></a>
         {resumeHref && <a class="btn" href={resumeHref}>Résumé (PDF) <span class="arrow" aria-hidden="true">↓</span></a>}
       </div>
     </div>
@@ -118,7 +113,6 @@ const [first, ...rest] = site.name.split(' ');
 
   {show.highlights && <Highlights groups={highlights} n={num('highlights')} />}
   {show.path && <Timeline groups={timeline} n={num('path')} />}
-  {show.skills && <Skills groups={site.skills} n={num('skills')} />}
   {show.interests && <Interests items={interests} n={num('interests')} />}
 
   {
@@ -129,35 +123,27 @@ const [first, ...rest] = site.name.split(' ');
             <p class="kicker">{num('latest')} / Latest</p>
             <h2 id="latest-h">Lately.</h2>
           </header>
-          <div class:list={['latest-grid', { single: !latestDaily || latestPosts.length === 0 }]}>
-            {latestDaily && (
-              <div class="latest-col" data-reveal>
-                <p class="mono muted col-label">From the daily log</p>
-                <DailyCard entry={latestDaily} headingLevel="h3" />
-              </div>
-            )}
-            {latestPosts.length > 0 && (
-              <div class="latest-col" data-reveal style="--d:1">
-                <p class="mono muted col-label">Projects, ideas &amp; accolades</p>
-                <ol class="rows">
-                  {latestPosts.map((p) => (
-                    <li>
-                      <a href={postUrl(p)} class="row">
-                        <span class="mono muted">
-                          {kindLabel[p.data.kind]} · {fmtDate(p.data.date)}
-                        </span>
-                        <span class="row-title">{p.data.title}</span>
-                        <Sparkline seed={p.id} width={120} height={28} class="row-spark" />
-                        <span class="row-arrow" aria-hidden="true">
-                          →
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-          </div>
+          {latestPosts.length > 0 && (
+            <div data-reveal>
+              <p class="mono muted col-label">Hobbies, sprints &amp; accolades</p>
+              <ol class="rows">
+                {latestPosts.map((p) => (
+                  <li>
+                    <a href={postUrl(p)} class="row">
+                      <span class="mono muted">
+                        {kindLabel[p.data.kind]} · {fmtDate(p.data.date)}
+                      </span>
+                      <span class="row-title">{p.data.title}</span>
+                      <Sparkline seed={p.id} width={120} height={28} class="row-spark" />
+                      <span class="row-arrow" aria-hidden="true">
+                        →
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
         <div class="bands">
           <a class="enter" href={url('/projects/')} data-reveal>
@@ -173,24 +159,7 @@ const [first, ...rest] = site.name.split(' ');
                 {posts.length} {posts.length === 1 ? 'post' : 'posts'}
               </span>
               <span class="enter-title">
-                Projects &amp; ideas <span class="enter-arrow" aria-hidden="true">→</span>
-              </span>
-            </span>
-          </a>
-          <a class="enter enter-alt" href={url('/daily/')} data-reveal style="--d:1">
-            {daily.some((d) => d.data.quote) && (
-              <span class="enter-marquee" aria-hidden="true">
-                {[0, 1].map(() => (
-                  <span>{daily.filter((d) => d.data.quote).map((d) => `“${d.data.quote!.text}”`).join('  ·  ')}  ·  </span>
-                ))}
-              </span>
-            )}
-            <span class="enter-inner">
-              <span class="kicker">
-                {daily.length} {daily.length === 1 ? 'entry' : 'entries'}
-              </span>
-              <span class="enter-title">
-                Daily log <span class="enter-arrow" aria-hidden="true">→</span>
+                Hobbies, sprints &amp; accolades <span class="enter-arrow" aria-hidden="true">→</span>
               </span>
             </span>
           </a>
@@ -389,76 +358,38 @@ const [first, ...rest] = site.name.split(' ');
   .latest {
     padding: clamp(3.5rem, 8vw, 6rem) 0 0;
   }
-  .latest-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(1.5rem, 4vw, 3rem);
-    align-items: stretch;
-    margin-bottom: 4rem;
-  }
-  .latest-col {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-  .latest-col :global(.daily) {
-    flex: 1;
-  }
-  .latest-grid.single {
-    grid-template-columns: minmax(0, 1fr);
-    max-width: 52rem;
-  }
   .col-label {
     margin: 0 0 1rem;
   }
   .rows {
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
     padding: 0;
-    margin: 0;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--surface);
-    overflow: hidden;
-  }
-  .rows li {
-    display: flex;
-    flex: 1 1 auto;
-  }
-  .rows li + li {
+    margin: 0 0 4rem;
     border-top: 1px solid var(--line);
   }
   .row {
     display: grid;
-    flex: 1;
-    grid-template-columns: 1fr 90px 1.5rem;
-    grid-template-areas: 'meta meta meta' 'title spark arrow';
+    grid-template-columns: 14rem minmax(0, 1fr) 120px 1.5rem;
     align-items: center;
-    gap: 0.4rem 1rem;
-    padding: 1rem 1.1rem;
+    gap: 0.75rem 1.25rem;
+    padding: 1.15rem 0.4rem;
+    border-bottom: 1px solid var(--line);
     text-decoration: none;
     transition:
       background 0.3s var(--ease),
       padding 0.4s var(--ease);
   }
-  .row > :first-child {
-    grid-area: meta;
-  }
   .row-title {
-    grid-area: title;
     font-family: var(--serif);
-    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    font-size: clamp(1.2rem, 2vw, 1.7rem);
     line-height: 1.15;
   }
   :global(.row-spark) {
-    grid-area: spark;
+    justify-self: end;
     opacity: 0.35;
     transition: opacity 0.3s;
   }
   .row-arrow {
-    grid-area: arrow;
     font-size: 1.3rem;
     transition: transform 0.4s var(--ease);
   }
@@ -476,8 +407,7 @@ const [first, ...rest] = site.name.split(' ');
   }
 
   .bands {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: block;
   }
   .enter {
     position: relative;
@@ -595,10 +525,25 @@ const [first, ...rest] = site.name.split(' ');
   }
 
   @media (max-width: 860px) {
-    .about-inner,
-    .latest-grid,
-    .bands {
+    .about-inner {
       grid-template-columns: 1fr;
+    }
+    .row {
+      grid-template-columns: 1fr 90px 1.5rem;
+      grid-template-areas: 'meta meta meta' 'title spark arrow';
+      gap: 0.35rem 0.8rem;
+    }
+    .row > :first-child {
+      grid-area: meta;
+    }
+    .row-title {
+      grid-area: title;
+    }
+    :global(.row-spark) {
+      grid-area: spark;
+    }
+    .row-arrow {
+      grid-area: arrow;
     }
     .hero-note {
       display: none;

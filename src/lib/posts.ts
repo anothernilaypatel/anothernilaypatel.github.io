@@ -7,7 +7,7 @@ export type Daily = CollectionEntry<'daily'>;
 const visible = ({ data }: { data: { draft: boolean } }) => import.meta.env.DEV || !data.draft;
 const newestFirst = (a: { data: { date: Date } }, b: { data: { date: Date } }) => b.data.date.valueOf() - a.data.date.valueOf();
 
-/** Published projects/ideas/accolades, newest first. Drafts show up only in `npm run dev`. */
+/** Published hobbies, sprints, and accolades, newest first. Drafts show up only in `npm run dev`. */
 export async function getPosts() {
   return (await getCollection('projects', visible)).sort(newestFirst);
 }
@@ -21,7 +21,9 @@ export const postUrl = (p: Post) => url(`/projects/${p.id}/`);
 export const dailyAnchor = (d: Daily) => `d-${d.id}`;
 export const dailyUrl = (d: Daily) => url(`/daily/#${dailyAnchor(d)}`);
 
-export const kindLabel = { project: 'Project', idea: 'Idea', accolade: 'Accolade' } as const;
+export const kindOrder = ['hobby', 'sprint', 'accolade'] as const;
+export const kindLabel = { hobby: 'Hobby', sprint: 'Sprint', accolade: 'Accolade' } as const;
+export const kindGroupLabel = { hobby: 'Hobbies', sprint: 'Sprints', accolade: 'Accolades' } as const;
 
 function plainText(body = '') {
   return body

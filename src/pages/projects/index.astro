@@ -4,21 +4,27 @@ import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import MarketField from '../../components/MarketField.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel } from '../../lib/posts';
+import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel, kindOrder, kindGroupLabel } from '../../lib/posts';
 import { site } from '../../site.config';
 
 const posts = await getPosts();
 const oldest = posts.at(-1);
+const groups = kindOrder.map((kind) => ({
+  id: kindGroupLabel[kind].toLowerCase(),
+  kind,
+  label: kindGroupLabel[kind],
+  posts: posts.filter((p) => p.data.kind === kind),
+}));
 ---
 
-<Base title="Projects, ideas & accolades" description={site.projectsIntro}>
+<Base title="Hobbies, sprints & accolades" description={site.projectsIntro}>
   <section class="head">
     <MarketField paths={22} seed={19} />
     <div class="head-veil" aria-hidden="true"></div>
     <div class="wrap head-inner">
       <a class="mono back" href={url('/')}>← Home</a>
-      <p class="kicker">{site.handle} / projects · ideas · accolades</p>
-      <h1>Projects <em>&amp; ideas</em></h1>
+      <p class="kicker">{site.handle} / hobbies · sprints · accolades</p>
+      <h1>Hobbies, sprints <em>&amp; accolades</em></h1>
       <p class="lede">{site.projectsIntro}</p>
       <dl class="meta mono">
         <div><dt class="muted">Entries</dt><dd>{posts.length}</dd></div>
@@ -29,44 +35,58 @@ const oldest = posts.at(-1);
   </section>
 
   <section class="wrap list-wrap" aria-label="Posts">
-    {posts.length === 0 && <p class="empty muted mono">First entry coming soon.</p>}
-    <ol class="posts">
+    <nav class="filters" aria-label="Categories">
       {
-        posts.map((p, i) => {
-          const { parts, index } = seriesOf(p, posts);
-          return (
-            <li class="post" data-reveal style={`--d:${Math.min(i, 6)}`}>
-              <a href={postUrl(p)} class="post-link" data-spot>
-                <span class="post-num mono" aria-hidden="true">
-                  {String(posts.length - i).padStart(2, '0')}
-                </span>
-                <span class="post-main">
-                  <span class="post-meta mono muted">
-                    <span class:list={['kind', `kind-${p.data.kind}`]}>{kindLabel[p.data.kind]}</span>
-                    <time datetime={p.data.date.toISOString()}>{fmtDate(p.data.date)}</time>
-                    <span>· {readingTime(p.body)} min</span>
-                    {parts.length > 1 && (
-                      <span class="post-series">
-                        · {p.data.series} {index}/{parts.length}
-                      </span>
-                    )}
-                  </span>
-                  <span class="post-title">{p.data.title}</span>
-                  <span class="post-summary">{describe(p)}</span>
-                </span>
-                <span class="post-chart" aria-hidden="true">
-                  {p.data.cover ? (
-                    <Image src={p.data.cover} alt="" width={360} class="post-cover" />
-                  ) : (
-                    <Sparkline seed={p.id} width={180} height={56} />
-                  )}
-                </span>
-              </a>
-            </li>
-          );
-        })
+        groups.map((g) => (
+          <a href={`#${g.id}`}>{g.label}</a>
+        ))
       }
-    </ol>
+    </nav>
+    {
+      groups.map((g) => (
+        <div class="group" id={g.id}>
+          <h2 id={`${g.id}-h`}>{g.label}</h2>
+          {g.posts.length === 0 && <p class="empty muted mono">Nothing here yet.</p>}
+          {g.posts.length > 0 && (
+            <ol class="posts">
+              {g.posts.map((p, i) => {
+                const { parts, index } = seriesOf(p, posts);
+                return (
+                  <li class="post" data-reveal style={`--d:${Math.min(i, 6)}`}>
+                    <a href={postUrl(p)} class="post-link" data-spot>
+                      <span class="post-num mono" aria-hidden="true">
+                        {String(g.posts.length - i).padStart(2, '0')}
+                      </span>
+                      <span class="post-main">
+                        <span class="post-meta mono muted">
+                          <span class:list={['kind', `kind-${p.data.kind}`]}>{kindLabel[p.data.kind]}</span>
+                          <time datetime={p.data.date.toISOString()}>{fmtDate(p.data.date)}</time>
+                          <span>· {readingTime(p.body)} min</span>
+                          {parts.length > 1 && (
+                            <span class="post-series">
+                              · {p.data.series} {index}/{parts.length}
+                            </span>
+                          )}
+                        </span>
+                        <span class="post-title">{p.data.title}</span>
+                        <span class="post-summary">{describe(p)}</span>
+                      </span>
+                      <span class="post-chart" aria-hidden="true">
+                        {p.data.cover ? (
+                          <Image src={p.data.cover} alt="" width={360} class="post-cover" />
+                        ) : (
+                          <Sparkline seed={p.id} width={180} height={56} />
+                        )}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
+      ))
+    }
   </section>
 </Base>
 
@@ -94,14 +114,21 @@ const oldest = posts.at(-1);
     color: var(--muted);
   }
   h1 {
-    font-size: clamp(3.5rem, 12vw, 9rem);
-    line-height: 0.9;
-    letter-spacing: -0.045em;
+    font-size: clamp(2.8rem, 7vw, 5.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
     margin: 1rem 0 1.5rem;
+    max-width: 16ch;
     font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
   }
   h1 em {
     color: var(--accent);
+  }
+  @media (max-width: 700px) {
+    h1 {
+      font-size: 2.35rem;
+      max-width: 9ch;
+    }
   }
   .lede {
     font-family: var(--serif);
@@ -128,6 +155,39 @@ const oldest = posts.at(-1);
 
   .list-wrap {
     padding: 3rem 0 6rem;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0 0 2.75rem;
+  }
+  .filters a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 0.95rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-2);
+  }
+  .filters a:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+  .group + .group {
+    margin-top: 3.5rem;
+  }
+  .group h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    margin: 0 0 1.1rem;
+  }
+  .group {
+    scroll-margin-top: 5.5rem;
   }
   .posts {
     list-style: none;
@@ -191,6 +251,9 @@ const oldest = posts.at(-1);
   }
   .kind {
     color: var(--accent);
+  }
+  .kind-sprint {
+    color: var(--ink-2);
   }
   .kind-accolade {
     color: var(--up);

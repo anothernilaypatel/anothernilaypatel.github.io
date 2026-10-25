@@ -42,7 +42,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
     <header class="post-head">
       <div class="head-spark" aria-hidden="true"><Sparkline seed={post.id} width={800} height={200} points={90} class="draw" /></div>
       <div class="wrap-narrow">
-        <a class="mono back" href={url('/projects/')}>← Projects &amp; ideas</a>
+        <a class="mono back" href={url('/projects/')}>← Hobbies, sprints &amp; accolades</a>
         <p class="kicker">
           {kindLabel[post.data.kind]}
           {inSeries.length > 1 && ` · ${series} · part ${seriesIndex} of ${inSeries.length}`}
@@ -106,7 +106,7 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
         ) : (
           <a class="pager-card next" href={url('/projects/')}>
             <span class="mono muted">You're caught up</span>
-            <span class="pager-title">Back to projects &amp; ideas</span>
+            <span class="pager-title">Back to hobbies, sprints &amp; accolades</span>
           </a>
         )
       }

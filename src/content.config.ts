@@ -4,7 +4,7 @@ import { z } from 'astro/zod';
 
 // Files starting with "_" are ignored by both collections, so they can be used for scratch notes.
 
-/** Longer posts: projects, ideas, and accolades. One <slug>.mdx file each. */
+/** Longer posts: hobbies, sprints, and accolades. One <slug>.mdx file each. */
 const projects = defineCollection({
   loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/projects' }),
   schema: ({ image }) =>
@@ -12,7 +12,7 @@ const projects = defineCollection({
       title: z.string(),
       date: z.coerce.date(),
       description: z.string().optional(),
-      kind: z.enum(['project', 'idea', 'accolade']).default('project'),
+      kind: z.enum(['hobby', 'sprint', 'accolade']).default('sprint'),
       cover: image().optional(),
       series: z.string().optional(),
       draft: z.boolean().default(false),

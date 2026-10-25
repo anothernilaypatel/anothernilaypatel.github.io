@@ -9,10 +9,7 @@ const anchors = [
   { href: url('/#path'), label: 'Experience', show: site.experience.length + site.education.length > 0 },
   { href: url('/#contact'), label: 'Contact', show: visibleLinks.length > 0 },
 ].filter((a) => a.show);
-const pills = [
-  { href: url('/projects/'), label: 'Projects', active: current.startsWith('/projects') },
-  { href: url('/daily/'), label: 'Daily', active: current.startsWith('/daily') },
-];
+const pills = [{ href: url('/projects/'), label: 'Projects', active: current.startsWith('/projects') }];
 ---
 
 <header class="nav" data-nav>

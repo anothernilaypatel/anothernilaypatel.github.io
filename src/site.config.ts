@@ -140,12 +140,8 @@ export const site = {
     },
   ],
 
-  /** Skills, grouped. [] hides the section. */
-  skills: [
-    { group: 'Code & data', items: ['Python', 'pandas', 'matplotlib', 'seaborn', 'FRED API', 'yfinance'] },
-    { group: 'Learning next', items: ['q', 'Julia'] },
-    { group: 'Other', items: ['PLACEHOLDER'] },
-  ],
+  /** Skills, grouped. [] hides the Toolkit section. */
+  skills: [],
 
   /**
    * Interests, shown as a scroll-driven strip. `post` is an optional project slug
@@ -167,7 +163,7 @@ export const site = {
     { label: 'LinkedIn', href: '' }, // e.g. 'https://www.linkedin.com/in/your-handle'
   ],
 
-  projectsIntro: 'Longer write-ups on the things I build, chase, and win: projects, half-formed ideas, and accolades.',
+  projectsIntro: 'Hobbies, short sprints, and the rankings and wins worth writing down.',
   dailyIntro: 'A short daily log: a quote I keep thinking about, a track on repeat, and a line or two.',
 };
 
