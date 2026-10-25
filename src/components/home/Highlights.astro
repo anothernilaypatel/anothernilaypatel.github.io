@@ -161,6 +161,24 @@ const { groups, n } = Astro.props;
       io.unobserve(e.target);
       const el = e.target as HTMLElement;
       const text = el.dataset.countdown ?? '';
+      // ":)" tries on a bunch of faces, then settles into the smile.
+      if (text === ':)') {
+        if (reduce) continue;
+        const faces = [':(', ':|', ':O', ':P', ';)', ':S', ':/', 'B)', '8)', ':3', 'xD', ':*', ':D'];
+        const t0 = performance.now();
+        const tick = (now: number) => {
+          const k = Math.min(1, (now - t0) / 1600);
+          if (k >= 0.72) {
+            el.textContent = ':)';
+            return;
+          }
+          const eased = 1 - Math.pow(1 - k / 0.72, 2);
+          el.textContent = faces[Math.min(faces.length - 1, Math.floor(eased * faces.length))];
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        continue;
+      }
       const m = text.match(/^(.*?)(\d[\d,]*)(%|st|nd|rd|th)?(.*)$/i);
       if (!m || reduce) continue;
       const [, prefix, digits, suffix = '', rest] = m;
