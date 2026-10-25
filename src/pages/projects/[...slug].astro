@@ -4,7 +4,7 @@ import { render } from 'astro:content';
 import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel, type Post } from '../../lib/posts';
+import { getPosts, readingTime, describe, postUrl, seriesOf, kindLabel, type Post } from '../../lib/posts';
 import { walk, seedFrom, toPath } from '../../lib/series';
 import '../../styles/prose.css';
 
@@ -50,8 +50,6 @@ const progressPath = toPath(walk(seedFrom(post.id), 120, { drift: 0.003, vol: 0.
         <h1>{title}</h1>
         <p class="summary">{summary}</p>
         <p class="meta mono muted">
-          <time datetime={date.toISOString()}>{fmtDate(date)}</time>
-          <span>·</span>
           <span>{readingTime(post.body)} min read</span>
         </p>
       </div>

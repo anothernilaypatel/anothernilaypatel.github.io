@@ -5,6 +5,8 @@ import { href } from '../../lib/url';
 interface Item {
   value: string;
   label: string;
+  /** Project name, when the big line is a place (2nd) and the event is the label. */
+  project?: string;
   detail?: string;
   href?: string;
 }
@@ -37,6 +39,7 @@ const { groups, n } = Astro.props;
                       {h.value}
                     </span>
                     <span class="hl-label">{h.label}</span>
+                    {h.project && <span class="hl-label">{h.project}</span>}
                     {h.detail && <span class:list={['hl-detail', { ph: isPlaceholder(h.detail) }]}>{h.detail}</span>}
                     <span class="hl-glow" aria-hidden="true" />
                   </Tag>

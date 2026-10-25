@@ -39,9 +39,10 @@ export const site = {
       label: 'Hackathons',
       items: [
         {
-          value: 'HackPrinceton',
-          label: 'ReliefChain',
-          detail: "2nd place. Coinbase's Best Use of OnChainKit. A funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
+          value: '2nd',
+          label: 'HackPrinceton',
+          project: 'ReliefChain',
+          detail: "Coinbase's Best Use of OnChainKit. A funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
           href: '',
         },
         {
@@ -51,9 +52,10 @@ export const site = {
           href: '',
         },
         {
-          value: "TechStars' Startup Weekend",
-          label: 'My Little Adventure',
-          detail: '2nd place. With a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
+          value: '2nd',
+          label: "TechStars' Startup Weekend",
+          project: 'My Not So Little Adventure',
+          detail: 'With a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
           href: '',
         },
       ],
@@ -115,7 +117,7 @@ export const site = {
     },
     {
       role: "Techstars' Startup Weekend",
-      org: 'My Little Adventure',
+      org: 'My Not So Little Adventure',
       period: 'October 2023',
       detail: 'Team of eleven. A tourism product with JavaScript geolocation and a Python montage tool. Launched an alpha.',
       href: '',

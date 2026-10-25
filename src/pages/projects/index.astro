@@ -4,11 +4,10 @@ import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import MarketField from '../../components/MarketField.astro';
 import Sparkline from '../../components/Sparkline.astro';
-import { getPosts, fmtDate, readingTime, describe, postUrl, seriesOf, kindLabel, kindOrder, kindGroupLabel } from '../../lib/posts';
+import { getPosts, readingTime, describe, postUrl, seriesOf, kindLabel, kindOrder, kindGroupLabel } from '../../lib/posts';
 import { site } from '../../site.config';
 
 const posts = await getPosts();
-const oldest = posts.at(-1);
 const groups = kindOrder.map((kind) => ({
   id: kindGroupLabel[kind].toLowerCase(),
   kind,
@@ -28,7 +27,6 @@ const groups = kindOrder.map((kind) => ({
       <p class="lede">{site.projectsIntro}</p>
       <dl class="meta mono">
         <div><dt class="muted">Entries</dt><dd>{posts.length}</dd></div>
-        {oldest && <div><dt class="muted">Since</dt><dd>{fmtDate(oldest.data.date)}</dd></div>}
         <div><dt class="muted">Feed</dt><dd><a href={url('/rss.xml')}>RSS ↗</a></dd></div>
       </dl>
     </div>
@@ -60,8 +58,7 @@ const groups = kindOrder.map((kind) => ({
                       <span class="post-main">
                         <span class="post-meta mono muted">
                           <span class:list={['kind', `kind-${p.data.kind}`]}>{kindLabel[p.data.kind]}</span>
-                          <time datetime={p.data.date.toISOString()}>{fmtDate(p.data.date)}</time>
-                          <span>· {readingTime(p.body)} min</span>
+                          <span>{readingTime(p.body)} min</span>
                           {parts.length > 1 && (
                             <span class="post-series">
                               · {p.data.series} {index}/{parts.length}

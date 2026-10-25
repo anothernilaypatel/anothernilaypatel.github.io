@@ -6,11 +6,13 @@ import Highlights from '../components/home/Highlights.astro';
 import Timeline from '../components/home/Timeline.astro';
 import Interests from '../components/home/Interests.astro';
 import { site, isPlaceholder, visibleLinks } from '../site.config';
-import { getPosts, fmtDate, postUrl, kindLabel } from '../lib/posts';
+import { getPosts, postUrl, kindLabel } from '../lib/posts';
 import { url, href } from '../lib/url';
 
 const posts = await getPosts();
-const latestPosts = posts.slice(0, 5);
+const hobbyIds = new Set(posts.filter((p) => p.data.kind === 'hobby').map((p) => p.id));
+const accoladeIds = new Set(posts.filter((p) => p.data.kind === 'accolade').map((p) => p.id));
+const sprintPosts = posts.filter((p) => p.data.kind === 'sprint');
 const published = new Set(posts.map((p) => p.id));
 
 const timeline = [
@@ -32,18 +34,25 @@ const timeline = [
   },
 ].filter((g) => g.items.length > 0);
 
-const interests = site.interests.map((i) => ({
-  ...i,
-  href: i.post && published.has(i.post) ? url(`/projects/${i.post}/`) : undefined,
-}));
+const interests = site.interests
+  .filter((i) => !i.post || hobbyIds.has(i.post))
+  .map((i) => ({
+    ...i,
+    href: i.post && published.has(i.post) ? url(`/projects/${i.post}/`) : undefined,
+  }));
 
 const highlights = site.highlights
   .map((group) => ({
     ...group,
-    items: group.items.map((h) => {
-      const slug = h.href?.match(/^\/projects\/([^/]+)\/?$/)?.[1];
-      return slug && !published.has(slug) ? { ...h, href: '' } : h;
-    }),
+    items: group.items
+      .filter((h) => {
+        const slug = h.href?.match(/^\/projects\/([^/]+)\/?$/)?.[1];
+        return !slug || accoladeIds.has(slug);
+      })
+      .map((h) => {
+        const slug = h.href?.match(/^\/projects\/([^/]+)\/?$/)?.[1];
+        return slug && !published.has(slug) ? { ...h, href: '' } : h;
+      }),
   }))
   .filter((group) => group.items.length > 0);
 
@@ -52,7 +61,7 @@ const show = {
   highlights: highlights.length > 0,
   path: timeline.length > 0,
   interests: interests.length > 0,
-  latest: posts.length > 0,
+  latest: true,
   contact: visibleLinks.length > 0 || !!site.resume,
 };
 const order = (Object.keys(show) as (keyof typeof show)[]).filter((k) => show[k]);
@@ -123,16 +132,15 @@ const [first, ...rest] = site.name.split(' ');
             <p class="kicker">{num('latest')} / Latest</p>
             <h2 id="latest-h">Lately.</h2>
           </header>
-          {latestPosts.length > 0 && (
-            <div data-reveal>
-              <p class="mono muted col-label">Hobbies, sprints &amp; accolades</p>
+          <div data-reveal>
+            <p class="mono muted col-label">Sprints</p>
+            {sprintPosts.length === 0 && <p class="empty muted mono">Nothing here yet.</p>}
+            {sprintPosts.length > 0 && (
               <ol class="rows">
-                {latestPosts.map((p) => (
+                {sprintPosts.map((p) => (
                   <li>
                     <a href={postUrl(p)} class="row">
-                      <span class="mono muted">
-                        {kindLabel[p.data.kind]} · {fmtDate(p.data.date)}
-                      </span>
+                      <span class="mono muted">{kindLabel[p.data.kind]}</span>
                       <span class="row-title">{p.data.title}</span>
                       <Sparkline seed={p.id} width={120} height={28} class="row-spark" />
                       <span class="row-arrow" aria-hidden="true">
@@ -142,27 +150,8 @@ const [first, ...rest] = site.name.split(' ');
                   </li>
                 ))}
               </ol>
-            </div>
-          )}
-        </div>
-        <div class="bands">
-          <a class="enter" href={url('/projects/')} data-reveal>
-            {posts.length > 0 && (
-              <span class="enter-marquee" aria-hidden="true">
-                {[0, 1].map(() => (
-                  <span>{posts.map((p) => p.data.title).join('  ·  ')}  ·  </span>
-                ))}
-              </span>
             )}
-            <span class="enter-inner">
-              <span class="kicker">
-                {posts.length} {posts.length === 1 ? 'post' : 'posts'}
-              </span>
-              <span class="enter-title">
-                Hobbies, sprints &amp; accolades <span class="enter-arrow" aria-hidden="true">→</span>
-              </span>
-            </span>
-          </a>
+          </div>
         </div>
       </section>
     )
@@ -360,6 +349,9 @@ const [first, ...rest] = site.name.split(' ');
   }
   .col-label {
     margin: 0 0 1rem;
+  }
+  .empty {
+    margin: 0 0 3rem;
   }
   .rows {
     list-style: none;
