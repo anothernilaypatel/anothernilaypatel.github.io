@@ -1,8 +1,91 @@
 ---
 title: Gramograms
 date: 2026-10-25
-description: This is a sprint.
+description: "Solving this without the use of AI or any proper tools seemed a bit unique."
 kind: sprint
 ---
 
-This is a sprint.
+I have always been a fan of making small, quick Python scripts to answer unique questions (typically questions that only I have). Deviancy (DVNC) was the longest word without slant rhymes, and excellency (XLNC) was the longest word with slight slant rhymes.
+
+![A post from April 15, 2023, naming deviancy (DVNC) as the longest word without slant rhymes](./gramograms/deviancy-note.png "April 15, 2023. The longest word without slant rhymes was deviancy (DVNC).")
+
+This project took only a few hours to program, but solving this without the use of AI or any proper tools seemed a bit unique. The solution required downloading the [pronouncing](https://pypi.org/project/pronouncing/) Python library and mapping each word's phonemes to the pronunciation of each letter. I had a dictionary of words from the "Hangman" project.
+
+```python
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 11 17:47:47 2023
+
+@author: Nilay Patel
+"""
+
+import pronouncing
+import re
+
+#GET PHONETICS FOR ALL LETTERS, SAVE TO ONE MASSIVE ARRAY
+alphabet = "abcdefghijklmnopqrstuvxyz"
+antiNumberPattern = r'[0-9]'
+
+phoneticArray = []
+phonemeFlag = False
+phonemeFinal = ""
+
+gramArray = []
+gramWordArray = []
+
+def swapPhonemes(array):
+    global phonemeFlag
+    global phonemeFinal
+    
+    for x in range(0, 3):
+        currentSearch = array[0:x + 1]
+        if currentSearch in phoneticArray:
+            phonemeFinal += alphabet[phoneticArray.index(currentSearch)]
+            if array[x + 1:] == []:
+                phonemeFlag = True;
+                return
+            else:
+                swapPhonemes(array[x + 1:])
+        
+        
+#LOOP THROUGH THE ALPHABET, GET THE PHONEMES, SAVE IT TO A 2D ARRAY
+for letter in alphabet:
+    pronunciation = pronouncing.phones_for_word(letter)
+    pronunciationArray = pronunciation[-1].split(" ")
+    for x in range(0, len(pronunciationArray)):
+        pronunciationArray[x] = re.sub(antiNumberPattern, "", pronunciationArray[x])
+        
+    #WE ONLY WANT THE SOUNDS OF THE LETTER TO BE SAVED
+    #EX: A SHOULD BE "AYYY" NOT "UHHH"
+    phoneticArray.append(pronunciationArray)
+    
+#GET INPUT FOR WORD
+fileIn = open("finalDict.txt", "r")
+readFile = fileIn.read()
+wordArray = readFile.split("\n")
+
+for word in wordArray:
+    print(word)
+    inputtedPronunciations = pronouncing.phones_for_word(word)
+    
+    #WORDS CAN HAVE MULTIPLE PRONUNCIATIONS, SO LOOP THROUGH THEM
+    for x in range(0, len(inputtedPronunciations)):
+        phonemeFlag = False
+        phonemeFinal = ""    
+        
+        currentWord = inputtedPronunciations[x]
+        currentWord = re.sub(antiNumberPattern, "", currentWord)
+        currentPhonemes = currentWord.split(" ")
+        
+        swapPhonemes(currentPhonemes)
+        if phonemeFlag:
+            if not(phonemeFinal.lower() == word.lower()):
+                gramArray.append(phonemeFinal)
+                gramWordArray.append(word)
+            
+print("LONGEST WORD: " + max(gramWordArray, key = len) + " (" + gramArray[gramWordArray.index(max(gramWordArray, key = len))] + ")")
+print("LONGEST GRAMOGRAM: " + max(gramArray, key = len) + " (" + gramWordArray[gramArray.index(max(gramArray, key = len))] + ")")
+
+```
+
+Despite finding the results similar to those online, I had the resources to bend the rules to find unique edge cases. This solution might not be the most optimized, but it was the quickest solution I could think of. When you have passion for a project, the solution flows naturally.
