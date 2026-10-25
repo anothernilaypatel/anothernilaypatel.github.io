@@ -39,21 +39,21 @@ export const site = {
       label: 'Hackathons',
       items: [
         {
+          value: 'HackPrinceton',
+          label: 'ReliefChain',
+          detail: "2nd place. Coinbase's Best Use of OnChainKit. A funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
+          href: '',
+        },
+        {
           value: 'HackHarvard',
           label: 'DocScribe',
           detail: 'Medical assistant AI with a team of four: realtime transcription that flags errors in doctor-patient visits. October 2024.',
           href: '',
         },
         {
-          value: '2nd',
-          label: 'HackPrinceton',
-          detail: "Coinbase's Best Use of OnChainKit. ReliefChain, a funding platform for people in natural disasters, with OnChainKit wallets and Solidity contracts. November 2024.",
-          href: '',
-        },
-        {
-          value: '2nd',
-          label: "TechStars' Startup Weekend",
-          detail: 'My Little Adventure, with a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
+          value: "TechStars' Startup Weekend",
+          label: 'My Little Adventure',
+          detail: '2nd place. With a team of eleven: a tourism product with JavaScript geolocation and a Python montage tool. October 2023.',
           href: '',
         },
       ],
@@ -70,13 +70,13 @@ export const site = {
         {
           value: 'Top 1%',
           label: 'Magic the Gathering: Arena',
-          detail: '',
+          detail: 'Seasonal leaderboard.',
           href: '/projects/mtg/',
         },
         {
           value: 'Top 50',
           label: 'Brawl Stars',
-          detail: '',
+          detail: 'National leaderboard.',
           href: '/projects/brawl-stars-top-50/',
         },
       ],
