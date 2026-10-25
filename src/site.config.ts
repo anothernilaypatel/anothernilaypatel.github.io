@@ -84,6 +84,17 @@ export const site = {
         },
       ],
     },
+    {
+      label: '',
+      items: [
+        {
+          value: 'S13: Passing the SIE with 13 Hours of Studying',
+          detail: 'Leveraging AI beyond the point of the corporate buzzword.',
+          href: '/projects/passing-the-sie/',
+          wide: true,
+        },
+      ],
+    },
   ],
 
   /** Education, newest first. [] hides it. */

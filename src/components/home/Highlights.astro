@@ -4,11 +4,13 @@ import { href } from '../../lib/url';
 
 interface Item {
   value: string;
-  label: string;
+  label?: string;
   /** Project name, when the big line is a place (2nd, :)) and the event is the label. */
   project?: string;
   detail?: string;
   href?: string;
+  /** Span the whole highlight row. The value is a title, not a countdown. */
+  wide?: boolean;
 }
 interface Props {
   groups: { label: string; items: Item[] }[];
@@ -24,21 +26,23 @@ const { groups, n } = Astro.props;
     {
       groups.map((group) => (
         <div class="hl-group">
-          <h3 class="hl-cat kicker" data-reveal>
-            {group.label}
-          </h3>
+          {group.label && (
+            <h3 class="hl-cat kicker" data-reveal>
+              {group.label}
+            </h3>
+          )}
           <ul class="hl-list">
             {group.items.map((h, i) => {
               const Tag = h.href ? 'a' : 'div';
               const longest = Math.max(...h.value.split(/\s+/).map((word) => word.length));
-              const scale = longest > 8 ? 'compact' : longest > 4 ? 'medium' : '';
+              const scale = h.wide ? '' : longest > 8 ? 'compact' : longest > 4 ? 'medium' : '';
               return (
-                <li data-reveal style={`--d:${i}`}>
-                  <Tag class="hl-card" href={h.href ? href(h.href) : undefined} data-hl-card>
-                    <span class:list={['hl-value', scale]} data-countdown={h.value}>
+                <li class:list={{ wide: h.wide }} data-reveal style={`--d:${i}`}>
+                  <Tag class:list={['hl-card', { wide: h.wide }]} href={h.href ? href(h.href) : undefined} data-hl-card>
+                    <span class:list={['hl-value', scale]} data-countdown={h.wide ? undefined : h.value}>
                       {h.value}
                     </span>
-                    <span class="hl-label">{h.label}</span>
+                    {h.label && <span class="hl-label">{h.label}</span>}
                     {h.project && <span class="hl-label">{h.project}</span>}
                     {h.detail && <span class:list={['hl-detail', { ph: isPlaceholder(h.detail) }]}>{h.detail}</span>}
                     <span class="hl-glow" aria-hidden="true" />
@@ -71,6 +75,9 @@ const { groups, n } = Astro.props;
     list-style: none;
     padding: 0;
     margin: 0.9rem 0 0;
+  }
+  .hl-list > li.wide {
+    grid-column: 1 / -1;
   }
   .hl-card {
     position: relative;
@@ -108,6 +115,16 @@ const { groups, n } = Astro.props;
     font-size: clamp(1.85rem, 4.6vw, 2.75rem);
     line-height: 1.05;
     letter-spacing: -0.03em;
+  }
+  .hl-card.wide .hl-value {
+    font-size: clamp(1.9rem, 3.5vw, 3.2rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    max-width: 22em;
+  }
+  .hl-card.wide .hl-detail {
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    max-width: 40rem;
   }
   .hl-label {
     font-family: var(--serif);

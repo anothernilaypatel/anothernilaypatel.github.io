@@ -44,7 +44,8 @@ if (type === 'project') {
     .replace(/^date: .*$/m, `date: ${today()}`)
     .replaceAll('your-post-slug', slug);
   write(path.join(root, 'src/content/projects', `${slug}.mdx`), body, [
-    `Images (optional): put them in src/content/projects/${slug}/`,
+    `Write paragraphs, links like [label](https://example.com), and images.`,
+    `Images: put them in src/content/projects/${slug}/`,
     `Preview: npm run dev, then open /projects/${slug}/`,
   ]);
 } else if (type === 'daily') {

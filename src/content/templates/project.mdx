@@ -4,30 +4,29 @@ date: 2026-01-01
 description: One sentence shown on the projects index, in RSS, and in link previews. Optional; defaults to the opening of the post.
 kind: sprint                          # hobby | sprint | accolade
 # cover: ./your-post-slug/cover.png   # optional image for the post header, projects index, and link previews
-# series: Hedge fund from scratch     # optional; posts sharing a series get "part n of N" navigation, ordered by date
+# series: A series name               # optional; posts sharing a series get "part n of N" navigation, ordered by date
 # draft: true                         # optional; hides the post everywhere except `npm run dev`
 ---
 
-Write in Markdown. The first paragraph gets a drop cap.
+The first paragraph. Write as many as you want. A blank line starts the next one.
 
-## A section heading
-
-Code blocks get syntax highlighting and a copy button:
-
-```python
-import pandas as pd
-returns = prices.pct_change().dropna()
-```
-
-Math works inline, like $\sigma\sqrt{t}$, or as a block:
-
-$$
-\text{Sharpe} = \frac{E[R_p - R_f]}{\sigma_p}
-$$
+A link sits in the sentence, like [an outside page](https://example.com) or [another post](/projects/coffee/).
 
 {/*
-  Images: put them in src/content/projects/your-post-slug/ and reference them on their own line.
-  The quoted text becomes a numbered caption, and readers can click to enlarge:
+  Images: put the file in src/content/projects/your-post-slug/ and put this on its own line.
+  The quoted text becomes the caption, and readers can click the picture to enlarge it.
 
-  ![Describe what the chart shows, for screen readers](./your-post-slug/chart.png "Caption shown under the figure.")
+  ![Describe the image](./your-post-slug/photo.png "Caption under the picture.")
+
+  Code blocks get syntax highlighting and a copy button:
+
+  ```python
+  returns = prices.pct_change().dropna()
+  ```
+
+  Math works inline, like $\sigma\sqrt{t}$, or as a block:
+
+  $$
+  \text{Sharpe} = \frac{E[R_p - R_f]}{\sigma_p}
+  $$
 */}

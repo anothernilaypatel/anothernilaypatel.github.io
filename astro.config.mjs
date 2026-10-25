@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { unified } from '@astrojs/markdown-remark';
 import rehypeFigure from './src/lib/rehype-figure.mjs';
+import rehypeLinks from './src/lib/rehype-links.mjs';
 
 // Where the site is served from. The deploy workflow sets SITE_URL from the repo's
 // GitHub Pages URL, so a project-site subpath and a root/custom domain both work.
@@ -16,7 +17,7 @@ export default defineConfig({
   base: siteUrl.pathname,
   integrations: [mdx(), sitemap({ filter: (page) => !/\/blog\//.test(page) })],
   markdown: {
-    processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex, rehypeFigure] }),
+    processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex, rehypeFigure, rehypeLinks(siteUrl.pathname)] }),
     shikiConfig: {
       themes: { light: 'github-light', dark: 'vesper' },
       defaultColor: false,
