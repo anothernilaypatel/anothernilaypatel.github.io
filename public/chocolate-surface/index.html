@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dark chocolate flavanol surface</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #fff; color: #1c1915; overflow: hidden; }
+    body { display: flex; flex-direction: column; min-height: 100%; font-family: system-ui, sans-serif; }
+    header, footer { padding: 14px 20px 8px; }
+    footer { padding-top: 4px; padding-bottom: 14px; }
+    h1 { font-size: 16px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+    p { margin: 0; font-size: 13px; line-height: 1.45; color: #5c564c; }
+    #plot { flex: 1; min-height: 0; }
+    main { display: flex; flex: 1; min-height: 0; }
+    aside { width: 300px; overflow: auto; border-left: 1px solid #e6e1d8; padding: 12px 14px 16px; }
+    aside h2 { font-size: 13px; margin: 0 0 6px; }
+    aside ol { margin: 8px 0 0; padding-left: 18px; }
+    aside li { margin: 0 0 8px; font-size: 12px; line-height: 1.35; }
+    aside li b { font-weight: 650; }
+    aside .meta { color: #5c564c; }
+    body.bare header, body.bare footer, body.bare aside { display: none; }
+  </style>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Dark chocolate: flavanols, metals, and price</h1>
+    <p>Every bar from the lab test is on the sheet, not only the Pareto bars. Larger dots deliver more flavanols per dollar. Height is flavanols.</p>
+  </header>
+  <main>
+    <div id="plot"></div>
+    <aside>
+      <h2>Bang for the buck</h2>
+      <p>Value score multiplies the dollars for 200 mg of flavanols by the metal score. Lower is better. Prices are what the lab paid in 2019 or 2022.</p>
+      <ol id="rank"></ol>
+    </aside>
+  </main>
+  <footer>
+    <p>Source: ConsumerLab.com, 2019 and 2022 tests and purchase prices. A lead value marked “&lt;” is the lab ceiling. Drag to rotate. Embed with <code>?bare=1</code> for the plot alone.</p>
+  </footer>
+  <script>
+    if (new URLSearchParams(location.search).has("bare")) {
+      document.body.classList.add("bare");
+    }
+
+    /** Every dark bar in the review with flavanols, lead, cadmium, and a serving price. */
+    const BARS = [
+      { brand: "Ghirardelli", product: "Intense Dark", label: "Ghirardelli 72%", cacao: 72, year: 2022, servingG: 25, flavanolMg: 318.5, cadmiumMcg: 2.7, leadMcg: 0.23, leadCensored: true, pricePerServing: 0.85 },
+      { brand: "Montezuma's", product: "Absolute Black", label: "Montezuma's 100%", cacao: 100, year: 2019, servingG: 25, flavanolMg: 350.5, cadmiumMcg: 1.4, leadMcg: 0.93, leadCensored: false, pricePerServing: 1.19 },
+      { brand: "Baker's", product: "Unsweetened", label: "Baker's 100%", cacao: 100, year: 2019, servingG: 14, flavanolMg: 109.8, cadmiumMcg: 2.9, leadMcg: 0.42, leadCensored: false, pricePerServing: 0.34 },
+      { brand: "Baker's", product: "Semi-sweet", label: "Baker's 56%", cacao: 56, year: 2022, servingG: 14, flavanolMg: 74, cadmiumMcg: 0.91, leadMcg: 0.2, leadCensored: false, pricePerServing: 0.43 },
+      { brand: "Lily's", product: "Sea Salt Extra Dark", label: "Lily's 70%", cacao: 70, year: 2022, servingG: 30, flavanolMg: 176, cadmiumMcg: 1.1, leadMcg: 0.6, leadCensored: false, pricePerServing: 1.52 },
+      { brand: "Endangered Species", product: "Strong + Velvety", label: "Endangered 88%", cacao: 88, year: 2019, servingG: 28, flavanolMg: 157.9, cadmiumMcg: 1.5, leadMcg: 0.7, leadCensored: true, pricePerServing: 1.05 },
+      { brand: "Chocolove", product: "Strong Dark", label: "Chocolove 70%", cacao: 70, year: 2019, servingG: 30, flavanolMg: 145.8, cadmiumMcg: 2.7, leadMcg: 0.75, leadCensored: true, pricePerServing: 1.1 },
+      { brand: "Green & Black's", product: "Organic Dark", label: "Green & Black's 85%", cacao: 85, year: 2022, servingG: 30, flavanolMg: 198.2, cadmiumMcg: 7.2, leadMcg: 0.57, leadCensored: false, pricePerServing: 1.16 },
+      { brand: "Trader Joe's", product: "Pound Plus", label: "TJ Pound Plus 72%", cacao: 72, year: 2019, servingG: 38, flavanolMg: 196.8, cadmiumMcg: 2.7, leadMcg: 1.2, leadCensored: false, pricePerServing: 0.38 },
+      { brand: "Evolved", product: "Midnight Coconut", label: "Evolved 100%", cacao: 100, year: 2022, servingG: 28, flavanolMg: 209.4, cadmiumMcg: 7.7, leadMcg: 1.1, leadCensored: false, pricePerServing: 2.1 },
+      { brand: "Lindt", product: "Excellence 90%", label: "Lindt 90%", cacao: 90, year: 2019, servingG: 40, flavanolMg: 147.5, cadmiumMcg: 5.8, leadMcg: 1, leadCensored: true, pricePerServing: 1.2 },
+      { brand: "Scharffen Berger", product: "Unsweetened", label: "Scharffen 99%", cacao: 99, year: 2019, servingG: 55, flavanolMg: 305.9, cadmiumMcg: 12.1, leadMcg: 1.4, leadCensored: true, pricePerServing: 2.44 },
+      { brand: "Theo", product: "Sea Salt", label: "Theo 70%", cacao: 70, year: 2019, servingG: 43, flavanolMg: 172.9, cadmiumMcg: 10.3, leadMcg: 1.1, leadCensored: true, pricePerServing: 1.53 },
+      { brand: "Hu", product: "Salty Dark", label: "Hu 70%", cacao: 70, year: 2022, servingG: 30, flavanolMg: 124.2, cadmiumMcg: 2.3, leadMcg: 0.81, leadCensored: false, pricePerServing: 2.65 },
+      { brand: "Taza", product: "Wicked Dark", label: "Taza 95%", cacao: 95, year: 2019, servingG: 35, flavanolMg: 192.5, cadmiumMcg: 6.8, leadMcg: 0.88, leadCensored: true, pricePerServing: 4.5 },
+      { brand: "Alter Eco", product: "Deep Dark Blackout", label: "Alter Eco 85%", cacao: 85, year: 2019, servingG: 40, flavanolMg: 221.5, cadmiumMcg: 14.1, leadMcg: 1.1, leadCensored: false, pricePerServing: 3.43 },
+      { brand: "Trader Joe's", product: "Uganda", label: "TJ Uganda 85%", cacao: 85, year: 2022, servingG: 30, flavanolMg: 117.5, cadmiumMcg: 7.6, leadMcg: 1.9, leadCensored: false, pricePerServing: 0.51 },
+      { brand: "ChocZero", product: "Sugar Free 70%", label: "ChocZero 70%", cacao: 70, year: 2022, servingG: 10, flavanolMg: 19.9, cadmiumMcg: 0.29, leadMcg: 0.3, leadCensored: false, pricePerServing: 0.5 }
+    ];
+
+    const LEAD_MADL = 0.5;
+    const CADMIUM_MADL = 4.1;
+
+    const bars = BARS.map((b) => {
+      const flavanolPerG = b.flavanolMg / b.servingG;
+      const cadmiumPerG = b.cadmiumMcg / b.servingG;
+      const leadPerG = b.leadMcg / b.servingG;
+      const scale = 200 / b.flavanolMg;
+      const score = (b.leadMcg * scale) / LEAD_MADL + (b.cadmiumMcg * scale) / CADMIUM_MADL;
+      const usdPer200 = b.pricePerServing * scale;
+      return {
+        ...b,
+        flavanolPerG,
+        cadmiumPerG,
+        leadPerG,
+        gramsFor200: b.servingG * scale,
+        cadmiumFor200: b.cadmiumMcg * scale,
+        leadFor200: b.leadMcg * scale,
+        score,
+        usdPer200,
+        flavanolsPerDollar: b.flavanolMg / b.pricePerServing,
+        valueScore: usdPer200 * score
+      };
+    });
+
+    function dominates(a, b) {
+      const betterOrEqual = a.flavanolPerG >= b.flavanolPerG - 1e-9 && a.cadmiumPerG <= b.cadmiumPerG + 1e-9 && a.leadPerG <= b.leadPerG + 1e-9;
+      const strictly = a.flavanolPerG > b.flavanolPerG + 1e-9 || a.cadmiumPerG < b.cadmiumPerG - 1e-9 || a.leadPerG < b.leadPerG - 1e-9;
+      return betterOrEqual && strictly;
+    }
+    bars.forEach((b) => {
+      b.pareto = !bars.some((other) => other !== b && dominates(other, b));
+    });
+    const winner = bars.reduce((best, b) => (b.valueScore < best.valueScore ? b : best));
+    const maxPerDollar = Math.max(...bars.map((b) => b.flavanolsPerDollar));
+
+    function circumcircle(ax, ay, bx, by, cx, cy) {
+      const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
+      if (Math.abs(d) < 1e-14) return null;
+      const a2 = ax * ax + ay * ay;
+      const b2 = bx * bx + by * by;
+      const c2 = cx * cx + cy * cy;
+      const x = (a2 * (by - cy) + b2 * (cy - ay) + c2 * (ay - by)) / d;
+      const y = (a2 * (cx - bx) + b2 * (ax - cx) + c2 * (bx - ax)) / d;
+      return { x, y, r2: (x - ax) * (x - ax) + (y - ay) * (y - ay) };
+    }
+
+    const i = [];
+    const j = [];
+    const k = [];
+    for (let a = 0; a < bars.length; a++) {
+      for (let b = a + 1; b < bars.length; b++) {
+        for (let c = b + 1; c < bars.length; c++) {
+          const circle = circumcircle(
+            bars[a].leadPerG, bars[a].cadmiumPerG,
+            bars[b].leadPerG, bars[b].cadmiumPerG,
+            bars[c].leadPerG, bars[c].cadmiumPerG
+          );
+          if (!circle) continue;
+          let empty = true;
+          for (let m = 0; m < bars.length; m++) {
+            if (m === a || m === b || m === c) continue;
+            const dx = bars[m].leadPerG - circle.x;
+            const dy = bars[m].cadmiumPerG - circle.y;
+            if (dx * dx + dy * dy < circle.r2 - 1e-12) {
+              empty = false;
+              break;
+            }
+          }
+          if (!empty) continue;
+          const cross =
+            (bars[b].leadPerG - bars[a].leadPerG) * (bars[c].cadmiumPerG - bars[a].cadmiumPerG) -
+            (bars[b].cadmiumPerG - bars[a].cadmiumPerG) * (bars[c].leadPerG - bars[a].leadPerG);
+          if (cross < 0) {
+            i.push(a); j.push(c); k.push(b);
+          } else {
+            i.push(a); j.push(b); k.push(c);
+          }
+        }
+      }
+    }
+
+    const lead = (v) => (v.leadCensored ? "<" : "") + v.leadPerG.toFixed(3);
+    const hover = bars.map((b) =>
+      "<b>" + b.brand + " " + b.cacao + "%</b><br>" +
+      b.product + " · " + b.year + "<br>" +
+      "Flavanols: " + b.flavanolPerG.toFixed(1) + " mg/g<br>" +
+      "Cadmium: " + b.cadmiumPerG.toFixed(3) + " µg/g<br>" +
+      "Lead: " + lead(b) + " µg/g<br>" +
+      "$" + b.pricePerServing.toFixed(2) + " per serving · $" + b.usdPer200.toFixed(2) + " per 200 mg flavanols<br>" +
+      Math.round(b.flavanolsPerDollar) + " mg flavanols per dollar<br>" +
+      "Metal score: " + (b.leadCensored ? "<" : "") + b.score.toFixed(2) +
+      "<br>Value score: " + (b.leadCensored ? "<" : "") + b.valueScore.toFixed(2) +
+      (b === winner ? "<br>Best value" : b.pareto ? "<br>Pareto bar" : "") +
+      "<extra></extra>"
+    );
+
+    const surface = {
+      type: "mesh3d",
+      x: bars.map((b) => b.leadPerG),
+      y: bars.map((b) => b.cadmiumPerG),
+      z: bars.map((b) => b.flavanolPerG),
+      i, j, k,
+      intensity: bars.map((b) => b.flavanolPerG),
+      cmin: Math.min(...bars.map((b) => b.flavanolPerG)),
+      cmax: Math.max(...bars.map((b) => b.flavanolPerG)),
+      colorscale: [[0, "#f4ecdc"], [1, "#6f4424"]],
+      colorbar: {
+        title: { text: "Flavanols (mg/g)", side: "right" },
+        thickness: 14,
+        len: 0.62,
+        tickfont: { size: 11, color: "#5c564c" },
+        titlefont: { size: 12, color: "#1c1915" }
+      },
+      flatshading: true,
+      opacity: 1,
+      lighting: { ambient: 0.62, diffuse: 0.75, specular: 0.04, roughness: 0.95, fresnel: 0.15 },
+      hoverinfo: "skip",
+      name: "Surface"
+    };
+
+    const markers = {
+      type: "scatter3d",
+      mode: "markers+text",
+      x: bars.map((b) => b.leadPerG),
+      y: bars.map((b) => b.cadmiumPerG),
+      z: bars.map((b) => b.flavanolPerG),
+      text: bars.map((b) => b.label),
+      textposition: "top center",
+      textfont: { size: 10, color: "#1c1915" },
+      hovertemplate: hover,
+      marker: {
+        size: bars.map((b) => 5 + 10 * (b.flavanolsPerDollar / maxPerDollar)),
+        color: bars.map((b) => (b.leadCensored ? "#ffffff" : b === winner ? "#6f4424" : b.pareto ? "#1c1915" : "#8a8175")),
+        line: {
+          width: bars.map((b) => (b.leadCensored || b === winner ? 2 : 0)),
+          color: bars.map((b) => (b === winner ? "#6f4424" : "#1c1915"))
+        }
+      },
+      name: "Bars"
+    };
+
+    const layout = {
+      margin: { l: 0, r: 0, t: 8, b: 0 },
+      paper_bgcolor: "rgba(0,0,0,0)",
+      font: { family: "system-ui, sans-serif", color: "#1c1915" },
+      showlegend: false,
+      scene: {
+        bgcolor: "rgba(0,0,0,0)",
+        aspectmode: "cube",
+        camera: { eye: { x: 1.55, y: -1.45, z: 0.85 } },
+        xaxis: { title: { text: "Lead (µg/g)" }, range: [0, 0.08], tickformat: ".2f", gridcolor: "#e6e1d8", zerolinecolor: "#cfc8bc" },
+        yaxis: { title: { text: "Cadmium (µg/g)" }, range: [0, 0.4], tickformat: ".2f", gridcolor: "#e6e1d8", zerolinecolor: "#cfc8bc" },
+        zaxis: { title: { text: "Flavanols (mg/g)" }, range: [0, 16], gridcolor: "#e6e1d8", zerolinecolor: "#cfc8bc" }
+      }
+    };
+
+    Plotly.newPlot("plot", [surface, markers], layout, {
+      responsive: true,
+      displaylogo: false,
+      modeBarButtonsToRemove: ["toImage"],
+      displayModeBar: true
+    });
+
+    const rank = [...bars].sort((a, b) => a.valueScore - b.valueScore);
+    document.getElementById("rank").innerHTML = rank.map((b) =>
+      "<li><b>" + b.label + "</b><br><span class=\"meta\">$" + b.usdPer200.toFixed(2) +
+      " / 200 mg · value " + (b.leadCensored ? "&lt;" : "") + b.valueScore.toFixed(2) +
+      (b === winner ? " · best value" : b.pareto ? " · Pareto" : "") + "</span></li>"
+    ).join("");
+  </script>
+</body>
+</html>
