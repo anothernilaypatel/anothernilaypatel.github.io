@@ -162,12 +162,12 @@ export const site = {
    * (src/content/projects/<slug>.mdx); the card links to it once that post is published.
    */
   interests: [
-    { name: 'Coffee', blurb: 'Usually with a coffee in hand.', post: 'coffee' },
-    { name: 'Jazz', blurb: 'Usually with jazz on.', post: 'jazz' },
-    { name: 'F1', blurb: 'Formula 1.', post: 'f1' },
-    { name: 'Coding', blurb: 'Coding.', post: 'coding' },
-    { name: 'Poker', blurb: 'Poker.', post: 'poker' },
-    { name: 'Golf', blurb: 'Golf.', post: 'golf' },
+    { name: 'Coffee', blurb: 'Usually with a coffee in hand.' },
+    { name: 'Jazz', blurb: 'Usually with jazz on.' },
+    { name: 'F1', blurb: 'Formula 1.' },
+    { name: 'Coding', blurb: 'Coding.' },
+    { name: 'Poker', blurb: 'Poker.' },
+    { name: 'Golf', blurb: 'Golf.' },
   ],
 
   /** Contact links. Entries with an empty `href` are hidden. */
