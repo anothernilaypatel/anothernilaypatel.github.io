@@ -1,0 +1,22 @@
+---
+title: "The Expected Value of Trio Showdown"
+date: 2026-10-26
+description: "A fair game at 1,000 trophies is worth about 3.48 trophies once the streak is collapsed."
+kind: sprint
+---
+
+A brawler is between 1,000 and 1,099 trophies, and a loss can still subtract trophies. Every Trio Showdown has four teams. This problem treats each place as equally likely, and it treats a 3v3 match as a fair coin flip. Find the long-run expected trophy change per game after the win streak has been collapsed, and compare that number with 3v3 in the same bracket.
+
+The [trophy table](https://brawlstars.fandom.com/wiki/Trophies) pays +11 for 1st, +5 for 2nd, 0 for 3rd, and −6 for 4th. A 1st or a 2nd is a win. A 3rd is a draw, so the streak stays where it is. A 4th resets the streak to 0. A 3v3 win pays +10 and a loss pays −5, and every loss resets the streak. The same win-streak bonus applies in both modes. The first win adds nothing. Each later win adds one more trophy than the win before it, until the bonus reaches 10, where it stays. Above 2,000 trophies that bonus turns off, which is outside this bracket.
+
+If the streak going into the game is $s$, the bonus on the next win is $W(s) = 0$ when $s = 0$, and $W(s) = \min(s, 10)$ otherwise. Under the probabilities in the problem, half of all games are wins in both modes, so the one-game value is the same function of the streak:
+
+$$
+EV(s) = 2.5 + \frac{1}{2} W(s).
+$$
+
+A cold streak is worth 2.50 trophies. A streak of 10 or more is worth 7.50. Those are not the long-run answers, because the streak moves.
+
+Let the state be the streak you walk in with, and fold every streak of 10 or more into one state. In Trio Showdown, a win advances the state with probability $1/2$, a 3rd holds it with probability $1/4$, and a 4th sends it to 0 with probability $1/4$. In 3v3, a win advances it with probability $1/2$ and a loss sends it to 0 with probability $1/2$. The collapsed value is the sum of $EV(s)$ times the share of games that start in state $s$.
+
+That sum is $411295/118098$, or about 3.48 trophies per Trio Showdown game. The same sum for 3v3 is $6143/2048$, or about 3.00 trophies per game. The base game, with the bonus removed, is 2.50 in both modes. Trio Showdown is ahead because a 3rd place keeps the streak, so the bonus is alive more often. This model leaves out the underdog bonus, which 3v3 can award and Showdown cannot.
