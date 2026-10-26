@@ -1,69 +1,59 @@
 ---
 title: Super Auto Pets
 date: 2026-10-05
-description: Top 1 on a monthly Super Auto Pets leaderboard. A win cashed in across a 200-point gap is worth about 5 ELO.
+description: Top 1 on a monthly Super Auto Pets leaderboard. Asyncs are similar to leverage, and a late cash-in still pays the minimum of 5 ELO.
 kind: accolade
 ---
 
 Ranked top 1 on a monthly Super Auto Pets leaderboard.
 
-Versus keeps one score for matchmaking and for the leaderboard. The [ranked mode](https://superautopets.wiki.gg/wiki/Version_0.28) is an ELO rating, and a game moves that rating from the opponent's score. This problem takes the queue as given. A game is offered only inside a 250-point gap, and most games are dealt inside 100. A win can be held and cashed in later, and the points use the two ratings at the cash-in. The game in the example is dealt with both players at 1,500. You climb to 1,700 before cashing the win in, and the opponent is still at 1,500. Find what that win is worth.
+A versus game is one match. It is queued, it is played, and the rating moves when it ends. I found that asyncs are a different position. An async is another game running at the same time, so several of them are several results in flight from the same stretch of play. That is similar to leverage. The versus game is one unit of the edge. Each async is another unit open beside it.
 
-The expected score of the player ahead by $d$ points is
+The queue still has a band. A game is offered only inside 250 ELO, and most games land inside 100. The points wait for the cash-in. I found that a win can be held, and that a win will not cash in for less than 5. The ratings that count are the ratings at that cash-in.
+
+The [ranked mode](https://superautopets.wiki.gg/wiki/Version_0.28) is an ELO rating. The expected score of the player ahead by $d$ points is
 
 $$
 E(d) = \frac{1}{1 + 10^{-d/400}}.
 $$
 
-A result $S$ then moves the rating by
-
-$$
-\Delta = K \, (S - E(d)).
-$$
-
-$S$ is 1 for a win and 0 for a loss, and $K$ sets the size of the update. The gap at cash-in is $d = 200$, so
-
-$$
-E(200) = \frac{1}{1 + 10^{-1/2}},
-$$
-
-which is about 0.76. That win was the expected result about 76% of the time, and the surprise in it is about 0.24. The example prices the cashed-in win at 5 points, so $0.24K = 5$ and $K$ is about 20.81. An even game then pays about 10.41 for a win.
-
-The same $K$ prices the rest of the window. A gap of 100 is the edge of the band where most games are dealt. A gap of 250 is the edge of the band where a game can still be offered. The 200-point row is the held win. The percentages and the points are rounded to two decimals.
+An unconstrained win then moves the rating by $K(1 - E(d))$, where $K$ is the size of an update. The cash-in pays that amount, and it pays 5 when the formula would pay less. The surprise in a win is $1 - E(d)$. A coin flip, a gap of 0, has a surprise of $1/2$. The surprises below are rounded to two decimals.
 
 <div class="table-wrap">
 <table>
-  <caption>A win is worth these points when the 200-point win is worth 5.</caption>
+  <caption>This is how much of a win is still a surprise when the higher rating cashes it in.</caption>
   <thead>
     <tr>
       <th scope="col">Gap</th>
       <th scope="col">Expected</th>
-      <th scope="col">Points</th>
+      <th scope="col">Surprise</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>0</td>
       <td>50.00%</td>
-      <td>10.41</td>
+      <td>0.50</td>
     </tr>
     <tr>
       <td>100</td>
       <td>64.01%</td>
-      <td>7.49</td>
+      <td>0.36</td>
     </tr>
     <tr>
       <td>200</td>
       <td>75.97%</td>
-      <td>5.00</td>
+      <td>0.24</td>
     </tr>
     <tr>
       <td>250</td>
       <td>80.83%</td>
-      <td>3.99</td>
+      <td>0.19</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-A loss cashed in at the same 200-point gap would cost about 15.81 points. The update pays the favorite only the part of the win that was not already expected, and it charges the favorite the part that was. Holding the win is what opens the gap. The queue paired two players at 1,500, inside both bands. At 1,700, a player still sitting at 1,500 is 200 points away, inside the 250 cap and outside the 100 band where most games are dealt. The 5 points are the price of that pairing after the ratings have moved apart. Ten held wins are 50 points, stacked on the climb from 1,500 to 1,700, and each one is priced as a favorite's win because those opponents stayed at 1,500.
+The late cash-in uses that floor. I play the games while both players are at 1,500, inside the band, and I leave the wins uncashed. The climb to 1,700 comes from the games that settle. The opponents on the held games can still be at 1,500, so the gap at cash-in is 200. That gap is outside the 100-point band where most games are dealt, and it is still inside the 250 cap. The higher rating was expected to win about 76% of those, so the surprise is about 0.24, about half of a coin flip. The formula's payout shrinks with that surprise. The minimum cash-in is 5, so each held win still pays 5.
+
+Each async is its own cash-in. Ten of them are 50 points, taken after the climb, from opponents who stayed at 1,500. The leverage is having those games open together. The floor is what keeps the late ones worth cashing.
