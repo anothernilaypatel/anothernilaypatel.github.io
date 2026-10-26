@@ -1,8 +1,79 @@
 ---
 title: "Magic the Gathering: Arena"
 date: 2026-10-05
-description: "Top 1% in Magic the Gathering: Arena. Seasonal leaderboard."
+description: "Top 1% in Magic the Gathering: Arena, on the seasonal leaderboard. Four copies raise the chance an opening hand has already found the card."
 kind: accolade
 ---
 
-Top 1% in Magic the Gathering: Arena. Seasonal leaderboard.
+Ranked in the top 1% in Magic the Gathering: Arena, on the seasonal leaderboard.
+
+A constructed deck has at least 60 cards, and [rule 100.2a](https://doesitresolve.net/rules/100.2a/) allows any number of basic lands and no more than four copies of any other English name. The four-copy cap counts the main deck and the sideboard together. This problem takes a deck of exactly 60, a fair shuffle, and an opening hand of 7, with no mulligan. Find the chance the hand already contains a chosen card as the list goes from 1 copy to 4, and separate that chance from the variance of the count.
+
+The hand is a sample of 7 cards drawn from 60 without replacement, so the count $X$ of a card with $K$ copies follows a hypergeometric distribution. The chance the hand has already found it is
+
+$$
+P(X \ge 1) = 1 - \frac{\binom{60-K}{7}}{\binom{60}{7}}.
+$$
+
+The mean of the count is
+
+$$
+E[X] = 7 \cdot \frac{K}{60}.
+$$
+
+The variance that follows from it is
+
+$$
+\mathrm{Var}(X) = E[X] \cdot \left(1 - \frac{K}{60}\right) \cdot \frac{53}{59}.
+$$
+
+The factor $53/59$ is the finite-population correction. Seven cards is a large enough share of a 60-card deck that sampling without replacement matters, and it is a small enough sample that one copy is easy to miss.
+
+One copy is in the opening hand with probability $7/60$, about 11.67%, so the hand misses it with probability $53/60$. The second, third, and fourth copies add about 10.48, 9.40, and 8.41 percentage points. Four copies are in the opening hand with probability $38962/97527$, about 39.95%, and the hand still misses them about 60.05% of the time. Each added copy buys a smaller step than the copy before it. The fourth copy is still worth about 8 percentage points in the opener, and the rules are what stop a fifth.
+
+The player on the play skips the draw on turn 1, then draws on each later turn. By turn 4 that player has seen 10 cards. One copy has shown up by then with probability $1/6$. Four copies have shown up with probability $51467/97527$, about 52.77%. The same four steps are worth about 16.67, 14.12, 11.93, and 10.05 percentage points. A playset is a coin flip by the turn a four-mana spell could be cast, which is why a list that needs a job done plays more than one playset of that job. Eight cards of one job are already in the opening hand about 65% of the time, and twelve are already there about 81% of the time.
+
+The percentages below are rounded to two decimals.
+
+<div class="table-wrap">
+<table>
+  <caption>A 60-card deck has this chance of having already shown you the card.</caption>
+  <thead>
+    <tr>
+      <th scope="col">Copies</th>
+      <th scope="col">Opening hand</th>
+      <th scope="col">By turn 4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>11.67%</td>
+      <td>16.67%</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>22.15%</td>
+      <td>30.79%</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>31.54%</td>
+      <td>42.72%</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>39.95%</td>
+      <td>52.77%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+The variance of the count moves the other way. At one copy it is $371/3600$, about 0.10. At four copies it is $5194/13275$, about 0.39. The card is present more often, so the count has more room to vary. What falls is the spread relative to the mean. The standard deviation divided by the mean goes from $\sqrt{53/7}$, about 2.75, to $\sqrt{106/59}$, about 1.34. Four copies make the hand more predictable as a share of how often the card appears. They do that by raising the hit rate, up to a position limit of 4.
+
+A 61st card dilutes every copy. The opening-hand hit rate of a four-of falls from $38962/97527$ to $205604/521855$, which is about half a percentage point. Playing 60 keeps the weight of each copy as high as the minimum deck size allows.
+
+Basic lands are the sleeve with no position limit, because every hand needs mana. A deck with 24 lands has an expected $14/5$, or 2.80, lands in the opening hand. About 77% of those hands have 2, 3, or 4 lands. About 14% have 0 or 1, and about 8% have 5 or more. The list sizes that uncapped sleeve so the opening hand concentrates in the band it can keep. In best-of-one, Arena deals more than one opening hand and favors the one whose land count sits nearer that average, which trims those tails before the hypergeometric model applies. The probabilities above are the unassisted shuffle.
+
+A portfolio cuts the variance of its return by spreading weight across bets that do not move together. A deck is a sizing problem with a sample of 7 cards out of 60. One copy is a position of $1/60$, and the opening hand misses it most of the time. Taking the names the deck wants up to the four-copy limit, leaving the deck at 60, and spending the uncapped land slot on mana is how the list makes the next hand look like the plan.
