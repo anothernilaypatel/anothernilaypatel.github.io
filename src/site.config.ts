@@ -57,6 +57,13 @@ export const site = {
           href: '/projects/hackprinceton/',
         },
         {
+          value: ':)',
+          label: 'HackHarvard',
+          project: 'DocScribe',
+          detail: "Unofficial project manager for a friend's team. Designed the file-in, file-out audit flow and taught it on a whiteboard at 1 a.m. October 2024.",
+          href: '/projects/hackharvard/',
+        },
+        {
           value: '2nd',
           label: 'Techstars Startup Weekend',
           project: 'My Not So Little Adventure',
