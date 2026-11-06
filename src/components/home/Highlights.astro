@@ -205,6 +205,33 @@ const { groups, n } = Astro.props;
       display: inline;
     }
   }
+  /* Set once a real mouse moves over the card, for devices that report (hover: none) but have one. */
+  .hl-card[data-mouse] .hl-hint {
+    left: var(--hx, auto);
+    top: var(--hy, auto);
+    right: auto;
+    bottom: auto;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  .hl-card[data-mouse]:hover .hl-hint {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .hl-card[data-mouse] .hint-pointer {
+    display: inline;
+  }
+  .hl-card[data-mouse] .hint-touch {
+    display: none;
+  }
+  .hl-card[data-mouse]:focus-visible:not(:hover) .hl-hint {
+    left: auto;
+    top: auto;
+    right: 1.2rem;
+    bottom: 1.2rem;
+    opacity: 1;
+    transform: none;
+  }
   @media (max-width: 860px) {
     .hl-list {
       grid-template-columns: 1fr;
@@ -223,6 +250,7 @@ const { groups, n } = Astro.props;
       card.style.setProperty('--mx', `${x}px`);
       card.style.setProperty('--my', `${y}px`);
       if (hint) {
+        if (e.pointerType === 'mouse') card.dataset.mouse = '';
         // The card clips its overflow, so keep the pill inside it near the edges.
         const hx = Math.min(x + 16, r.width - hint.offsetWidth - 8);
         const hy = Math.min(y + 16, r.height - hint.offsetHeight - 8);
