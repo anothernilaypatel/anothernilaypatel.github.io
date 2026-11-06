@@ -1,23 +1,23 @@
 ---
-title: Super Auto Pets
+title: "#1 in Super Auto Pets: Pricing a Win Under an Elo Floor"
 date: 2026-10-05
-description: Top 1 on a monthly Super Auto Pets leaderboard. Asyncs are similar to leverage, and a late cash-in still pays the minimum of 5 ELO.
+description: "How simultaneous async games and a 5-point minimum payout change what a win is worth, from a #1 monthly leaderboard finish."
 kind: accolade
 ---
 
-Ranked top 1 on a monthly Super Auto Pets leaderboard.
+I finished #1 on a monthly Super Auto Pets leaderboard. The ranked mode runs on an Elo rating, and two of its features are worth modeling closely: async games, which let several matches run at the same time, and a minimum payout of 5 points per win, no matter how lopsided the ratings are when the win is counted.
 
-A versus game is one match. It is queued, it is played, and the rating moves when it ends. I found that asyncs are a different position. An async is another game running at the same time, so several of them are several results in flight from the same stretch of play. That is similar to leverage. The versus game is one unit of the edge. Each async is another unit open beside it.
+A versus game is the simple case: it is queued, it is played, and the rating moves as soon as it ends. Asyncs behave differently. Each async is another game running alongside the others, so several of them are several results in flight from the same stretch of play. That makes them similar to leverage. If the versus game is one unit of edge, each async is another unit open beside it, and all of those outcomes settle later.
 
-The queue still has a band. A game is offered only inside 250 ELO, and most games land inside 100. The points wait for the cash-in. I found that a win can be held, and that a win will not cash in for less than 5. The ratings that count are the ratings at that cash-in.
+Matchmaking still keeps opponents close. A game is offered only when the two ratings are within 250 points of each other, and most games are matched within 100. The rating change, however, is applied when a win is cashed in rather than when the game is played, and a win can be held before it is cashed in. Two consequences follow: the ratings that determine the payout are the ratings at cash-in time, not at match time, and a win never pays less than 5.
 
-The [ranked mode](https://superautopets.wiki.gg/wiki/Version_0.28) is an ELO rating. The expected score of the player ahead by $d$ points is
+The [ranked mode](https://superautopets.wiki.gg/wiki/Version_0.28) uses a standard Elo expectation. The expected score of a player who is ahead by $d$ points is
 
 $$
 E(d) = \frac{1}{1 + 10^{-d/400}}.
 $$
 
-An unconstrained win then moves the rating by $K(1 - E(d))$, where $K$ is the size of an update. The cash-in pays that amount, and it pays 5 when the formula would pay less. The surprise in a win is $1 - E(d)$. A coin flip, a gap of 0, has a surprise of $1/2$. The surprises below are rounded to two decimals.
+An unconstrained win moves the rating by $K(1 - E(d))$, where $K$ is the size of an update, and the cash-in pays that amount unless the formula would pay less than 5, in which case it pays 5. The term $1 - E(d)$ measures how much of a surprise the win is. Between evenly matched players, a gap of 0, the surprise is $1/2$, and it shrinks as the winner's lead grows. The surprises in the table below are rounded to two decimals.
 
 <div class="table-wrap">
 <table>
@@ -54,6 +54,6 @@ An unconstrained win then moves the rating by $K(1 - E(d))$, where $K$ is the si
 </table>
 </div>
 
-The late cash-in uses that floor. I play the games while both players are at 1,500, inside the band, and I leave the wins uncashed. The climb to 1,700 comes from the games that settle. The opponents on the held games can still be at 1,500, so the gap at cash-in is 200. That gap is outside the 100-point band where most games are dealt, and it is still inside the 250 cap. The higher rating was expected to win about 76% of those, so the surprise is about 0.24, about half of a coin flip. The formula's payout shrinks with that surprise. The minimum cash-in is 5, so each held win still pays 5.
+The floor matters most for a win that is held while the ratings drift apart. Suppose both players are at 1,500 when the game is played, well inside the matchmaking band, and the win is cashed in only after the winner has climbed to 1,700 on other games. The gap at cash-in is then 200, which is outside the 100-point band where most games are matched but still inside the 250-point cap. At that gap the higher-rated player was expected to win about 76% of the time, so the surprise is about 0.24, roughly half of what an even game is worth. The formula's payout shrinks with that surprise, but the floor does not, so the held win still pays at least 5.
 
-Each async is its own cash-in. Ten of them are 50 points, taken after the climb, from opponents who stayed at 1,500. The leverage is having those games open together. The floor is what keeps the late ones worth cashing.
+Because each async is cashed in separately, ten held wins are worth at least 50 points however far the ratings have moved in the meantime. That is where the leverage comes from: having several games open at once multiplies the units of edge, and the floor puts a lower bound on what each one is worth when it finally settles.

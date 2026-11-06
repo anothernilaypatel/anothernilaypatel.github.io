@@ -1,43 +1,43 @@
 ---
-title: Top 50 in Brawl Stars
+title: "Top 50 in Brawl Stars: The Expected Value of a Trophy Bracket"
 date: 2026-10-05
-description: Ranked in the top 50 in Brawl Stars, on the national leaderboard. The expected trophy change falls at each bracket from 1,000 to 2,000.
+description: "Ranked in the top 50 nationally. The expected trophy change per game from 1,000 to 2,000 trophies, with and without the win streak, using a Markov chain over the streak."
 kind: accolade
 ---
 
-Ranked in the top 50 in Brawl Stars, on the national leaderboard.
+I've ranked in the top 50 on the national Brawl Stars leaderboard. Climbing that high means grinding through trophy brackets whose payouts get steadily worse, so I wanted to know exactly how much a single game is worth at each step from 1,000 trophies to 2,000.
 
-A brawler is climbing the brackets from 1,000 trophies to 2,000, and a loss can still subtract trophies inside a bracket. Sitting exactly on 1,000 or on 2,000 is a prestige lock, so a loss there cannot cross that line, and those two points are left out of the averages that follow. Every Trio Showdown has four teams. This problem treats each place as equally likely, and it treats a 3v3 match as a fair coin flip. Find the expected trophy change per game with the win streak removed, and find it again after the streak has been collapsed, in each bracket from 1,000 through 2,000.
+Within a bracket, a loss can still take trophies away. Sitting exactly on 1,000 or on 2,000 is a prestige lock, where a loss cannot drop a brawler back across the line, so those two exact values are left out of the averages below. Every Trio Showdown match has four teams. To keep the model simple, I treat each of the four places as equally likely and treat a 3v3 match as a fair coin flip. The goal is to find the expected trophy change per game in each bracket from 1,000 through 2,000, first with the win streak removed and then with the streak averaged in.
 
-The [trophy table](https://brawlstars.fandom.com/wiki/Trophies) is the one after the February 2026 rework. In Trio Showdown, 1st pays +11 and 2nd pays +5 from 1,000 through 1,999. 3rd pays 0 through 1,499 and −5 from 1,500 through 1,999. 4th pays −6 in the 1,000–1,099 bracket and then gets one trophy worse at each later bracket, through −11 at 1,800–1,999. At 2,000–2,199 the wins shrink, to +9 and +4, while 3rd and 4th stay at −5 and −11. A 1st or a 2nd is a win. A 3rd is a draw, so the streak stays where it is. A 4th resets the streak to 0.
+The payouts come from the [trophy table](https://brawlstars.fandom.com/wiki/Trophies) as it stands after the February 2026 rework. In Trio Showdown, from 1,000 through 1,999, 1st place pays +11 and 2nd pays +5. 3rd place pays 0 through 1,499 and −5 from 1,500 through 1,999. 4th place pays −6 in the 1,000–1,099 bracket and gets one trophy worse in each later bracket, down to −11 at 1,800–1,999. At 2,000–2,199 the wins shrink to +9 and +4, while 3rd and 4th stay at −5 and −11. For the streak, a 1st or 2nd counts as a win, a 3rd counts as a draw that leaves the streak where it is, and a 4th resets the streak to 0.
 
-In 3v3 the win pays +10 and the loss gets one trophy worse at each bracket, from −5 at 1,000–1,099 to −10 at 1,800–1,999. At 2,000–2,499 the win pays +8 and the loss pays −10. A win advances the streak, and a loss resets it. Trio Showdown's 2,000 bracket runs from 2,000 to 2,199, and the 3v3 bracket runs from 2,000 to 2,499. The win streak pays in both modes through 1,999, and it turns off at 2,000.
+In 3v3, a win pays +10 and a loss gets one trophy worse in each bracket, from −5 at 1,000–1,099 to −10 at 1,800–1,999. At 2,000–2,499 the win drops to +8 and the loss stays at −10. A win advances the streak and a loss resets it. The brackets differ slightly at the top: Trio Showdown's 2,000 bracket runs from 2,000 to 2,199, while the 3v3 bracket runs from 2,000 to 2,499. In both modes the win streak pays out through 1,999 and turns off at 2,000.
 
-With the streak removed, the value of a game is the average of its payouts.
+With the streak removed, the value of a game is simply the average of its payouts:
 
 $$
 b_{\text{trio}} = \frac{r_1 + r_2 + r_3 + r_4}{4}, \qquad b_{\text{3v3}} = \frac{w + \ell}{2}.
 $$
 
-In Trio Showdown that average starts at $5/2$. The next three brackets each worsen 4th place by one trophy, and one place is a quarter of the game, so each of those steps cuts the average by $1/4$. The average is $9/4$, then $2$, then $7/4$. At 1,500–1,799, 3rd falls from 0 to −5 and 4th falls from −9 to −10. That is six trophies across four places, so the average falls by $3/2$, to $1/4$. One more step of $1/4$ puts 1,800–1,999 at 0. At 2,000–2,199, 1st falls by 2 and 2nd falls by 1, which is three trophies across four places, so the average falls by $3/4$, to $-3/4$.
+In Trio Showdown that average starts at $5/2$. Each of the next three brackets makes 4th place one trophy worse, and since one place is a quarter of the game, each step cuts the average by $1/4$, giving $9/4$, then $2$, then $7/4$. At 1,500–1,799 the drop is much larger: 3rd falls from 0 to −5 and 4th falls from −9 to −10, a total of six trophies spread across four places, so the average falls by $3/2$, to $1/4$. One more step of $1/4$ brings 1,800–1,999 to exactly 0. At 2,000–2,199, 1st falls by 2 and 2nd falls by 1, which is three trophies across four places, so the average falls by $3/4$, to $-3/4$.
 
-In 3v3 the average starts at $5/2$ as well. Each bracket through 1,999 worsens the loss by one trophy, and a loss is half the games, so the average falls by $1/2$ each time and lands on 0 at 1,800–1,999. At 2,000–2,499 the win falls by 2, and a win is half the games, so the average falls by 1, to $-1$.
+In 3v3 the average also starts at $5/2$. Each bracket through 1,999 makes the loss one trophy worse, and since a loss is half of all games, the average falls by $1/2$ each time and reaches 0 at 1,800–1,999. At 2,000–2,499 the win falls by 2, and since a win is also half of all games, the average falls by 1, to $-1$.
 
-If the streak going into the game is $s$, the bonus on the next win is $W(s) = 0$ when $s = 0$, and $W(s) = \min(s, 10)$ otherwise. The first win adds nothing. Each later win adds one more trophy than the win before it, until the bonus reaches 10, where it stays. Half of all games are wins in both modes, so in a bracket whose no-streak value is $b$ the one-game value is
+The win streak adds a bonus on top of that. If the streak going into a game is $s$, the bonus on the next win is $W(s) = 0$ when $s = 0$ and $W(s) = \min(s, 10)$ otherwise. The first win of a streak adds nothing, each later win adds one more trophy than the win before it, and the bonus stops growing once it reaches 10. Since half of all games are wins in both modes, the value of a single game in a bracket whose no-streak value is $b$ is
 
 $$
 EV(s) = b + \frac{1}{2} W(s)
 $$
 
-while the streak is on. At 2,000 and above the bonus is off, and $EV(s) = b$. A cold streak is worth $b$. A streak of 10 or more is worth $b + 5$. The long-run answer has to average over the streak, because the streak moves.
+while the streak is active. At 2,000 and above the bonus is turned off, so $EV(s) = b$. A player on a cold streak gets $b$ per game, and a player on a streak of 10 or more gets $b + 5$. Because the streak itself rises and falls from game to game, the long-run answer has to average over it.
 
-Let the state be the streak you walk in with, and fold every streak of 10 or more into one state. In Trio Showdown, a win advances the state with probability $1/2$, a 3rd holds it with probability $1/4$, and a 4th sends it to 0 with probability $1/4$. In 3v3, a win advances it with probability $1/2$ and a loss sends it to 0 with probability $1/2$. The place probabilities stay fixed as the payouts change, so the long-run mix of streaks is the same in every bracket from 1,000 through 1,999.
+To do that, I model the streak as a Markov chain. The state is the streak a player walks into a game with, and every streak of 10 or more is folded into a single state. In Trio Showdown, a win advances the state with probability $1/2$, a 3rd place holds it with probability $1/4$, and a 4th place sends it back to 0 with probability $1/4$. In 3v3, a win advances it with probability $1/2$ and a loss resets it with probability $1/2$. Because these probabilities stay fixed while the payouts change, the long-run mix of streaks is the same in every bracket from 1,000 through 1,999.
 
-The collapsed value is $b$ plus the expected bonus under that mix. The expected bonus is $58025/59049$ in Trio Showdown, about 0.98 trophies, and $1023/2048$ in 3v3, about 0.50 trophies. Below 2,000 the collapsed value therefore moves by the same amount as the no-streak value when the bracket changes. At 2,000 the bonus turns off, so the collapsed value falls by the table's step and by the whole bonus. In Trio Showdown it falls from $58025/59049$ to $-3/4$. In 3v3 it falls from $1023/2048$ to $-1$.
+The collapsed value is $b$ plus the expected bonus under that long-run mix. The expected bonus is $58025/59049$ in Trio Showdown, about 0.98 trophies, and $1023/2048$ in 3v3, about 0.50 trophies. Below 2,000, the collapsed value therefore changes by exactly the same amount as the no-streak value from one bracket to the next. At 2,000 the bonus switches off, so the collapsed value drops by the table's step and by the entire bonus at once: in Trio Showdown it falls from $58025/59049$, about 0.98, to $-3/4$, and in 3v3 it falls from $1023/2048$, about 0.50, to $-1$.
 
-In the 1,000–1,099 bracket, where $b = 5/2$, the collapsed value is $411295/118098$, about 3.48, in Trio Showdown, and $6143/2048$, about 3.00, in 3v3. Trio Showdown is ahead because a 3rd place keeps the streak, so the bonus is alive more often. This model leaves out the underdog bonus, which 3v3 can award below 2,000 and Showdown cannot.
+In the 1,000–1,099 bracket, where $b = 5/2$, the collapsed value is $411295/118098$, about 3.48, in Trio Showdown, and $6143/2048$, about 3.00, in 3v3. Trio Showdown comes out ahead because a 3rd-place finish keeps the streak alive, so the bonus is active more often. One limitation is worth noting: this model leaves out the underdog bonus, which 3v3 can award below 2,000 and Showdown cannot.
 
-Each change column is measured from the bracket below, and the 1,000–1,099 row is the start. Below 2,000 the collapsed change equals the no-streak change. The collapsed values are rounded to two decimals, and so is the last collapsed change. Every no-streak value, and every change in it, is exact at two decimals.
+In the tables below, each change column is measured from the previous, lower bracket, and the 1,000–1,099 row is the starting point. Below 2,000 the collapsed change equals the no-streak change. The collapsed values are rounded to two decimals, as is the last collapsed change, while every no-streak value and every change in it is exact.
 
 <div class="table-wrap">
 <table>
@@ -170,3 +170,5 @@ Each change column is measured from the bracket below, and the 1,000–1,099 row
   </tbody>
 </table>
 </div>
+
+The practical takeaway is that the climb gets harder well before the 2,000 wall. By 1,800, a game played without a streak is worth nothing on average in either mode, so from that point on, the streak bonus and a win rate above the coin-flip assumption are what keep a player moving up.
