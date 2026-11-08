@@ -194,9 +194,9 @@ export const site = {
 
   /** Contact links. Entries with an empty `href` are hidden. */
   links: [
-    { label: 'Email', href: '' }, // e.g. 'mailto:you@example.com'
+    { label: 'Email', href: 'mailto:nilay.patel.mail@gmail.com' },
     { label: 'GitHub', href: 'https://github.com/anothernilaypatel' },
-    { label: 'LinkedIn', href: '' }, // e.g. 'https://www.linkedin.com/in/your-handle'
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nilay-patel-777735240' },
   ],
 
   projectsIntro: 'Hobbies, short sprints, and the rankings and wins worth writing down.',
