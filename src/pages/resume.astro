@@ -12,11 +12,17 @@ const bare = (u: string) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const home = absoluteUrl('/', Astro.site!);
 
 // `bulleted` splits the detail into one bullet per sentence; otherwise it stays one line.
-const sections = [
+type Entry = { head: string; sub: string; period: string; detail: string; points?: string[]; href: string };
+const sections: { title: string; bulleted: boolean; items: Entry[] }[] = [
   {
     title: 'Experience',
     bulleted: true,
-    items: site.experience.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, href: e.href })),
+    items: site.experience.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, points: e.points, href: e.href })),
+  },
+  {
+    title: 'Quantitative projects',
+    bulleted: true,
+    items: site.projects.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, points: e.points, href: e.href })),
   },
   {
     title: 'Education',
@@ -24,9 +30,9 @@ const sections = [
     items: site.education.map((e) => ({ head: e.school, sub: e.credential, period: e.period, detail: e.detail, href: '' })),
   },
   {
-    title: 'Startups & hackathons',
+    title: 'Hackathons',
     bulleted: true,
-    items: site.startups.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, href: e.href })),
+    items: site.startups.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, points: e.points, href: e.href })),
   },
   {
     title: 'Competitions',
@@ -76,13 +82,14 @@ const contacts = [
                   <h3>
                     {it.href ? <a href={link(it.href)}>{it.head}</a> : it.head}
                     {it.sub && <span class="r-sub">{it.sub}</span>}
+                    {!s.bulleted && it.detail.length <= 60 && <span class="r-sub">{it.detail}</span>}
                   </h3>
                   <span class="r-period">{it.period}</span>
                 </div>
-                {it.detail &&
+                {(it.points || (it.detail && (s.bulleted || it.detail.length > 60))) &&
                   (s.bulleted ? (
                     <ul class="r-bullets">
-                      {bullets(it.detail).map((b) => <li>{b}</li>)}
+                      {(it.points ?? bullets(it.detail)).map((b) => <li>{b}</li>)}
                     </ul>
                   ) : (
                     <p class="r-detail">{it.detail}</p>
@@ -279,7 +286,7 @@ const contacts = [
 
   @page {
     size: letter;
-    margin: 0.45in 0.5in;
+    margin: 0.4in 0.45in;
   }
   @media print {
     :global(.nav),
@@ -304,6 +311,43 @@ const contacts = [
       box-shadow: none;
       border-radius: 0;
       background: #fff;
+      font-size: 9.5pt;
+      line-height: 1.27;
+    }
+    .r-head h1 {
+      font-size: 22pt;
+    }
+    .r-title {
+      font-size: 12pt;
+      margin-top: 0.2rem;
+    }
+    .r-contact {
+      margin-top: 0.35rem;
+    }
+    .r-summary {
+      margin-top: 0.55rem;
+      padding-top: 0.45rem;
+    }
+    .r-section {
+      margin-top: 0.6rem;
+    }
+    .r-section h2 {
+      margin-bottom: 0.25rem;
+    }
+    .r-item + .r-item {
+      margin-top: 0.3rem;
+    }
+    .r-line h3 {
+      font-size: 9.5pt;
+    }
+    .r-period {
+      font-size: 8.5pt;
+    }
+    .r-bullets {
+      margin-top: 0.05rem;
+    }
+    .r-bullets li + li {
+      margin-top: 0;
     }
   }
 </style>
