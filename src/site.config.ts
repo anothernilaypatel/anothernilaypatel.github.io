@@ -70,14 +70,14 @@ export const site = {
   currently: '',
 
   /**
-   * Résumé link. '/resume/' is the viewer page, built from this file; the deploy also prints it to
-   * /resume.pdf. '' hides the buttons.
+   * Résumé link. '/resume/' is the on-screen viewer. The file people download is
+   * public/nilay-patel-resume.docx. '' hides the buttons.
    */
   resume: '/resume/',
 
   /** About: 1–2 short paragraphs. [] hides the section. */
   about: [
-    "I'm a quantitative developer and researcher at Golden Egg Labs, where I build and validate risk, forecasting, and optimization models and trading strategies in Python. I graduated from Wentworth Institute of Technology with a B.S. in Computer Science.",
+    "I'm a quantitative developer and researcher at Golden Egg Labs, where I build 0DTE options algorithms in Python that trade sub-second, backtest them against realistic latency and Monte Carlo paths, and pick stocks from technicals, fundamentals, EDGAR filings, and earnings. I graduated from Wentworth Institute of Technology with a B.S. in Computer Science.",
     "Outside of work, I write up probability, expected-value, and optimization problems, from sizing a Magic: The Gathering deck like a portfolio to mapping a Pareto frontier of dark chocolate. I've also passed FINRA's SIE exam.",
   ],
 
@@ -106,8 +106,8 @@ export const site = {
         {
           value: 'Golden Egg Labs',
           label: 'Quantitative Developer & Researcher',
-          detail: 'January 2026 to present. Risk, forecasting, and optimization models and trading strategies in Python, from first build to the memo for leadership.',
-          steps: ['Build the model', 'Stress-test it', 'Backtest & simulate', 'Write the research memo'],
+          detail: 'August 2025 to present. 0DTE options algorithms in Python, from scraped market-flow signals to sub-second execution under live risk limits.',
+          steps: ['Scrape HIRO, TRACE & TickStrike', 'Backtest with real latency & Monte Carlo', 'Trade sub-second', 'Watch Greeks & max loss live'],
           id: 'golden-egg-labs',
           wide: true,
         },
@@ -211,21 +211,21 @@ export const site = {
   experience: [
     {
       role: 'Golden Egg Labs',
-      org: 'Quantitative Developer & Researcher · Hybrid',
-      period: 'January 2026 – Present',
-      detail: 'Build and validate risk, forecasting, and optimization models and trading strategies in Python. Stress-test models, build backtesting frameworks and simulations, and write research memos for leadership.',
+      org: 'Quantitative Developer & Researcher',
+      period: 'August 2025 – Present',
+      detail: 'Build 0DTE options algorithms that trade sub-second on signals scraped from HIRO, TRACE, and TickStrike. Backtest them on latency-mimicking paper trades and Monte Carlo simulations, track Greeks and multi-position max loss in real time, and pick stocks from technicals, fundamentals, EDGAR filings, and earnings.',
       points: [
-        'Build and validate risk, forecasting, and optimization models and trading strategies in Python',
-        'Quantify risk and robustness through stress testing, sensitivity analysis, and performance attribution',
-        'Develop backtesting frameworks, simulations, and analytical tools that automate model evaluation',
-        'Aggregate and analyze financial datasets with hypothesis testing to identify signals and inefficiencies',
+        'Build 0DTE options algorithms that trade sub-second on signals scraped from HIRO, TRACE, and TickStrike',
+        'Backtest with latency-mimicking paper trades and Monte Carlo simulations for realistic fills and P&L',
+        'Monitor positions in real time with Greeks and multi-position max-loss limits to cap downside',
+        'Pick stocks by pairing technicals and fundamentals with EDGAR filings and earnings analysis',
         'Write research memos on assumptions, limitations, and results, coordinating deliverables with leadership',
       ],
       href: '/#golden-egg-labs',
     },
     {
       role: 'Jaguar Health',
-      org: 'Finance Intern · In person',
+      org: 'Finance Intern',
       period: 'May 2023 – October 2023',
       detail: 'Reconciled $1.4 million in balances and found $700 thousand in untracked prepaid assets. Automated journal entries, amortization schedules, and reconciliations in Excel VBA, and led the rollout of Centage Maestro, training the full finance department.',
       points: [
@@ -238,11 +238,11 @@ export const site = {
     },
   ],
 
-  /** Quantitative projects: résumé only (the home page shows them as highlight cards). */
+  /** Portfolio: résumé only (the home page shows these as highlight cards). */
   projects: [
     {
       role: 'anothernilaypatel.github.io',
-      org: 'Probability, expected-value, and optimization write-ups',
+      org: 'Personal portfolio & journey',
       period: 'Ongoing',
       detail: '',
       points: [
@@ -275,7 +275,9 @@ export const site = {
       org: 'DocScribe',
       period: 'October 2024',
       detail: "Unofficial project manager for a friend's team; not a registered competitor, and wrote none of the code. Designed the file-in, file-out audit flow and taught a teammate to build its backend on a whiteboard at 1 a.m.",
-      points: ['Unofficial PM; designed the audit pipeline’s file-in, file-out flow and taught a teammate to build it'],
+      points: [
+        'Unofficial PM; designed the audit pipeline’s file-in, file-out flow and taught a teammate to build it',
+      ],
       href: '/projects/hackharvard/',
     },
     {
@@ -283,7 +285,10 @@ export const site = {
       org: 'My Not So Little Adventure',
       period: 'October 2023',
       detail: 'Team of eleven. 2nd place. A locally curated travel map with JavaScript geolocation and a Python montage tool. Launched an alpha and secured initial funding and workspace.',
-      points: ['2nd place', 'Pitched and launched an alpha tourism product with a team of 11, securing initial funding and workspace'],
+      points: [
+        '2nd place',
+        'Pitched and launched an alpha tourism product with a team of 11, securing initial funding and workspace',
+      ],
       href: '/projects/techstars-startup-weekend/',
     },
   ],
@@ -314,11 +319,11 @@ export const site = {
     },
     {
       group: 'Finance',
-      items: ['Margin & leverage', 'Risk/return metrics (Sharpe, Sortino, Calmar)', 'Securities regulation', 'Reconciliations'],
+      items: ['Margin & leverage', 'Options Greeks', 'Securities regulation', 'Reconciliations'],
     },
     {
       group: 'Analytical',
-      items: ['Risk modeling', 'Stress testing', 'Backtesting', 'Statistical analysis', 'Data visualization', 'Excel/VBA'],
+      items: ['Risk modeling', 'Monte Carlo simulation', 'Stress testing', 'Backtesting', 'Statistical analysis', 'Excel/VBA'],
     },
     { group: 'Licenses', items: ['Securities Industry Essentials (SIE), FINRA: passed'] },
   ],

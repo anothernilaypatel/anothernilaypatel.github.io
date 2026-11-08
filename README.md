@@ -24,7 +24,7 @@ npm run check     # type-check .astro/.ts files
 Everything on the home page lives in **`src/site.config.ts`**: tagline, about, highlights, experience, education, skills, interests, contact links, and the résumé PDF.
 - An empty value (`''` or `[]`) hides that section, along with its nav link.
 - A value containing `PLACEHOLDER` is shown with a dashed outline so it's obvious what's left to fill in.
-- **Résumé:** put the PDF at `public/resume.pdf` and set `resume: '/resume.pdf'`.
+- **Résumé:** the on-screen copy is `/resume/`, built from `site.config.ts`. The download is `public/nilay-patel-resume.docx`.
 - **Interests:** each interest can name a project post (`post: 'coffee'`). The card links to that post once it's published.
 - **Site paths in config** (like `href: '/projects/the-beginning/'`) get the base path automatically.
 
