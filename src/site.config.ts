@@ -70,8 +70,8 @@ export const site = {
   currently: '',
 
   /**
-   * Résumé link. '/resume/' is the viewer page, built from this file; the deploy also prints it to
-   * /resume.pdf. '' hides the buttons.
+   * Résumé link. '/resume/' is the on-screen viewer. The file people download is
+   * public/nilay-patel-resume.docx. '' hides the buttons.
    */
   resume: '/resume/',
 
@@ -267,7 +267,6 @@ export const site = {
         "2nd place, Coinbase's Best Use of OnChainKit",
         "Built a disaster-relief funding platform with a team of 4 using Coinbase's OnChainKit wallets",
         'Developed Solidity smart contracts settled in stablecoins to enforce contractual obligations on-chain',
-        'Let donors attach terms, like no rebuilding in a flood zone, that recipients accept before funds release',
       ],
       href: '/projects/hackprinceton/',
     },
@@ -278,7 +277,6 @@ export const site = {
       detail: "Unofficial project manager for a friend's team; not a registered competitor, and wrote none of the code. Designed the file-in, file-out audit flow and taught a teammate to build its backend on a whiteboard at 1 a.m.",
       points: [
         'Unofficial PM; designed the audit pipeline’s file-in, file-out flow and taught a teammate to build it',
-        'Allocated work and planned sleep schedules to keep the team building through the overnight sprint',
       ],
       href: '/projects/hackharvard/',
     },
@@ -290,7 +288,6 @@ export const site = {
       points: [
         '2nd place',
         'Pitched and launched an alpha tourism product with a team of 11, securing initial funding and workspace',
-        'Built a geolocation-aware JavaScript map and a Python video-montage tool for the team’s pitch',
       ],
       href: '/projects/techstars-startup-weekend/',
     },

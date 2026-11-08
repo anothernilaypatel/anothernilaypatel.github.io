@@ -4,7 +4,7 @@ import { site, contact } from '../site.config';
 import { url, absoluteUrl, href } from '../lib/url';
 
 // Built from site.config.ts, the same data as the home page, so the two can't disagree.
-// The deploy prints this page to /resume.pdf (scripts/resume-pdf.mjs).
+// The download is public/nilay-patel-resume.docx, Nilay's Word résumé. This page is the on-screen copy.
 
 const bullets = (text: string) => text.split(/(?<=\.)\s+(?=[A-Z])/).filter(Boolean);
 const link = (path: string) => (path.startsWith('/') ? absoluteUrl(path, Astro.site!) : href(path));
@@ -53,8 +53,8 @@ const contacts = [
     <div class="wrap toolbar">
       <a class="btn" href={url('/')}><span class="arrow back" aria-hidden="true">←</span> Back</a>
       <div class="toolbar-actions">
-        <a class="btn btn-primary" href={url('/resume.pdf')} download="nilay-patel-resume.pdf">
-          Download PDF <span class="arrow" aria-hidden="true">↓</span>
+        <a class="btn btn-primary" href={url('/nilay-patel-resume.docx')} download="nilay-patel-resume.docx">
+          Download résumé <span class="arrow" aria-hidden="true">↓</span>
         </a>
         <button type="button" class="btn" data-print>Print <span class="arrow" aria-hidden="true">⎙</span></button>
       </div>
