@@ -26,7 +26,6 @@ export const GET: APIRoute = ({ site: siteUrl }) => {
     `URL:${absoluteUrl('/', siteUrl!)}`,
     // Apple Contacts shows the X-ABLabel next to its grouped URL; other apps still read the URL.
     ...(contact.linkedin ? [`item1.URL:${contact.linkedin}`, 'item1.X-ABLabel:LinkedIn'] : []),
-    ...(contact.github ? [`item2.URL:${contact.github}`, 'item2.X-ABLabel:GitHub'] : []),
     'END:VCARD',
   ].filter((l): l is string => !!l);
 

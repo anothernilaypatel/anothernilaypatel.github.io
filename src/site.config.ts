@@ -21,7 +21,6 @@ export const contact = {
   email: 'nilay.patel.mail@gmail.com',
   phone: '+1-862-485-0945', // only goes in the vCard, never shown on the page
   linkedin: 'https://www.linkedin.com/in/nilay-patel-777735240',
-  github: 'https://github.com/anothernilaypatel',
 };
 
 /** Public pages that back up the hero fact chips. An empty URL shows the chip as plain text. */
@@ -109,6 +108,7 @@ export const site = {
           label: 'Quantitative Developer & Researcher',
           detail: 'January 2026 to present. Risk, forecasting, and optimization models and trading strategies in Python, from first build to the memo for leadership.',
           steps: ['Build the model', 'Stress-test it', 'Backtest & simulate', 'Write the research memo'],
+          id: 'golden-egg-labs',
           wide: true,
         },
         {
@@ -221,7 +221,7 @@ export const site = {
         'Aggregate and analyze financial datasets with hypothesis testing to identify signals and inefficiencies',
         'Write research memos on assumptions, limitations, and results, coordinating deliverables with leadership',
       ],
-      href: proof.linkedinExperience,
+      href: '/#golden-egg-labs',
     },
     {
       role: 'Jaguar Health',
@@ -339,7 +339,6 @@ export const site = {
   /** Contact links, filled from `contact` above. Entries with an empty `href` are hidden. */
   links: [
     { label: 'Email', href: contact.email ? `mailto:${contact.email}` : '' },
-    { label: 'GitHub', href: contact.github },
     { label: 'LinkedIn', href: contact.linkedin },
   ],
 

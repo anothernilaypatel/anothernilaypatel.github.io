@@ -44,7 +44,6 @@ const sections: { title: string; bulleted: boolean; items: Entry[] }[] = [
 const contacts = [
   contact.email && { label: contact.email, href: `mailto:${contact.email}` },
   contact.linkedin && { label: 'LinkedIn', href: contact.linkedin },
-  contact.github && { label: bare(contact.github), href: contact.github },
   { label: bare(home), href: home },
 ].filter(Boolean) as { label: string; href: string }[];
 ---

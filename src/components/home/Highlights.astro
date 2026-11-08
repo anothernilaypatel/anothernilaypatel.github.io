@@ -15,6 +15,8 @@ interface Item {
   countUp?: boolean;
   /** A numbered pipeline drawn under the detail, e.g. how a piece of work gets done. */
   steps?: string[];
+  /** Anchor id, so other sections can link to the card. */
+  id?: string;
 }
 interface Props {
   groups: { label: string; items: Item[] }[];
@@ -41,7 +43,7 @@ const { groups, n } = Astro.props;
               const longest = Math.max(...h.value.split(/\s+/).map((word) => word.length));
               const scale = h.wide ? '' : longest > 8 ? 'compact' : longest > 4 ? 'medium' : '';
               return (
-                <li class:list={{ wide: h.wide }} data-reveal style={`--d:${i}`}>
+                <li class:list={{ wide: h.wide }} id={h.id} data-reveal style={`--d:${i}`}>
                   <Tag class:list={['hl-card', { wide: h.wide }]} href={h.href ? href(h.href) : undefined} data-hl-card>
                     <span
                       class:list={['hl-value', scale]}
@@ -99,6 +101,9 @@ const { groups, n } = Astro.props;
     list-style: none;
     padding: 0;
     margin: 0.9rem 0 0;
+  }
+  .hl-list > li[id] {
+    scroll-margin-top: 6rem;
   }
   .hl-list > li.wide {
     grid-column: 1 / -1;
@@ -171,7 +176,7 @@ const { groups, n } = Astro.props;
     padding: 0;
     margin: 1.2rem 0 0;
   }
-  /* The rail runs through the step dots and fills in, left to right, when the card scrolls in. */
+  /* The rail fills with scroll (--p, 0 to 1, set by the script), and each dot lights as the fill reaches it. */
   .hl-steps::before,
   .hl-steps::after {
     content: '';
@@ -184,12 +189,8 @@ const { groups, n } = Astro.props;
   }
   .hl-steps::after {
     background: var(--accent);
-    transform: scaleX(0);
+    transform: scaleX(var(--p, 0));
     transform-origin: left;
-    transition: transform 1.4s var(--ease);
-  }
-  .hl-steps.is-run::after {
-    transform: scaleX(1);
   }
   .hl-steps li {
     position: relative;
@@ -209,22 +210,32 @@ const { groups, n } = Astro.props;
     border: 2px solid var(--line);
     background: var(--surface);
     transition:
-      border-color 0.3s,
-      background 0.3s;
-    transition-delay: calc(var(--k) * 0.35s);
+      border-color 0.25s,
+      background 0.25s,
+      transform 0.25s var(--ease);
   }
-  .hl-steps.is-run li::before {
+  .hl-steps li.on::before {
     border-color: var(--accent);
     background: var(--accent);
+    transform: scale(1.15);
   }
   .step-n {
     font-size: 0.75rem;
-    color: var(--accent);
+    color: var(--muted);
+    transition: color 0.25s;
   }
   .step-label {
     font-family: var(--serif);
     font-size: clamp(1.05rem, 1.6vw, 1.3rem);
     line-height: 1.2;
+    color: var(--muted);
+    transition: color 0.25s;
+  }
+  .hl-steps li.on .step-n {
+    color: var(--accent);
+  }
+  .hl-steps li.on .step-label {
+    color: var(--ink);
   }
   @media (max-width: 860px) {
     .hl-steps {
@@ -241,20 +252,11 @@ const { groups, n } = Astro.props;
       height: auto;
     }
     .hl-steps::after {
-      transform: scaleY(0);
+      transform: scaleY(var(--p, 0));
       transform-origin: top;
-    }
-    .hl-steps.is-run::after {
-      transform: scaleY(1);
     }
     .hl-steps li {
       padding: 0 0 0 2rem;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hl-steps::after,
-    .hl-steps li::before {
-      transition: none;
     }
   }
   .hl-glow {
@@ -452,15 +454,36 @@ const { groups, n } = Astro.props;
   });
   document.querySelectorAll('[data-countup]').forEach((el) => up.observe(el));
 
-  const steps = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        steps.unobserve(e.target);
-        e.target.classList.add('is-run');
+  // The pipeline rail tracks scroll: empty while the card's middle is low in the viewport,
+  // full once it's a little above center. A dot lights when the fill reaches it.
+  const pipelines = [...document.querySelectorAll<HTMLElement>('[data-steps]')];
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  let queued = false;
+  const paintSteps = () => {
+    queued = false;
+    const vh = innerHeight;
+    for (const el of pipelines) {
+      const r = el.getBoundingClientRect();
+      const mid = r.top + r.height / 2;
+      const p = Math.min(1, Math.max(0, (vh * 0.85 - mid) / (vh * 0.45)));
+      el.style.setProperty('--p', p.toFixed(3));
+      const vertical = getComputedStyle(el).gridAutoFlow.startsWith('row');
+      const rail = vertical ? el.clientHeight - 0.55 * rem - 2.3 * rem : el.clientWidth - 1.1 * rem;
+      for (const li of el.children as HTMLCollectionOf<HTMLElement>) {
+        const at = (vertical ? li.offsetTop : li.offsetLeft) / rail;
+        li.classList.toggle('on', p > 0 && p >= at - 0.001);
       }
-    },
-    { threshold: 0.6 },
-  );
-  document.querySelectorAll('[data-steps]').forEach((el) => steps.observe(el));
+    }
+  };
+  const queueSteps = () => {
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(paintSteps);
+    }
+  };
+  if (pipelines.length) {
+    addEventListener('scroll', queueSteps, { passive: true });
+    addEventListener('resize', queueSteps);
+    paintSteps();
+  }
 </script>
