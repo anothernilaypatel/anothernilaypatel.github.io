@@ -1,0 +1,117 @@
+---
+import QRCode from 'qrcode';
+import { site } from '../site.config';
+import { absoluteUrl } from '../lib/url';
+
+const shareUrl = absoluteUrl('/', Astro.site!);
+// Dark modules on white, in both themes: phone cameras read that most reliably.
+const qr = await QRCode.toString(shareUrl, {
+  type: 'svg',
+  margin: 2,
+  errorCorrectionLevel: 'M',
+  color: { dark: '#1a1203', light: '#ffffff' },
+});
+const display = shareUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+---
+
+<dialog class="share" data-share data-url={shareUrl} aria-labelledby="share-h">
+  <div class="share-inner">
+    <p class="kicker">Scan to open</p>
+    <h2 id="share-h">{site.name}</h2>
+    <div class="share-qr" role="img" aria-label={`QR code for ${display}`} set:html={qr} />
+    <p class="mono share-url">{display}</p>
+    <div class="share-actions">
+      <button type="button" class="btn btn-primary" data-share-native hidden>Share…</button>
+      <button type="button" class="btn" data-share-copy>Copy link</button>
+      <button type="button" class="btn" data-share-close>Close</button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .share {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .share[open] {
+    display: grid;
+    place-items: center;
+  }
+  .share::backdrop {
+    background: var(--bg);
+  }
+  .share-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .share-inner h2 {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+  }
+  .share-qr {
+    width: min(78vw, 52dvh, 420px);
+    aspect-ratio: 1;
+    padding: 0.6rem;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 20px 60px -25px color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+  .share-qr :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .share-url {
+    margin: 0;
+    color: var(--ink-2);
+    word-break: break-all;
+  }
+  .share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .share-actions [hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-share]');
+  if (dialog) {
+    const url = dialog.dataset.url!;
+    document.querySelectorAll('[data-share-open]').forEach((b) => b.addEventListener('click', () => dialog.showModal()));
+    dialog.querySelector('[data-share-close]')?.addEventListener('click', () => dialog.close());
+
+    const data = { title: document.title, url };
+    const native = dialog.querySelector<HTMLButtonElement>('[data-share-native]');
+    if (native && navigator.share && (!navigator.canShare || navigator.canShare(data))) {
+      native.hidden = false;
+      native.addEventListener('click', () => navigator.share(data).catch(() => {}));
+    }
+
+    const copy = dialog.querySelector<HTMLButtonElement>('[data-share-copy]');
+    copy?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        copy.textContent = 'Copied';
+      } catch {
+        copy.textContent = url;
+      }
+      setTimeout(() => (copy.textContent = 'Copy link'), 2000);
+    });
+  }
+</script>

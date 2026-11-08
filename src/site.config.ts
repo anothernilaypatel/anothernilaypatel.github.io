@@ -10,17 +10,59 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+/**
+ * Contact details, used by the Contact links and the "Save contact" vCard (/contact.vcf).
+ * Empty values are left out of both. Anything filled in here is public: the vCard is a
+ * plain file on the site that anyone can download.
+ */
+export const contact = {
+  title: 'Quantitative Developer & Researcher',
+  org: 'Golden Egg Labs',
+  email: 'nilay.patel.mail@gmail.com',
+  phone: '+1-862-485-0945', // only goes in the vCard, never shown on the page
+  linkedin: 'https://www.linkedin.com/in/nilay-patel-777735240',
+  github: 'https://github.com/anothernilaypatel',
+};
+
+/** Public pages that back up the hero fact chips. An empty URL shows the chip as plain text. */
+export const proof = {
+  // USACO doesn't publish Gold promotions by name; the public record is the January 2019
+  // Bronze-to-Silver promotion. Keep the labels to what each page shows.
+  usacoNote: 'Public record: promoted Bronze to Silver, January 2019 (score 750, cutoff 750).',
+  usaco: [
+    { label: 'Promotion results', href: 'http://www.usaco.org/index.php?page=jan19results' },
+    { label: 'Bronze results list', href: 'http://www.usaco.org/current/data/jan19_bronze_results.html' },
+  ],
+  // 2022 Scholars tier, New Jersey (archived NCSF winners page).
+  nationalCyberScholar: 'https://web.archive.org/web/2024/https://www.nationalcyberscholarship.org/winners-2022',
+};
+
+const positioning =
+  'Quant developer and researcher. I build risk, forecasting, and trading models in Python, and write up the math behind them.';
+
 export const site = {
   name: 'Nilay Patel',
   handle: 'anothernilaypatel',
-  title: 'Nilay Patel: Failure is not falling down, but refusing to get up.',
-  description: 'Failure is not falling down, but refusing to get up.',
+  title: 'Nilay Patel: Quantitative Developer & Researcher',
+  description: positioning,
 
   /** Big line under the name in the hero. */
-  tagline: 'Failure is not falling down, but refusing to get up.',
+  tagline: positioning,
+
+  /**
+   * Fact chips under the tagline: a résumé in one row. `href` links the chip; empty renders a plain chip.
+   * `links` (with an optional `note`) turns the chip into a small popover listing several proof pages.
+   */
+  facts: <{ label: string; href?: string; note?: string; links?: { label: string; href: string }[] }[]>[
+    { label: 'Quant Developer @ Golden Egg Labs' },
+    { label: "B.S. CS, Wentworth '25" },
+    { label: 'FINRA SIE', href: '/projects/passing-the-sie/' },
+    { label: 'USACO Gold', note: proof.usacoNote, links: proof.usaco },
+    { label: 'National Cyber Scholar', href: proof.nationalCyberScholar },
+  ],
 
   /** Optional "Currently: …" line in the hero. '' hides it. */
-  currently: 'Quantitative Developer & Researcher at Golden Egg Labs',
+  currently: '',
 
   /** Résumé PDF: put the file in public/ (e.g. public/resume.pdf) and set '/resume.pdf'. '' hides the buttons. */
   resume: '',
@@ -150,8 +192,8 @@ export const site = {
       role: 'National Cyber Scholarship Foundation',
       org: 'National Cyber Scholar, top 1,152 nationally',
       period: '2022',
-      detail: 'Cybersecurity.',
-      href: '',
+      detail: 'Scholars tier, New Jersey. Cybersecurity.',
+      href: proof.nationalCyberScholar,
     },
     {
       role: 'USACO',
@@ -183,7 +225,7 @@ export const site = {
    * Interests, shown as a scroll-driven strip. `post` is an optional project slug
    * (src/content/projects/<slug>.mdx); the card links to it once that post is published.
    */
-  interests: [
+  interests: <{ name: string; blurb: string; post?: string }[]>[
     { name: 'Coffee', blurb: 'Usually with a coffee in hand.' },
     { name: 'Jazz', blurb: 'Usually with jazz on.' },
     { name: 'F1', blurb: 'Formula 1.' },
@@ -192,11 +234,11 @@ export const site = {
     { name: 'Golf', blurb: 'Golf.' },
   ],
 
-  /** Contact links. Entries with an empty `href` are hidden. */
+  /** Contact links, filled from `contact` above. Entries with an empty `href` are hidden. */
   links: [
-    { label: 'Email', href: '' }, // e.g. 'mailto:you@example.com'
-    { label: 'GitHub', href: 'https://github.com/anothernilaypatel' },
-    { label: 'LinkedIn', href: '' }, // e.g. 'https://www.linkedin.com/in/your-handle'
+    { label: 'Email', href: contact.email ? `mailto:${contact.email}` : '' },
+    { label: 'GitHub', href: contact.github },
+    { label: 'LinkedIn', href: contact.linkedin },
   ],
 
   projectsIntro: 'Hobbies, short sprints, and the rankings and wins worth writing down.',
