@@ -122,7 +122,7 @@ const [first, ...rest] = site.name.split(' ');
       }
       <div class="hero-cta">
         <a class="btn btn-primary" href={url('/projects/')}>Hobbies, sprints &amp; accolades <span class="arrow" aria-hidden="true">→</span></a>
-        {resumeHref && <a class="btn" href={resumeHref}>Résumé (PDF) <span class="arrow" aria-hidden="true">↓</span></a>}
+        {resumeHref && <a class="btn" href={resumeHref}>Résumé <span class="arrow" aria-hidden="true">→</span></a>}
         <a class="btn" href={url('/contact.vcf')} download={`${site.name.toLowerCase().replace(/\s+/g, '-')}.vcf`} data-vcard>
           Save contact <span class="arrow" aria-hidden="true">+</span>
         </a>
@@ -221,9 +221,9 @@ const [first, ...rest] = site.name.split(' ');
             {resumeHref && (
               <li data-reveal>
                 <a class="link-row" href={resumeHref}>
-                  <span>Résumé (PDF)</span>
+                  <span>Résumé</span>
                   <span class="link-arrow" aria-hidden="true">
-                    ↓
+                    →
                   </span>
                 </a>
               </li>

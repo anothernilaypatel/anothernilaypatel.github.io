@@ -33,6 +33,10 @@ jobs:
           # (a /<repo>/ subpath for project sites, the root for user sites or custom
           # domains). Set a repository variable SITE_URL to override it.
           SITE_URL: ${{ vars.SITE_URL || steps.pages.outputs.base_url }}
+      - name: Print résumé to PDF
+        run: npm run resume:pdf
+        env:
+          SITE_URL: ${{ vars.SITE_URL || steps.pages.outputs.base_url }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
