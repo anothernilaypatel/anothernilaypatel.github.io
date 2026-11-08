@@ -9,6 +9,7 @@ interface Props {
 }
 const { groups, n } = Astro.props;
 const ph = (s?: string) => isPlaceholder(s);
+const isPost = (link: string) => link.startsWith('/');
 ---
 
 <section id="path" class="path" aria-labelledby="path-h">
@@ -35,6 +36,17 @@ const ph = (s?: string) => isPlaceholder(s);
                   </p>
                   <p class:list={['tl-sub', { ph: ph(it.sub) }]}>{it.sub}</p>
                   {it.detail && <p class:list={['tl-detail', { ph: ph(it.detail) }]}>{it.detail}</p>}
+                  {it.href && (
+                    <a
+                      class="mono tl-link"
+                      href={href(it.href)}
+                      target={isPost(it.href) ? undefined : '_blank'}
+                      rel={isPost(it.href) ? undefined : 'noopener'}
+                      aria-label={`${isPost(it.href) ? 'Read the post about' : 'Proof for'} ${it.title}`}
+                    >
+                      {isPost(it.href) ? 'Read the post →' : 'Proof ↗'}
+                    </a>
+                  )}
                 </li>
               ))}
             </ol>
@@ -131,6 +143,24 @@ const ph = (s?: string) => isPlaceholder(s);
   }
   .tl-title a {
     text-decoration-color: var(--accent);
+  }
+  .tl-link {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-decoration: none;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+  .tl-link:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
   }
   .tl-sub {
     color: var(--ink-2);

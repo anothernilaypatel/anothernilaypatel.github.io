@@ -35,6 +35,9 @@ export const proof = {
   ],
   // 2022 Scholars tier, New Jersey (archived NCSF winners page).
   nationalCyberScholar: 'https://web.archive.org/web/2024/https://www.nationalcyberscholarship.org/winners-2022',
+  // Roles and the degree have no public page of their own; LinkedIn lists them.
+  linkedinExperience: `${contact.linkedin}/details/experience/`,
+  linkedinEducation: `${contact.linkedin}/details/education/`,
 };
 
 const positioning =
@@ -75,7 +78,7 @@ export const site = {
 
   /** About: 1–2 short paragraphs. [] hides the section. */
   about: [
-    "I'm a quantitative developer and researcher at Golden Egg Labs, where I build and validate risk, forecasting, and optimization models and trading strategies in Python. I graduated from Wentworth Institute of Technology with a B.S. in Computer Science and minors in Data Science, Applied Mathematics, and Business Analytics.",
+    "I'm a quantitative developer and researcher at Golden Egg Labs, where I build and validate risk, forecasting, and optimization models and trading strategies in Python. I graduated from Wentworth Institute of Technology with a B.S. in Computer Science.",
     "Outside of work, I write up probability, expected-value, and optimization problems, from sizing a Magic: The Gathering deck like a portfolio to mapping a Pareto frontier of dark chocolate. I've also passed FINRA's SIE exam.",
   ],
 
@@ -194,9 +197,10 @@ export const site = {
   education: [
     {
       school: 'Wentworth Institute of Technology',
-      credential: 'B.S. Computer Science · Minors in Data Science, Applied Mathematics, and Business Analytics',
+      credential: 'B.S. Computer Science',
       period: 'September 2022 – December 2025',
       detail: 'Coursework: data science, machine learning, databases, algorithms, data structures, parallel computing, enterprise computing, software engineering, and operating systems.',
+      href: proof.linkedinEducation,
     },
   ],
 
@@ -217,7 +221,7 @@ export const site = {
         'Aggregate and analyze financial datasets with hypothesis testing to identify signals and inefficiencies',
         'Write research memos on assumptions, limitations, and results, coordinating deliverables with leadership',
       ],
-      href: '',
+      href: proof.linkedinExperience,
     },
     {
       role: 'Jaguar Health',
@@ -230,7 +234,7 @@ export const site = {
         'Led implementation of Centage Maestro, a cloud-based financial planning and budgeting platform',
         'Trained the full finance department on Maestro through tailored presentations and live demonstrations',
       ],
-      href: '',
+      href: proof.linkedinExperience,
     },
   ],
 
@@ -264,7 +268,7 @@ export const site = {
         "Built a disaster-relief funding platform with a team of 4 using Coinbase's OnChainKit wallets",
         'Developed Solidity smart contracts settled in stablecoins to enforce contractual obligations on-chain',
       ],
-      href: '',
+      href: '/projects/hackprinceton/',
     },
     {
       role: 'HackHarvard',
@@ -280,7 +284,7 @@ export const site = {
       period: 'October 2023',
       detail: 'Team of eleven. 2nd place. A locally curated travel map with JavaScript geolocation and a Python montage tool. Launched an alpha and secured initial funding and workspace.',
       points: ['2nd place', 'Pitched and launched an alpha tourism product with a team of 11, securing initial funding and workspace'],
-      href: '',
+      href: '/projects/techstars-startup-weekend/',
     },
   ],
 
@@ -298,7 +302,7 @@ export const site = {
       org: 'Gold, top 2,000',
       period: '2018–2022',
       detail: 'Data structures and algorithms.',
-      href: '',
+      href: proof.usaco[0].href,
     },
   ],
 
