@@ -20,11 +20,13 @@
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "astro": "^7.3.5",
     "katex": "^0.19.0",
+    "qrcode": "^1.5.4",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@types/qrcode": "^1.5.6",
     "typescript": "^6.0.3"
   }
 }
