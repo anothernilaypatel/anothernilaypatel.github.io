@@ -153,6 +153,11 @@ const [first, ...rest] = site.name.split(' ');
                 {p}
               </p>
             ))}
+            {site.motto && (
+              <blockquote class="motto" data-reveal style={`--d:${site.about.length + 1}`}>
+                <p>“{site.motto}”</p>
+              </blockquote>
+            )}
           </div>
         </div>
       </section>
@@ -473,6 +478,20 @@ const [first, ...rest] = site.name.split(' ');
     max-width: 42rem;
     margin: 1.2rem 0 0;
     padding: 0.2rem 0.4rem;
+  }
+  .motto {
+    max-width: 42rem;
+    margin: 2rem 0 0;
+    padding: 0.2rem 0 0.2rem 1.2rem;
+    border-left: 2px solid var(--accent);
+  }
+  .motto p {
+    margin: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    line-height: 1.4;
+    color: var(--accent);
   }
 
   .latest {

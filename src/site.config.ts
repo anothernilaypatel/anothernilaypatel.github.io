@@ -61,6 +61,9 @@ export const site = {
     { label: 'National Cyber Scholar', href: proof.nationalCyberScholar },
   ],
 
+  /** Personal motto, shown as a pull quote under About. '' hides it. */
+  motto: 'Failure is not falling down, but refusing to get up.',
+
   /** Optional "Currently: …" line in the hero. '' hides it. */
   currently: '',
 
