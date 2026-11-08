@@ -11,7 +11,7 @@ const link = (path: string) => (path.startsWith('/') ? absoluteUrl(path, Astro.s
 const bare = (u: string) => u.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const home = absoluteUrl('/', Astro.site!);
 
-// `bulleted` splits the detail into one bullet per sentence; otherwise it stays one line.
+// Same order as public/nilay-patel-resume.docx. Skills are rendered between the two groups.
 type Entry = { head: string; sub: string; period: string; detail: string; points?: string[]; href: string };
 const sections: { title: string; bulleted: boolean; items: Entry[] }[] = [
   {
@@ -20,14 +20,14 @@ const sections: { title: string; bulleted: boolean; items: Entry[] }[] = [
     items: site.experience.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, points: e.points, href: e.href })),
   },
   {
+    title: 'Education',
+    bulleted: false,
+    items: site.education.map((e) => ({ head: e.school, sub: e.credential, period: e.period, detail: e.detail, href: e.href })),
+  },
+  {
     title: 'Portfolio',
     bulleted: true,
     items: site.projects.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, points: e.points, href: e.href })),
-  },
-  {
-    title: 'Education',
-    bulleted: false,
-    items: site.education.map((e) => ({ head: e.school, sub: e.credential, period: e.period, detail: e.detail, href: '' })),
   },
   {
     title: 'Hackathons',
@@ -40,6 +40,8 @@ const sections: { title: string; bulleted: boolean; items: Entry[] }[] = [
     items: site.competitions.map((e) => ({ head: e.role, sub: e.org, period: e.period, detail: e.detail, href: e.href })),
   },
 ].filter((s) => s.items.length > 0);
+const lead = sections.filter((s) => s.title === 'Experience' || s.title === 'Education');
+const rest = sections.filter((s) => s.title !== 'Experience' && s.title !== 'Education');
 
 const contacts = [
   contact.email && { label: contact.email, href: `mailto:${contact.email}` },
@@ -69,10 +71,8 @@ const contacts = [
         </ul>
       </header>
 
-      <p class="r-summary">{site.description}</p>
-
       {
-        sections.map((s) => (
+        lead.map((s) => (
           <section class="r-section">
             <h2>{s.title}</h2>
             {s.items.map((it) => (
@@ -113,6 +113,34 @@ const contacts = [
             </dl>
           </section>
         )
+      }
+
+      {
+        rest.map((s) => (
+          <section class="r-section">
+            <h2>{s.title}</h2>
+            {s.items.map((it) => (
+              <div class="r-item">
+                <div class="r-line">
+                  <h3>
+                    {it.href ? <a href={link(it.href)}>{it.head}</a> : it.head}
+                    {it.sub && <span class="r-sub">{it.sub}</span>}
+                    {!s.bulleted && it.detail.length <= 60 && <span class="r-sub">{it.detail}</span>}
+                  </h3>
+                  <span class="r-period">{it.period}</span>
+                </div>
+                {(it.points || (it.detail && (s.bulleted || it.detail.length > 60))) &&
+                  (s.bulleted ? (
+                    <ul class="r-bullets">
+                      {(it.points ?? bullets(it.detail)).map((b) => <li>{b}</li>)}
+                    </ul>
+                  ) : (
+                    <p class="r-detail">{it.detail}</p>
+                  ))}
+              </div>
+            ))}
+          </section>
+        ))
       }
     </article>
   </div>
