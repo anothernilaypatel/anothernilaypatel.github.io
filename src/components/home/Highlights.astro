@@ -11,6 +11,10 @@ interface Item {
   href?: string;
   /** Span the whole highlight row. The value is a title, not a countdown. */
   wide?: boolean;
+  /** Count the number up from zero (amounts) instead of down into place (ranks). */
+  countUp?: boolean;
+  /** A numbered pipeline drawn under the detail, e.g. how a piece of work gets done. */
+  steps?: string[];
 }
 interface Props {
   groups: { label: string; items: Item[] }[];
@@ -39,12 +43,26 @@ const { groups, n } = Astro.props;
               return (
                 <li class:list={{ wide: h.wide }} data-reveal style={`--d:${i}`}>
                   <Tag class:list={['hl-card', { wide: h.wide }]} href={h.href ? href(h.href) : undefined} data-hl-card>
-                    <span class:list={['hl-value', scale]} data-countdown={h.wide ? undefined : h.value}>
+                    <span
+                      class:list={['hl-value', scale]}
+                      data-countdown={h.wide || h.countUp ? undefined : h.value}
+                      data-countup={h.countUp ? h.value : undefined}
+                    >
                       {h.value}
                     </span>
                     {h.label && <span class="hl-label">{h.label}</span>}
                     {h.project && <span class="hl-label">{h.project}</span>}
                     {h.detail && <span class:list={['hl-detail', { ph: isPlaceholder(h.detail) }]}>{h.detail}</span>}
+                    {h.steps && h.steps.length > 0 && (
+                      <ol class="hl-steps" data-steps>
+                        {h.steps.map((step, k) => (
+                          <li style={`--k:${k}`}>
+                            <span class="step-n mono">{String(k + 1).padStart(2, '0')}</span>
+                            <span class="step-label">{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
                     <span class="hl-glow" aria-hidden="true" />
                     {h.href && (
                       <span class="hl-hint mono" aria-hidden="true" data-hl-hint>
@@ -142,6 +160,102 @@ const { groups, n } = Astro.props;
     max-width: 34rem;
     padding: 0.15rem 0.35rem;
     margin-left: -0.35rem;
+  }
+  .hl-steps {
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.2rem 0 0;
+  }
+  /* The rail runs through the step dots and fills in, left to right, when the card scrolls in. */
+  .hl-steps::before,
+  .hl-steps::after {
+    content: '';
+    position: absolute;
+    left: 0.55rem;
+    right: 0.55rem;
+    top: 0.55rem;
+    height: 2px;
+    background: var(--line);
+  }
+  .hl-steps::after {
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1.4s var(--ease);
+  }
+  .hl-steps.is-run::after {
+    transform: scaleX(1);
+  }
+  .hl-steps li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-top: 1.7rem;
+  }
+  .hl-steps li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    transition:
+      border-color 0.3s,
+      background 0.3s;
+    transition-delay: calc(var(--k) * 0.35s);
+  }
+  .hl-steps.is-run li::before {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  .step-n {
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+  .step-label {
+    font-family: var(--serif);
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    line-height: 1.2;
+  }
+  @media (max-width: 860px) {
+    .hl-steps {
+      grid-auto-flow: row;
+      gap: 0.9rem;
+    }
+    .hl-steps::before,
+    .hl-steps::after {
+      left: 0.55rem;
+      right: auto;
+      top: 0.55rem;
+      bottom: 2.3rem;
+      width: 2px;
+      height: auto;
+    }
+    .hl-steps::after {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    .hl-steps.is-run::after {
+      transform: scaleY(1);
+    }
+    .hl-steps li {
+      padding: 0 0 0 2rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hl-steps::after,
+    .hl-steps li::before {
+      transition: none;
+    }
   }
   .hl-glow {
     position: absolute;
@@ -313,4 +427,40 @@ const { groups, n } = Astro.props;
     }
   });
   document.querySelectorAll('[data-countdown]').forEach((el) => io.observe(el));
+
+  // Amounts count up from zero, keeping their decimals: "$1.4M" runs $0.0M, $0.7M, … $1.4M.
+  const up = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      up.unobserve(e.target);
+      const el = e.target as HTMLElement;
+      const m = (el.dataset.countup ?? '').match(/^(.*?)(\d[\d,]*(?:\.\d+)?)(.*)$/);
+      if (!m || reduce) continue;
+      const [, prefix, digits, rest] = m;
+      const target = Number(digits.replace(/,/g, ''));
+      const decimals = digits.split('.')[1]?.length ?? 0;
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const k = Math.min(1, (now - t0) / 1600);
+        const eased = 1 - Math.pow(1 - k, 4);
+        const n = target * eased;
+        el.textContent = `${prefix}${n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${rest}`;
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  });
+  document.querySelectorAll('[data-countup]').forEach((el) => up.observe(el));
+
+  const steps = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        steps.unobserve(e.target);
+        e.target.classList.add('is-run');
+      }
+    },
+    { threshold: 0.6 },
+  );
+  document.querySelectorAll('[data-steps]').forEach((el) => steps.observe(el));
 </script>

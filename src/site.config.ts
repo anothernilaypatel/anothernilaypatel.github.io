@@ -83,9 +83,53 @@ export const site = {
    * Highlight rows. `value` is the headline (any number counts in on scroll).
    * [] hides the section. A row with no cards is skipped.
    */
-  highlights: [
+  highlights: <
     {
-      label: '',
+      label: string;
+      items: {
+        value: string;
+        label?: string;
+        project?: string;
+        detail?: string;
+        href?: string;
+        wide?: boolean;
+        countUp?: boolean;
+        steps?: string[];
+      }[];
+    }[]
+  >[
+    {
+      label: 'Work',
+      items: [
+        {
+          value: 'Golden Egg Labs',
+          label: 'Quantitative Developer & Researcher',
+          detail: 'January 2026 to present. Risk, forecasting, and optimization models and trading strategies in Python, from first build to the memo for leadership.',
+          steps: ['Build the model', 'Stress-test it', 'Backtest & simulate', 'Write the research memo'],
+          wide: true,
+        },
+        {
+          value: '$1.4M',
+          label: 'Reconciled',
+          detail: 'Balances reconciled as a finance intern at Jaguar Health, May to October 2023.',
+          countUp: true,
+        },
+        {
+          value: '$700K',
+          label: 'Found',
+          detail: 'Untracked prepaid assets surfaced during those reconciliations.',
+          countUp: true,
+        },
+        {
+          value: '3',
+          label: 'Workflows automated',
+          detail: 'Journal entries, amortization schedules, and reconciliations in Excel VBA. Then led the Centage Maestro rollout and trained the whole finance department.',
+          countUp: true,
+        },
+      ],
+    },
+    {
+      label: 'Licenses',
       items: [
         {
           value: 'S13: Passing the SIE in 13 Hours',
