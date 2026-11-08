@@ -200,13 +200,23 @@ export const site = {
     },
   ],
 
-  /** Experience, newest first. [] hides it. `href` is optional. */
+  /**
+   * Experience, newest first. [] hides it. `href` is optional. `detail` is the home-page summary;
+   * `points` are the résumé bullets (the résumé falls back to `detail`, split by sentence).
+   */
   experience: [
     {
       role: 'Golden Egg Labs',
       org: 'Quantitative Developer & Researcher · Hybrid',
       period: 'January 2026 – Present',
       detail: 'Build and validate risk, forecasting, and optimization models and trading strategies in Python. Stress-test models, build backtesting frameworks and simulations, and write research memos for leadership.',
+      points: [
+        'Build and validate risk, forecasting, and optimization models and trading strategies in Python',
+        'Quantify risk and robustness through stress testing, sensitivity analysis, and performance attribution',
+        'Develop backtesting frameworks, simulations, and analytical tools that automate model evaluation',
+        'Aggregate and analyze financial datasets with hypothesis testing to identify signals and inefficiencies',
+        'Write research memos on assumptions, limitations, and results, coordinating deliverables with leadership',
+      ],
       href: '',
     },
     {
@@ -214,17 +224,46 @@ export const site = {
       org: 'Finance Intern · In person',
       period: 'May 2023 – October 2023',
       detail: 'Reconciled $1.4 million in balances and found $700 thousand in untracked prepaid assets. Automated journal entries, amortization schedules, and reconciliations in Excel VBA, and led the rollout of Centage Maestro, training the full finance department.',
+      points: [
+        'Reconciled $1.4 million in balances and identified $700 thousand of previously untracked prepaid assets',
+        'Automated monthly journal entries, amortization schedules, and reconciliations in Excel VBA',
+        'Led implementation of Centage Maestro, a cloud-based financial planning and budgeting platform',
+        'Trained the full finance department on Maestro through tailored presentations and live demonstrations',
+      ],
       href: '',
     },
   ],
 
-  /** Startup projects from the résumé, newest first. */
+  /** Quantitative projects: résumé only (the home page shows them as highlight cards). */
+  projects: [
+    {
+      role: 'anothernilaypatel.github.io',
+      org: 'Probability, expected-value, and optimization write-ups',
+      period: 'Ongoing',
+      detail: '',
+      points: [
+        'Modeled concurrent games as leverage on Elo cash-ins to reach #1 on a monthly Super Auto Pets leaderboard',
+        'Sized positions under a 4-copy limit using hypergeometric variance to reach top 1% in MTG: Arena',
+        'Built a Markov chain expected-value model of tiered payouts to rank top 50 nationally in Brawl Stars',
+        'Mapped a 3D Pareto frontier of dark chocolate, trading flavanols per dollar against lead and cadmium',
+        'Passed the SIE in 13 hours of study by using AI to build targeted, score-weighted review guides',
+      ],
+      href: '/',
+    },
+  ],
+
+  /** Hackathons, newest first. `points` are the résumé bullets, as for experience. */
   startups: [
     {
       role: 'HackPrinceton',
       org: 'ReliefChain',
       period: 'November 2024',
       detail: "Team of four. 2nd in Coinbase's OnChainKit track. Built the Solidity smart contracts, settled in stablecoins, that enforce donor terms on-chain.",
+      points: [
+        "2nd place, Coinbase's Best Use of OnChainKit",
+        "Built a disaster-relief funding platform with a team of 4 using Coinbase's OnChainKit wallets",
+        'Developed Solidity smart contracts settled in stablecoins to enforce contractual obligations on-chain',
+      ],
       href: '',
     },
     {
@@ -232,6 +271,7 @@ export const site = {
       org: 'DocScribe',
       period: 'October 2024',
       detail: "Unofficial project manager for a friend's team; not a registered competitor, and wrote none of the code. Designed the file-in, file-out audit flow and taught a teammate to build its backend on a whiteboard at 1 a.m.",
+      points: ['Unofficial PM; designed the audit pipeline’s file-in, file-out flow and taught a teammate to build it'],
       href: '/projects/hackharvard/',
     },
     {
@@ -239,6 +279,7 @@ export const site = {
       org: 'My Not So Little Adventure',
       period: 'October 2023',
       detail: 'Team of eleven. 2nd place. A locally curated travel map with JavaScript geolocation and a Python montage tool. Launched an alpha and secured initial funding and workspace.',
+      points: ['2nd place', 'Pitched and launched an alpha tourism product with a team of 11, securing initial funding and workspace'],
       href: '',
     },
   ],
@@ -261,7 +302,7 @@ export const site = {
     },
   ],
 
-  /** Skills, grouped. [] hides the Toolkit section. */
+  /** Skills, grouped. Résumé only. */
   skills: [
     {
       group: 'Programming',
@@ -269,13 +310,13 @@ export const site = {
     },
     {
       group: 'Finance',
-      items: ['Margin & leverage', 'Sharpe, Sortino & Calmar', 'Securities regulation', 'Reconciliations'],
+      items: ['Margin & leverage', 'Risk/return metrics (Sharpe, Sortino, Calmar)', 'Securities regulation', 'Reconciliations'],
     },
     {
       group: 'Analytical',
       items: ['Risk modeling', 'Stress testing', 'Backtesting', 'Statistical analysis', 'Data visualization', 'Excel/VBA'],
     },
-    { group: 'Licenses', items: ['FINRA SIE (passed)'] },
+    { group: 'Licenses', items: ['Securities Industry Essentials (SIE), FINRA: passed'] },
   ],
 
   /**
