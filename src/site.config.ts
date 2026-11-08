@@ -64,8 +64,11 @@ export const site = {
   /** Optional "Currently: …" line in the hero. '' hides it. */
   currently: '',
 
-  /** Résumé PDF: put the file in public/ (e.g. public/resume.pdf) and set '/resume.pdf'. '' hides the buttons. */
-  resume: '',
+  /**
+   * Résumé link. '/resume/' is the viewer page, built from this file; the deploy also prints it to
+   * /resume.pdf. '' hides the buttons.
+   */
+  resume: '/resume/',
 
   /** About: 1–2 short paragraphs. [] hides the section. */
   about: [
@@ -176,6 +179,13 @@ export const site = {
       period: 'November 2024',
       detail: "Team of four. 2nd in Coinbase's OnChainKit track. Built the Solidity smart contracts, settled in stablecoins, that enforce donor terms on-chain.",
       href: '',
+    },
+    {
+      role: 'HackHarvard',
+      org: 'DocScribe',
+      period: 'October 2024',
+      detail: "Unofficial project manager for a friend's team; not a registered competitor, and wrote none of the code. Designed the file-in, file-out audit flow and taught a teammate to build its backend on a whiteboard at 1 a.m.",
+      href: '/projects/hackharvard/',
     },
     {
       role: 'Techstars Startup Weekend',
