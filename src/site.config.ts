@@ -33,7 +33,7 @@ export const proof = {
     { label: 'Bronze results list', href: 'http://www.usaco.org/current/data/jan19_bronze_results.html' },
   ],
   // 2022 Scholars tier, New Jersey (archived NCSF winners page).
-  nationalCyberScholar: 'https://web.archive.org/web/2024/https://www.nationalcyberscholarship.org/winners-2022',
+  nationalCyberScholar: 'https://web.archive.org/web/20240912090918/https://www.nationalcyberscholarship.org/ncsf-winners-2022',
   // Roles and the degree have no public page of their own; LinkedIn lists them.
   linkedinExperience: `${contact.linkedin}/details/experience/`,
   linkedinEducation: `${contact.linkedin}/details/education/`,
